@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="pt_br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{{title}}</title>
 </head>
 <body>
-    {{body}}
+    <header>
+        {{#if customHeaderHome}}
+            {{> headerHome}}  <!-- Cabeçalho principal -->
+        {{/if}}
+
+        {{#if customHeaderLogin}}
+            {{> headerLogin}}  <!-- Cabeçalho de login -->
+        {{/if}}
+
+    </header>
+
+    <main>
+        {{{body}}}  <!-- O conteúdo da página será injetado aqui -->
+    </main>
+
+     {{> footer}}<!-- Rodapé comum para todas as páginas -->
 </body>
 </html>
