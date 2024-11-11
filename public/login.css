@@ -1,0 +1,39 @@
+/* public/css/login.css */
+
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 5rem;
+    background-color: #f9f9f9;
+}
+
+.login-container h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+/* Estilo para o botão de login */
+.login-button {
+    background-color: #007bff; /* Cor de fundo */
+    color: #fff; /* Cor do texto */
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+/* Efeito ao passar o mouse */
+.login-button:hover {
+    background-color: #0056b3;
+}

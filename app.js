@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const homepage = require("./routes/homePage")
 const { engine } = require('express-handlebars');
+app.use(express.static('public'));
 
 //Configurações
     //Template Engine
