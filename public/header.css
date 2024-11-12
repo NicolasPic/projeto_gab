@@ -1,0 +1,34 @@
+/* Estilo básico para o cabeçalho */
+.header {
+    display: flex;
+    align-items: center;       /* Centraliza verticalmente */
+    padding: 15px 30px;        /* Espaçamento interno */
+    background-color: #007bff; /* Cor de fundo */
+    color: white;              /* Cor do texto */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para o cabeçalho */
+}
+
+/* Estilo para o logotipo */
+.logo h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+/* Barra de navegação em linha horizontal */
+.navbar ul {
+    list-style: none;          /* Remove os marcadores */
+    display: flex;             /* Mostra os itens em linha */
+    gap: 20px;                 /* Espaço entre os links */
+    margin-left: 20px;         /* Espaço entre logo e navegação */
+    padding: 0;
+}
+
+.navbar a {
+    text-decoration: none;     /* Remove o sublinhado dos links */
+    color: white;              /* Cor do texto */
+    font-size: 16px;
+}
+
+.navbar a:hover {
+    color: #ffdd57;            /* Cor de destaque ao passar o mouse */
+}

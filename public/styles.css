@@ -1,7 +1,8 @@
 /* public/css/styles.css */
 
 /* Importa os arquivos CSS individuais */
+@import url('reset.css');
 @import url('header.css');
 @import url('footer.css');
 @import url('login.css');
-@import url('home.css');
+@import url('inicial.css');

@@ -8,20 +8,27 @@
 </head>
 <body>
     <header>
+        {{#if customHeaderVazio}}
+            {{> headerVazio}}  
+        {{/if}}
+
         {{#if customHeaderHome}}
-            {{> headerHome}}  <!-- Cabeçalho principal -->
+            {{> headerHome}}  
         {{/if}}
-
-        {{#if customHeaderLogin}}
-            {{> headerLogin}}  <!-- Cabeçalho de login -->
-        {{/if}}
-
+        
+        <!-- Cabeçalho customizado
+        {{#if customHeaderCustom}}  Cabeçalho principal 
+            {{> headerCustom}}  
+        {{/if}} -->
+        
     </header>
 
     <main>
         {{{body}}}  <!-- O conteúdo da página será injetado aqui -->
     </main>
 
-     {{> footer}}<!-- Rodapé comum para todas as páginas -->
+    <footer>
+         {{> footerVazio}}<!-- Rodapé comum para todas as páginas -->
+    </footer>   
 </body>
 </html>

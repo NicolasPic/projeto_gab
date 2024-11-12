@@ -3,10 +3,17 @@ const router = express.Router()
 
 router.get('/', (req, res) => {
     res.render('pages/home', { 
-        title: 'Página Inicial',
-        customHeaderHome: true  // Ativa o cabeçalho principal
+        title: 'Página home',
+        customHeaderHome: true
     });
 });
+
+router.get('/jogar', (req,res)=> {
+    res.render('pages/jogar',{
+        title: 'Página jogar',
+        customHeaderHome: true
+    });
+})
 
 
 module.exports = router
