@@ -3,11 +3,11 @@ const app = express();
 const http = require('http');
 const socketIo = require('socket.io');
 const { engine } = require('express-handlebars');
-const { conectarDB } = require('./config/DB/database');
+//const { conectarDB } = require('./config/DB/database');
 const configurarSocket = require('./config/socket/gameSocket');
 
 // Conectar ao banco antes de rodar o servidor
-conectarDB();
+//conectarDB();
 
 // Configuração do servidor
 const server = http.createServer(app);
@@ -27,11 +27,13 @@ app.use(express.json());
 const inicialpage = require("./routes/inicialpage");
 const loginpage = require("./routes/loginpage");
 const homepage = require("./routes/homepage");
+const jogarpage = require("./routes/jogarpage");
 
 // Definição das rotas
 app.use('/inicial', inicialpage);
 app.use('/login', loginpage);
 app.use('/home', homepage);
+app.use('/jogar', jogarpage);
 
 // Inicia o servidor
 server.listen(8081, () => {

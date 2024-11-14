@@ -10,19 +10,18 @@ function configurarSocket(io) {
         socket.on('criarSala', (codigoSala) => {
             if (!salas[codigoSala]) {
                 salas[codigoSala] = { jogadores: [socket.id], estado: 'esperando' };
-                socket.emit('salaCriada', codigoSala);  // Envia o código da sala para o criador
+                socket.emit('salaCriada', codigoSala);
                 console.log(`Sala ${codigoSala} criada`);
             } else {
                 socket.emit('erro', 'Sala já existe');
             }
         });
 
-        // Jogador entra em uma sala
         socket.on('entrarSala', (codigoSala) => {
             if (salas[codigoSala]) {
-                salas[codigoSala].jogadores.push(socket.id);  // Adiciona o jogador à sala
-                socket.emit('salaEntrou', salas[codigoSala]);  // Envia os dados da sala para o jogador
-                console.log(`Jogador entrou na sala ${codigoSala}`);
+                salas[codigoSala].jogadores.push(socket.id);
+                io.to(codigoSala).emit('atualizarJogadores', salas[codigoSala].jogadores);
+                socket.join(codigoSala);
             } else {
                 socket.emit('erro', 'Sala não encontrada');
             }

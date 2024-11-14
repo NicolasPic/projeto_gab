@@ -8,12 +8,4 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/jogar', (req,res)=> {
-    res.render('pages/jogar',{
-        title: 'Página jogar',
-        customHeaderHome: true
-    });
-})
-
-
 module.exports = router

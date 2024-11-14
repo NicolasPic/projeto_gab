@@ -1,9 +1,64 @@
 <div class="jogar-container">
+    <div class="metade-jogar-container jogar-superior"></div>
 
-    <!-- Contêiner central sobrepondo as metades -->
-    <div class="centro-jogar-container">
-        <button class="botao-home"onclick="window.location.href='/jogar'">Jogar</button>
+    <div class="jogar-centro-superior-container">
+        <h1>GABHoot</h1>
     </div>
 
+    <div class="jogar-centro-inferior-container">
+      
+            <div class="botao-jogar-container">
+                <button id="btnCriarSala" class="botao-sala">Criar Sala</button>
+                <button id="btnEntrarSala" class="botao-sala">Entrar na Sala</button>
+            </div>
 
+            <input type="text" id="codigoSala" placeholder="Código da Sala" />
+    </div>
+
+    <div class="metade-jogar-container jogar-inferior">
+        <button class="botao-voltar"onclick="window.location.href='/home'">Voltar</button>
+    </div>
 </div>
+
+<script src="/socket/gameSocket.js"></script>
+<script>
+    // Conectando ao servidor com Socket.IO
+    const socket = io();
+
+    // Referenciando os botões e o campo de texto
+    const btnCriarSala = document.getElementById('btnCriarSala');
+    const btnEntrarSala = document.getElementById('btnEntrarSala');
+    const codigoSalaInput = document.getElementById('codigoSala');
+
+    // Evento de clique para criar uma sala
+    btnCriarSala.addEventListener('click', () => {
+        const codigoSala = codigoSalaInput.value.trim();  // Obtém o código da sala digitado
+        if (codigoSala) {
+            socket.emit('criarSala', codigoSala);  // Emite o evento de criação da sala
+        }
+    });
+
+    // Evento de clique para entrar em uma sala
+    btnEntrarSala.addEventListener('click', () => {
+        const codigoSala = codigoSalaInput.value.trim();
+        if (codigoSala) {
+            socket.emit('entrarSala', codigoSala);  // Emite o evento de entrada na sala
+        }
+    });
+
+    // Recebe confirmação da criação da sala
+    socket.on('salaCriada', (codigoSala) => {
+    window.location.href = `/jogar/sala/${codigoSala}`;
+});
+
+    // Recebe confirmação de entrada na sala
+    socket.on('salaEntrou', (sala) => {
+        alert(`Você entrou na sala ${sala.jogadores.length} jogadores`);
+    });
+
+    // Exibe mensagem de erro
+    socket.on('erro', (mensagem) => {
+        alert(`Erro: ${mensagem}`);
+    });
+
+</script>
