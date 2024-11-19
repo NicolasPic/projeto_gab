@@ -1,19 +1,25 @@
-//const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
+const { Sequelize } = require('sequelize'); 
 
-//const sequelize = new Sequelize('mysql://user:password@localhost:3306/nome_do_banco', {
-//  dialect: 'mysql',
-//  logging: false, // Desativa os logs de queries
-//});
+const sequelize = new Sequelize({
+  dialect: 'mysql',
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  logging: false,  // Desativa o log do SQL
+});
 
-//async function conectarDB() {
-//  try {
-//    await sequelize.authenticate();
-//    console.log('Conectado ao banco de dados com sucesso!');
-//  } catch (error) {
-//    console.error('Não foi possível conectar ao banco de dados:', error);
-//    process.exit(1); // Para o servidor em caso de falha na conexão com o banco
-//  }
-//}
+async function conectarDB() {
+  try {
+    await sequelize.authenticate();
+    console.log('Conectado ao banco de dados com sucesso!');
+  } catch (error) {
+    console.error('Erro ao conectar ao banco de dados:', error);
+    process.exit(1);
+  }
+}
 
-//module.exports = { sequelize, conectarDB };
+module.exports = { sequelize, conectarDB };

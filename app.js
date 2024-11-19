@@ -3,13 +3,33 @@ const app = express();
 const http = require('http');
 const socketIo = require('socket.io');
 const { engine } = require('express-handlebars');
-//const { conectarDB } = require('./config/DB/database');
+require('dotenv').config();
+const { conectarDB } = require('./config/DB/database');
+const Pergunta = require('./models/pergunta');
+const Resposta = require('./models/resposta');
 const configurarSocket = require('./config/socket/gameSocket');
+const session = require("express-session")
+const flash = require("connect-flash")
+
+//sessão
+app.use(session({
+    secret: "projetogab",
+    resave: true,
+    saveUninitialized: true
+}))
+app.use(flash())
+
+//Middleware
+app.use((req, res, next) => {
+    res.locals.success_msg =req.flash("success_msg")
+    res.locals.error_msg = req.flash("error_msg")
+    next()
+})
 
 // Conectar ao banco antes de rodar o servidor
-//conectarDB();
+conectarDB();
 
-// Configuração do servidor
+//Configuração do servidor
 const server = http.createServer(app);
 const io = socketIo(server);
 configurarSocket(io);
