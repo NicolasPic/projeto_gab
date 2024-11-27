@@ -2,7 +2,7 @@
 
     <!-- Metade superior da tela -->
     <div class="metade-login-container login-superior">
-
+        <!-- Espaço para logo ou imagem (opcional) -->
     </div>
 
     <!-- Contêiner central sobrepondo as metades -->
@@ -12,7 +12,26 @@
 
     <!-- Metade inferior da tela -->
     <div class="metade-login-container login-inferior">
-        <button class="botao-login"onclick="window.location.href='/home'">Logar</button>
+        <div class="card">
+            <div class="card-body">
+                <form action="/login" method="POST">
+                    <!-- Campo para Nome -->
+                    <div class="input-group">
+                        <label for="name">Nome:</label>
+                        <input type="text" id="name" name="name" placeholder="Digite seu nome" required>
+                    </div>
+
+                    <!-- Campo para Senha -->
+                    <div class="input-group">
+                        <label for="password">Senha:</label>
+                        <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+                    </div>
+
+                    <!-- Botão de Login -->
+                    <button type="submit" class="botao-login">Logar</button>
+                </form>
+            </div>
+        </div>
     </div>
 
 </div>
