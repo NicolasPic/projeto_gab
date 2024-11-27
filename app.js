@@ -8,8 +8,10 @@ const { conectarDB } = require('./config/DB/database');
 const Pergunta = require('./models/pergunta');
 const Resposta = require('./models/resposta');
 const configurarSocket = require('./config/socket/gameSocket');
-const session = require("express-session")
-const flash = require("connect-flash")
+const session = require("express-session");
+const flash = require("connect-flash");
+const passport = require("passport");
+require("./config/auth/auth")(passport)
 
 //sessão
 app.use(session({
@@ -17,12 +19,17 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
+
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use(flash())
 
 //Middleware
 app.use((req, res, next) => {
     res.locals.success_msg =req.flash("success_msg")
     res.locals.error_msg = req.flash("error_msg")
+    res.locals.error = req.flash("error")
     next()
 })
 
@@ -37,6 +44,7 @@ configurarSocket(io);
 // Configuração do Handlebars
 app.engine('handlebars', engine({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
+
 
 // Middleware
 app.use(express.static('public'));

@@ -8,6 +8,7 @@
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+    {{>_msg}}
     <header>
         {{#if customHeaderVazio}}
             {{> headerVazio}}  
@@ -25,11 +26,21 @@
     </header>
 
     <main>
-        {{{body}}}  <!-- O conteúdo da página será injetado aqui -->
+        
+    <div class="container mt-4">
+        {{#if error}}
+        <div class="alert alert-danger">{{error}}</div>
+        {{else}}
+        {{/if}}
+        
+        {{{body}}}
+
+    </div>
+    
     </main>
 
     <footer>
          {{> footerVazio}}<!-- Rodapé comum para todas as páginas -->
-    </footer>   
+    </footer>
 </body>
 </html>

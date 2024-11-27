@@ -8,3 +8,31 @@
 @import url('inicial.css');
 @import url('home.css');
 @import url('jogar.css');
+@import url('criarconta.css');
+
+/* Estilo do alerta */
+.alert {
+    position: fixed;            /* Fixa o alerta no topo da página */
+    top: 20px;                  /* Distância do topo da página */
+    left: 50%;                  /* Centraliza horizontalmente */
+    transform: translateX(-50%);/* Centraliza com precisão */
+    width: 90%;                 /* Largura do alerta (ajustável) */
+    z-index: 9999;              /* Garante que o alerta fique por cima de outros elementos */
+    margin: 0 auto;             /* Remove margens automáticas */
+    font-size: 1.2em;           /* Tamanho da fonte */
+    padding: 15px;              /* Espaçamento interno */
+    border-radius: 5px;         /* Bordas arredondadas */
+}
+
+/* Opções de estilo para diferentes tipos de alertas */
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
