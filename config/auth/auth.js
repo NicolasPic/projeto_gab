@@ -2,46 +2,47 @@ const localStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const Usuario = require('../../models/usuario');
 
-module.exports = function(passport){
+// Função isAuthenticated
+module.exports.isAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+};
 
-    // Definindo a estratégia local de login
+// Configuração do Passport
+module.exports.setupPassport = function(passport){
     passport.use(new localStrategy({usernameField: 'cpf'}, (cpf, senha, done) => {
-        // Buscando o usuário no banco
         Usuario.findOne({ where: { cpf: cpf } }).then((usuario) => {
-            // Verificando se o usuário existe
             if (!usuario) {
                 return done(null, false, { message: "Esta conta não existe" });
             }
 
-            // Comparando a senha informada com a senha armazenada
             bcrypt.compare(senha, usuario.senha, (erro, igual) => {
                 if (erro) {
-                    return done(erro);  // Caso haja erro no processo de comparação
+                    return done(erro);
                 }
 
                 if (igual) {
-                    return done(null, usuario);  // Login bem-sucedido
+                    return done(null, usuario);
                 } else {
                     return done(null, false, { message: "Senha incorreta" });
                 }
             });
         }).catch((err) => {
-            return done(err);  // Erro no banco de dados
+            return done(err);
         });
     }));
 
-    // Serializando o usuário
     passport.serializeUser((usuario, done) => {
-        done(null, usuario.id);  // Armazenando o ID do usuário na sessão
+        done(null, usuario.id);
     });
 
-    // Desserializando o usuário
     passport.deserializeUser((id, done) => {
-        // Buscando o usuário pelo ID (usando findByPk, não findById)
         Usuario.findByPk(id).then((usuario) => {
-            done(null, usuario);  // Retornando o usuário encontrado
+            done(null, usuario);
         }).catch((err) => {
-            done(err, null);  // Caso ocorra erro, retornamos o erro
+            done(err, null);
         });
     });
 };

@@ -1,24 +1,26 @@
-  <h1>Sala Código: {{codigoSala}}</h1>
-    <h2>Jogadores Conectados:</h2>
-    <ul id="lista-jogadores">
-        <!-- Jogadores serão adicionados aqui -->
-    </ul>
+<h1>Sala Código: {{codigoSala}}</h1>
+<h2>Jogadores Conectados:</h2>
+<ul id="lista-jogadores">
+    {{#each jogadores}}
+        <li>{{this.nome}}</li> 
+    {{/each}}
+</ul>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-        
-        // Receber lista de jogadores atualizada
-        socket.on('atualizarJogadores', (jogadores) => {
-            const lista = document.getElementById('lista-jogadores');
-            lista.innerHTML = '';  // Limpa a lista atual
-            jogadores.forEach(jogador => {
-                const li = document.createElement('li');
-                li.textContent = jogador;
-                lista.appendChild(li);
-            });
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    // Receber lista de jogadores atualizada
+    socket.on('atualizarJogadores', (jogadores) => {
+        const lista = document.getElementById('lista-jogadores');
+        lista.innerHTML = ''; 
+        jogadores.forEach(jogador => {
+            const li = document.createElement('li');
+            li.textContent = jogador.nome; 
+            lista.appendChild(li);
         });
+    });
 
-        // Solicitar atualização da lista de jogadores ao entrar na sala
-        socket.emit('entrarSala', '{{codigoSala}}');
-    </script>
+    // Solicitar atualização da lista de jogadores ao entrar na sala
+    socket.emit('entrarSala', '{{codigoSala}}');
+</script>

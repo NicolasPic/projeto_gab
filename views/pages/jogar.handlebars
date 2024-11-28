@@ -6,17 +6,16 @@
     </div>
 
     <div class="jogar-centro-inferior-container">
-      
-            <div class="botao-jogar-container">
-                <button id="btnCriarSala" class="botao-sala">Criar Sala</button>
-                <button id="btnEntrarSala" class="botao-sala">Entrar na Sala</button>
-            </div>
-
-            <input type="text" id="codigoSala" placeholder="Código da Sala" />
+    <!-- Exibir o nome do jogador automaticamente -->
+    <div class="nome-jogador-container">
+        <label for="nomeJogador">Nome do Jogador:</label>
+        <input type="text" id="nomeJogador" value="{{nomeJogador}}" readonly />
     </div>
 
-    <div class="metade-jogar-container jogar-inferior">
-        <button class="botao-voltar"onclick="window.location.href='/home'">Voltar</button>
+    <div class="botao-jogar-container">
+        <button id="btnCriarSala" class="botao-sala">Criar Sala</button>
+        <button id="btnEntrarSala" class="botao-sala">Entrar na Sala</button>
+        <input type="text" id="codigoSala" placeholder="Código da Sala" />
     </div>
 </div>
 
@@ -29,36 +28,42 @@
     const btnCriarSala = document.getElementById('btnCriarSala');
     const btnEntrarSala = document.getElementById('btnEntrarSala');
     const codigoSalaInput = document.getElementById('codigoSala');
+    const nomeJogadorInput = document.getElementById('nomeJogador');  // Nome do jogador já preenchido
+
+    // Enviar nome do jogador assim que a página carregar
+    const nomeJogador = nomeJogadorInput.value.trim();
+    if (nomeJogador) {
+        socket.emit('nomeJogador', nomeJogador);  // Envia o nome do jogador imediatamente
+    }
 
     // Evento de clique para criar uma sala
     btnCriarSala.addEventListener('click', () => {
-        const codigoSala = codigoSalaInput.value.trim();  // Obtém o código da sala digitado
+        const codigoSala = codigoSalaInput.value.trim();  // Obtém o código da sala
         if (codigoSala) {
             socket.emit('criarSala', codigoSala);  // Emite o evento de criação da sala
+        } else {
+            alert('Por favor, insira um código de sala.');
         }
     });
 
     // Evento de clique para entrar em uma sala
     btnEntrarSala.addEventListener('click', () => {
-        const codigoSala = codigoSalaInput.value.trim();
+        const codigoSala = codigoSalaInput.value.trim();  // Obtém o código da sala
         if (codigoSala) {
             socket.emit('entrarSala', codigoSala);  // Emite o evento de entrada na sala
+        } else {
+            alert('Por favor, insira o código da sala.');
         }
     });
 
-    // Recebe confirmação da criação da sala
+    // Receber confirmação da criação da sala
     socket.on('salaCriada', (codigoSala) => {
-    window.location.href = `/jogar/sala/${codigoSala}`;
-});
-
-    // Recebe confirmação de entrada na sala
-    socket.on('salaEntrou', (sala) => {
-        alert(`Você entrou na sala ${sala.jogadores.length} jogadores`);
+        window.location.href = `/jogar/sala/${codigoSala}`;
     });
 
-    // Exibe mensagem de erro
+    // Receber mensagem de erro
     socket.on('erro', (mensagem) => {
         alert(`Erro: ${mensagem}`);
     });
-
 </script>
+
