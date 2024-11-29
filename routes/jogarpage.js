@@ -4,7 +4,7 @@ const { isAuthenticated } = require('../config/auth/auth');
 
 router.get('/', isAuthenticated, (req, res) => {
     // Supondo que o nome do usuário esteja em req.user
-    const nomeUsuario = req.user ? req.user.nome : 'Visitante';  // ou do JWT
+    const nomeUsuario = req.user ? req.user.nome : 'Visitante'; 
     res.render('pages/jogar', { 
         title: 'Página jogar',
         customHeaderHome: true,  // Ativa o cabeçalho principal
@@ -14,8 +14,9 @@ router.get('/', isAuthenticated, (req, res) => {
 
 router.get('/sala/:codigo', isAuthenticated, (req, res) => {
     const codigoSala = req.params.codigo;
-    const nomeUsuario = req.user ? req.user.nome : 'Visitante';  // Pega o nome do usuário logado
+    const nomeUsuario = req.user ? req.user.nome : 'Visitante'; 
     res.render('pages/sala', { codigoSala, nomeJogador: nomeUsuario });
 });
+
 
 module.exports = router;

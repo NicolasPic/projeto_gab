@@ -12,6 +12,7 @@
 
     // Receber lista de jogadores atualizada
     socket.on('atualizarJogadores', (jogadores) => {
+        console.log("Jogadores atualizados:", jogadores);  // Diagnóstico
         const lista = document.getElementById('lista-jogadores');
         lista.innerHTML = ''; 
         jogadores.forEach(jogador => {
