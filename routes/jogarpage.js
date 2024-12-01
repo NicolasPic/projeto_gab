@@ -141,18 +141,19 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
     }
 });
 
-
 router.get('/resultado', isAuthenticated, (req, res) => {
     const respostas = req.session.respostas || [];
     req.session.perguntas = null;
     req.session.respostas = null;
 
     const acertos = respostas.filter(r => r.correta === 1).length;
-    const tempoTotalRestante = respostas.reduce((total, r) => total + (r.tempoRestante || 0), 0);
+    const tempoTotalRestante = respostas
+        .filter(r => r.correta === 1) // Filtra apenas as respostas corretas
+        .reduce((total, r) => total + (r.tempoRestante || 0), 0); // Soma o tempo restante das respostas corretas
 
     console.log('Respostas registradas:', respostas);
     console.log('Total de acertos:', acertos);
-    console.log('Tempo total restante:', tempoTotalRestante);
+    console.log('Tempo total restante (apenas acertos):', tempoTotalRestante);
 
     res.render('pages/resultado', { 
         total: respostas.length,
@@ -160,6 +161,7 @@ router.get('/resultado', isAuthenticated, (req, res) => {
         tempoTotalRestante
     });
 });
+
 
 
 module.exports = router;
