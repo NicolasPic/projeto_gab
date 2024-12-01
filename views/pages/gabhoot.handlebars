@@ -1,9 +1,10 @@
 <h1>Gabhoot</h1>
 
-<p id="tempo-restante">Tempo restante: 35 segundos</p>
+<p id="tempo-restante">Tempo restante: <span id="tempo">35</span> segundos</p>
 
 <form id="form-resposta" action="/jogar/proxima" method="POST">
     <input type="hidden" name="resposta" id="resposta-selecionada">
+    <input type="hidden" name="tempoRestante" id="tempo-restante-valor"> <!-- Campo para o tempo restante -->
     <div class="pergunta">
         <h2>{{pergunta.texto}}</h2>
         {{#each pergunta.respostas}}
@@ -24,25 +25,28 @@
 
 <script>
     let tempo = 35;
-    const tempoRestante = document.getElementById('tempo-restante');
+    const tempoRestanteEl = document.getElementById('tempo');
     const form = document.getElementById('form-resposta');
     const inputResposta = document.getElementById('resposta-selecionada');
+    const inputTempoRestante = document.getElementById('tempo-restante-valor');
 
     function selecionarResposta(valor) {
-        inputResposta.value = valor || ''; 
+        inputResposta.value = valor || ''; // Define "" se vazio
     }
 
     const contador = setInterval(() => {
         tempo--;
-        tempoRestante.textContent = `Tempo restante: ${tempo} segundos`;
+        tempoRestanteEl.textContent = tempo;
 
         if (tempo <= 0) {
             clearInterval(contador);
+            inputTempoRestante.value = 0; // Define 0 como tempo restante
             form.submit();
         }
     }, 1000);
 
     form.addEventListener('submit', () => {
         clearInterval(contador);
+        inputTempoRestante.value = tempo; // Define o tempo restante no momento do envio
     });
 </script>

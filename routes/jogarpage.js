@@ -74,6 +74,7 @@ router.get('/gabhoot', isAuthenticated, async (req, res) => {
 router.post('/proxima', isAuthenticated, async (req, res) => {
     try {
         const respostaID = parseInt(req.body.resposta, 10);
+        const tempoRestante = parseInt(req.body.tempoRestante, 10); // Tempo restante enviado pelo cliente
         const perguntas = req.session.perguntas || [];
 
         if (!perguntas || perguntas.length === 0) {
@@ -100,7 +101,8 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
         req.session.respostas.push({
             pergunta_id: perguntaAtual,
             resposta_id: respostaID,
-            correta: correta
+            correta: correta,
+            tempoRestante: tempoRestante // Armazena o tempo restante
         });
 
         req.session.perguntas = perguntas;
@@ -139,20 +141,25 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
     }
 });
 
+
 router.get('/resultado', isAuthenticated, (req, res) => {
     const respostas = req.session.respostas || [];
     req.session.perguntas = null;
     req.session.respostas = null;
 
     const acertos = respostas.filter(r => r.correta === 1).length;
+    const tempoTotalRestante = respostas.reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
     console.log('Respostas registradas:', respostas);
     console.log('Total de acertos:', acertos);
+    console.log('Tempo total restante:', tempoTotalRestante);
 
     res.render('pages/resultado', { 
         total: respostas.length,
-        acertos
+        acertos,
+        tempoTotalRestante
     });
 });
+
 
 module.exports = router;
