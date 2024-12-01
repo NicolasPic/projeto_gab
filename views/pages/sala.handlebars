@@ -1,27 +1,19 @@
-<h1>Sala Código: {{codigoSala}}</h1>
-<h2>Jogadores Conectados:</h2>
-<ul id="lista-jogadores">
-    {{#each jogadores}}
-        <li>{{this.nome}}</li> 
-    {{/each}}
-</ul>
+<div class="sala-container">
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
+    <!-- Metade superior da tela -->
+    <div class="metade-sala-container sala-superior">
 
-    // Receber lista de jogadores atualizada
-    socket.on('atualizarJogadores', (jogadores) => {
-        console.log("Jogadores atualizados:", jogadores);  // Diagnóstico
-        const lista = document.getElementById('lista-jogadores');
-        lista.innerHTML = ''; 
-        jogadores.forEach(jogador => {
-            const li = document.createElement('li');
-            li.textContent = jogador.nome; 
-            lista.appendChild(li);
-        });
-    });
+    </div> 
 
-    // Solicitar atualização da lista de jogadores ao entrar na sala
-    socket.emit('entrarSala', '{{codigoSala}}');
-</script>
+    <!-- Contêiner central sobrepondo as metades -->
+    <div class="centro-sala-container">
+        <h1>GABHoot</h1>
+    </div>
+
+    <!-- Metade inferior da tela -->
+    <div class="metade-sala-container sala-inferior">
+        <button class="botao-sala"onclick="window.location.href='/jogar'">Voltar</button>
+        <button class="botao-sala"onclick="window.location.href='/jogar/gabhoot'">Iniciar</button>
+    </div>
+
+</div>
