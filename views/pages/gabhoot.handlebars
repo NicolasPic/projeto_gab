@@ -5,37 +5,41 @@
 <form id="form-resposta" action="/jogar/proxima" method="POST">
     <input type="hidden" name="resposta" id="resposta-selecionada">
     <div class="pergunta">
-        <h2>{{pergunta.texto}}</h2>
-        {{#each pergunta.respostas}}
-            <div>
-                <label>
-                    <input type="radio" name="resposta" value="{{id}}" onchange="selecionarResposta(this.value)">
-                    {{texto}}
-                </label>
-            </div>
-        {{/each}}
+<h2>{{pergunta.texto}}</h2>
+{{#each pergunta.respostas}}
+    <div>
+        <label>
+            <input 
+                type="radio" 
+                name="resposta" 
+                value="{{id}}" 
+                onchange="selecionarResposta(this.value)">
+            {{texto}}
+        </label>
+    </div>
+{{/each}}
+
     </div>
     <button type="submit">Enviar Resposta</button>
 </form>
 
 <script>
-    let tempo = 35; // Tempo limite em segundos
+    let tempo = 35;
     const tempoRestante = document.getElementById('tempo-restante');
     const form = document.getElementById('form-resposta');
     const inputResposta = document.getElementById('resposta-selecionada');
 
     function selecionarResposta(valor) {
-        inputResposta.value = valor; // Define a resposta selecionada
+        inputResposta.value = valor || ''; // Define "" se vazio
     }
 
-    // Atualiza o contador de tempo
     const contador = setInterval(() => {
         tempo--;
         tempoRestante.textContent = `Tempo restante: ${tempo} segundos`;
 
         if (tempo <= 0) {
             clearInterval(contador);
-            form.submit(); // Submete o formulário automaticamente
+            form.submit();
         }
     }, 1000);
 

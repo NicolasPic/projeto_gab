@@ -29,47 +29,46 @@ router.get('/sala/:codigo', isAuthenticated, (req, res) => {
 
 router.get('/gabhoot', isAuthenticated, async (req, res) => {
     try {
-        // Gerar 10 IDs aleatórios
+        // Gerar IDs aleatórios
         const randomIDs = getRandomUniqueNumbers(1, 20, 10);
         console.log('IDs gerados:', randomIDs);
 
-        // Salvar os IDs na sessão
+        // Salvar IDs na sessão
         req.session.perguntas = randomIDs;
 
         // Buscar a primeira pergunta
         const perguntaID = randomIDs[0];
-        const [rows] = await sequelize.query(`
+        const rows = await sequelize.query(`
             SELECT p.id AS pergunta_id, p.texto AS pergunta_texto, 
                    r.id AS resposta_id, r.texto AS resposta_texto
             FROM perguntas p
-            JOIN respostas r ON p.id = r.pergunta_id
+            LEFT JOIN respostas r ON p.id = r.pergunta_id
             WHERE p.id = ?
         `, {
             replacements: [perguntaID],
             type: sequelize.QueryTypes.SELECT
         });
 
-        if (!rows) {
+        // Verificar se há resultados
+        if (!rows || rows.length === 0) {
             console.error(`Nenhuma pergunta encontrada para o ID ${perguntaID}.`);
             return res.status(404).send('Nenhuma pergunta encontrada.');
         }
 
-        console.log('Resultado da query:', rows);
-
-        // Verificar se `rows` é um único objeto ou uma matriz
-        const isSingleObject = !Array.isArray(rows);
-
-        // Montar a pergunta
+        // Processar os dados retornados
         const pergunta = {
-            id: isSingleObject ? rows.pergunta_id : rows[0]?.pergunta_id,
-            texto: isSingleObject ? rows.pergunta_texto : rows[0]?.pergunta_texto,
-            respostas: isSingleObject
-                ? [{ id: rows.resposta_id, texto: rows.resposta_texto }]
-                : rows.map(row => ({ id: row.resposta_id, texto: row.resposta_texto }))
+            id: rows[0].pergunta_id, // O ID da pergunta (igual para todas as linhas)
+            texto: rows[0].pergunta_texto, // O texto da pergunta (igual para todas as linhas)
+            respostas: rows.map(row => ({
+                id: row.resposta_id,
+                texto: row.resposta_texto
+            })).filter(resposta => resposta.id) // Filtrar respostas válidas
         };
 
-        console.log('Primeira pergunta carregada:', pergunta);
+        console.log('Dados retornados pela consulta:', rows);
+        console.log('Pergunta processada:', pergunta);
 
+        // Renderizar a página com a pergunta e respostas
         res.render('pages/gabhoot', { pergunta });
     } catch (error) {
         console.error('Erro ao carregar a primeira pergunta:', error);
@@ -77,29 +76,27 @@ router.get('/gabhoot', isAuthenticated, async (req, res) => {
     }
 });
 
-// Rota para próxima pergunta
 router.post('/proxima', isAuthenticated, async (req, res) => {
     try {
-        const respostaID = req.body.resposta || null;
-        const perguntas = req.session.perguntas;
+        const respostaID = req.body.resposta || ''; // Captura a resposta enviada (ou vazio)
+        const perguntas = req.session.perguntas || []; // Lista de IDs de perguntas
 
-        // Verifica se há perguntas restantes
+        // Verifica se ainda há perguntas restantes
         if (!perguntas || perguntas.length === 0) {
             console.log('Nenhuma pergunta restante. Redirecionando para o resultado.');
             return res.redirect('/jogar/resultado');
         }
 
-        // Registra a resposta do jogador
-        if (respostaID) {
-            req.session.respostas = req.session.respostas || [];
-            req.session.respostas.push({ pergunta_id: perguntas[0], resposta_id: respostaID });
-        }
+        // Salva a resposta do jogador (mesmo que seja vazia)
+        req.session.respostas = req.session.respostas || [];
+        req.session.respostas.push({
+            pergunta_id: perguntas[0], // Associa a resposta à pergunta atual
+            resposta_id: respostaID
+        });
 
-        // Remove o ID da pergunta já respondida
-        const perguntaID = perguntas.shift(); // Remove o primeiro ID
-        req.session.perguntas = perguntas; // Atualiza a sessão
-
-        console.log(`Buscando pergunta para o ID: ${perguntaID}`);
+        // Remove a pergunta atual da lista
+        perguntas.shift(); // Remove o primeiro ID
+        req.session.perguntas = perguntas;
 
         // Se não houver mais perguntas, redireciona para o resultado
         if (perguntas.length === 0) {
@@ -107,35 +104,33 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
             return res.redirect('/jogar/resultado');
         }
 
-        // Busca a próxima pergunta
-        const [rows] = await sequelize.query(`
+        // Buscar a próxima pergunta
+        const perguntaID = perguntas[0]; // Próximo ID
+        const rows = await sequelize.query(`
             SELECT p.id AS pergunta_id, p.texto AS pergunta_texto, 
                    r.id AS resposta_id, r.texto AS resposta_texto
             FROM perguntas p
-            JOIN respostas r ON p.id = r.pergunta_id
+            LEFT JOIN respostas r ON p.id = r.pergunta_id
             WHERE p.id = ?
         `, {
-            replacements: [perguntas[0]], // Usa o próximo ID
+            replacements: [perguntaID],
             type: sequelize.QueryTypes.SELECT
         });
 
-        if (!rows) {
-            console.error(`Nenhuma pergunta encontrada para o ID ${perguntas[0]}.`);
+        // Verifica se a consulta retornou dados
+        if (!rows || rows.length === 0) {
+            console.error(`Nenhuma pergunta encontrada para o ID ${perguntaID}.`);
             return res.status(404).send('Nenhuma pergunta encontrada.');
         }
 
-        console.log('Resultado da query:', rows);
-
-        // Verifica se `rows` é um único objeto ou uma matriz
-        const isSingleObject = !Array.isArray(rows);
-
-        // Organiza a próxima pergunta
+        // Montar a próxima pergunta
         const pergunta = {
-            id: isSingleObject ? rows.pergunta_id : rows[0]?.pergunta_id,
-            texto: isSingleObject ? rows.pergunta_texto : rows[0]?.pergunta_texto,
-            respostas: isSingleObject
-                ? [{ id: rows.resposta_id, texto: rows.resposta_texto }]
-                : rows.map(row => ({ id: row.resposta_id, texto: row.resposta_texto }))
+            id: rows[0].pergunta_id, // ID da pergunta
+            texto: rows[0].pergunta_texto, // Texto da pergunta
+            respostas: rows.map(row => ({
+                id: row.resposta_id,
+                texto: row.resposta_texto
+            })).filter(resposta => resposta.id) // Filtrar respostas válidas
         };
 
         console.log('Próxima pergunta carregada:', pergunta);
@@ -147,13 +142,26 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
     }
 });
 
-// Rota para exibir o resultado final
+
+
 router.get('/resultado', isAuthenticated, (req, res) => {
     const respostas = req.session.respostas || [];
-    req.session.perguntas = null; // Limpa as perguntas da sessão
-    req.session.respostas = null; // Limpa as respostas da sessão
 
-    res.render('pages/resultado', { total: respostas.length }); // Renderiza o resultado final
+    // Limpar a sessão
+    req.session.perguntas = null;
+    req.session.respostas = null;
+
+    // Calcular acertos
+    const acertos = respostas.filter(r => parseInt(r.resposta_id, 10) === parseInt(r.correta, 10)).length;
+
+    console.log('Respostas registradas:', respostas);
+    console.log('Total de acertos:', acertos);
+
+    // Renderizar a página de resultado
+    res.render('pages/resultado', { 
+        total: respostas.length, // Total de perguntas respondidas
+        acertos                   // Total de acertos
+    });
 });
 
 module.exports = router;
