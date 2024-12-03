@@ -1,0 +1,71 @@
+/* Contêiner principal que vai envolver as metades */
+.resultado-container {
+    display: flex;             
+    flex-direction: column;    /* Coloca os elementos em coluna */
+    height: 100vh;             /* Altura total da tela */
+}
+
+/* Contêiner central superior para o título */
+.resultado-centro-superior-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 150px;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.resultado-centro-superior-container h1 {
+    font-size: 4em;
+    color: #01438a;  /* Cor de destaque */
+}
+
+/* Contêiner com os resultados */
+.resultado-centro-inferior-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(166, 192, 216);
+    width: 50%;  /* Ajuste a largura para não ocupar 100% da tela */
+    height: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+/* Estilo do conteúdo de resultado */
+.resultado-centro-inferior-container p {
+    font-size: 1.4em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Estilo da área com os botões */
+.resultado-actions {
+    display: flex;
+    flex-direction: column; /* Coloca os botões em uma coluna */
+    gap: 15px;              /* Espaço entre os botões */
+    width: 100%;            /* Largura de 100% para os botões */
+    align-items: center;    /* Alinha os botões ao centro */
+}
+
+/* Estilo dos botões */
+.botao-resultado {
+    padding: 15px 30px;     /* Ajuste o padding para maior consistência */
+    font-size: 1.5em;       /* Ajuste o tamanho do texto */
+    background-color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 80%;             /* Ajuste a largura dos botões */
+}
+
+/* Efeito hover nos botões */
+.botao-resultado:hover {
+    background-color: #ddd;
+    transition: background-color 0.3s ease;
+}

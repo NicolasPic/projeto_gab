@@ -1,7 +1,7 @@
 .jogar-container {
     display: flex;
     flex-direction: column;
-    height: 91vh;
+    height: 92.9vh;
     align-items: center; /* Alinha o conteúdo ao centro horizontalmente */
     justify-content: space-between; /* Espaça os elementos uniformemente */
 }
@@ -27,7 +27,7 @@
     align-items: center;
     justify-content: center;
     background-color: rgb(166, 192, 216);
-    width: 50%;
+    width: 30%;
     height: auto;
     padding: 20px;
     border-radius: 10px; /* Bordas arredondadas para um visual mais suave */

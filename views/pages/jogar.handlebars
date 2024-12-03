@@ -1,23 +1,31 @@
 <div class="jogar-container">
-    <div class="metade-jogar-container jogar-superior"></div>
 
-    <div class="jogar-centro-superior-container">
-        <h1>GABHoot</h1>
-    </div>
-
-    <div class="jogar-centro-inferior-container">
-        <!-- Exibir o nome do jogador automaticamente -->
-        <div class="nome-jogador-container">
-            <label for="nomeJogador">Nome do Jogador:</label>
-            <input type="text" id="nomeJogador" value="{{nomeJogador}}" readonly />
-        </div>
-
-        <div class="botao-jogar-container">
-            <button id="btnCriarSala" class="botao-sala">Criar Sala</button>
-            <button id="btnEntrarSala" class="botao-sala">Entrar na Sala</button>
-            <input type="text" id="codigoSala" placeholder="Código da Sala" />
+    <!-- Metade superior da tela -->
+    <div class="metade-jogar-container jogar-superior">
+        <!-- Conteúdo da metade superior, como o título -->
+        <div class="jogar-centro-superior-container">
+            <h1>GABHoot</h1>
         </div>
     </div>
+
+    <!-- Metade inferior da tela -->
+    <div class="metade-jogar-container jogar-inferior">
+        <div class="jogar-centro-inferior-container">
+            <!-- Exibir o nome do jogador automaticamente -->
+            <div class="nome-jogador-container">
+                <label for="nomeJogador">Nome do Jogador:</label>
+                <input type="text" id="nomeJogador" value="{{nomeJogador}}" readonly />
+            </div>
+
+            <!-- Botões para Criar Sala e Entrar na Sala -->
+            <div class="botao-jogar-container">
+                <button id="btnCriarSala" class="botao-sala">Criar Sala</button>
+                <button id="btnEntrarSala" class="botao-sala">Entrar na Sala</button>
+                <input type="text" id="codigoSala" placeholder="Código da Sala" />
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script src="/socket/gameSocket.js"></script>
@@ -65,7 +73,7 @@
         }
     });
 
-      // Receber evento de sucesso ao criar a sala
+    // Receber evento de sucesso ao criar a sala
     socket.on('salaCriada', (codigoSala) => {
         // Redireciona para a página da sala
         window.location.href = `/jogar/sala/${codigoSala}`;
@@ -76,7 +84,6 @@
         // Redireciona para a página da sala
         window.location.href = `/jogar/sala/${codigoSala}`;
     });
-
 
     // Receber erro do servidor
     socket.on('erro', (mensagem) => {

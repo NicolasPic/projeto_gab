@@ -3,7 +3,7 @@
 .criarconta-container {
     display: flex;             /* Aplica o Flexbox */
     flex-direction: column;    /* Altera a direção do Flexbox para coluna */
-    height: 100vh;             
+    height: 92.8vh;             
 }
 
 .criarconta-centro-container {

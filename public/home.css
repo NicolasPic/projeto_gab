@@ -3,7 +3,7 @@
 .home-container {
     display: flex;             /* Aplica o Flexbox */
     flex-direction: column;    /* Altera a direção do Flexbox para coluna */
-    height: 91vh;             
+    height: 92.9vh;             
 }
 
 .centro-home-container {

@@ -1,27 +1,43 @@
-<h1>Gabhoot</h1>
+<div class="gabhoot-container">
 
-<p id="tempo-restante">Tempo restante: <span id="tempo">35</span> segundos</p>
-
-<form id="form-resposta" action="/jogar/proxima" method="POST">
-    <input type="hidden" name="resposta" id="resposta-selecionada">
-    <input type="hidden" name="tempoRestante" id="tempo-restante-valor"> <!-- Campo para o tempo restante -->
-    <div class="pergunta">
-        <h2>{{pergunta.texto}}</h2>
-        {{#each pergunta.respostas}}
-        <div>
-            <label>
-                <input 
-                    type="radio" 
-                    name="resposta" 
-                    value="{{id}}" 
-                    onchange="selecionarResposta(this.value)">
-                {{texto}}
-            </label>
-        </div>
-        {{/each}}
+    <!-- Contêiner central sobrepondo as metades -->
+    <div class="metade-gabhoot-container gabhoot-superior">
+        
     </div>
-    <button type="submit">Enviar Resposta</button>
-</form>
+
+    <div class='centro-gabhoot-container'>
+        <h1>GABHoot</h1>
+    </div>
+   
+    <div class="metade-gabhoot-container gabhoot-inferior">
+        <p id="tempo-restante">Tempo restante: <span id="tempo">35</span> segundos</p>
+        <form id="form-resposta" action="/jogar/proxima" method="POST">
+            <input type="hidden" name="resposta" id="resposta-selecionada">
+            <input type="hidden" name="tempoRestante" id="tempo-restante-valor">
+            
+            <div class="pergunta">
+                <h2>{{pergunta.texto}}</h2>
+                {{#each pergunta.respostas}}
+                    <div>
+                        <label>
+                            <input 
+                                type="radio" 
+                                name="resposta" 
+                                value="{{id}}" 
+                                onchange="selecionarResposta(this.value)">
+                            {{texto}}
+                        </label>
+                    </div>
+                {{/each}}
+            </div>
+
+            <button type="submit">Enviar Resposta</button>
+        </form>
+
+    </div>
+    
+
+</div>
 
 <script>
     let tempo = 35;
