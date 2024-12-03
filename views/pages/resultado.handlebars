@@ -1,23 +1,21 @@
 <div class="resultado-container">
-    <!-- Metade superior azul -->
-    <div class="metade-superior">
+
+    <!-- Metade superior da tela -->
+    <div class="metade-resultado-container resultado-superior">
+        <div class="centro-resultado-container">
+            <h1>GABHoot</h1>
+        </div>
         <h1>Resultado Final</h1>
+        <p>Total de perguntas respondidas: {{total}}</p>
+        <p>Total de acertos: {{acertos}}</p>
+        <p>Pontuação: {{tempoTotalRestante}}</p>
     </div>
 
-     <div class="centro-resultado-container">
-    
+    <!-- Metade inferior da tela -->
+    <div class="metade-resultado-container resultado-inferior">
+        
+        <a href="/jogar/gabhoot" class="botao-resultado">Jogar Novamente</a>
+        <a href="/home" class="botao-resultado">Voltar para o Início</a>
     </div>
 
-    <!-- Metade inferior -->
-    <div class="metade-inferior">
-        <div class="resultado-centro-inferior-container">
-            <p>Total de perguntas respondidas: {{total}}</p>
-            <p>Total de acertos: {{acertos}}</p>
-            <p>Pontuação: {{tempoTotalRestante}}</p>
-        </div>
-        <div class="resultado-actions">
-            <a href="/jogar/gabhoot" class="botao-resultado">Jogar Novamente</a>
-            <a href="/home" class="botao-resultado">Voltar para o Início</a>
-        </div>
-    </div>
 </div>
