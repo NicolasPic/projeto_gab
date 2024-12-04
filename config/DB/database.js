@@ -18,7 +18,7 @@ async function conectarDB() {
     console.log('Conectado ao banco de dados com sucesso!');
     
     // Sincroniza as tabelas com o banco de dados
-    await sequelize.sync({ alter: false });  // Cria as tabelas no banco de dados, se elas não existirem
+    await sequelize.sync({ alter: false });
     console.log('Tabelas sincronizadas com sucesso!');
   } catch (error) {
     console.error('Erro ao conectar ou sincronizar o banco de dados:', error);
