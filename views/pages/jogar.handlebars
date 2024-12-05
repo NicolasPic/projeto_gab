@@ -35,7 +35,8 @@
     document.getElementById('btnCriarSala').addEventListener('click', () => {
         const codigoSala = document.getElementById('codigoSala').value;
         if (codigoSala) {
-            socket.emit('criarSala', codigoSala);  
+            socket.emit('sala', { codigoSala, userId:123 });
+            window.location.href = `/jogar/sala/${codigoSala}`;
         }else{
             console.log('Não foi possivel criar a sala')
         }
@@ -44,9 +45,12 @@
     document.getElementById('btnEntrarSala').addEventListener('click', () => {
         const codigoSala = document.getElementById('codigoSala').value;
         if (codigoSala) {
-            socket.emit('entrarSala', codigoSala);  
+            socket.emit('sala',  { codigoSala, userId:123 });  
+            window.location.href = `/jogar/sala/${codigoSala}`;
         }else{
             console.log('Não foi possivel entrar na sala')
         }
     });
+
+
 </script>
