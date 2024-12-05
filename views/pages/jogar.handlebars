@@ -30,63 +30,23 @@
 
 <script src="/socket/gameSocket.js"></script>
 <script>
-    const socket = io();
+  const socket = io();
 
-    const nomeJogadorInput = document.getElementById('nomeJogador');
-    const btnCriarSala = document.getElementById('btnCriarSala');
-    const btnEntrarSala = document.getElementById('btnEntrarSala');
-    const codigoSalaInput = document.getElementById('codigoSala');
-
-    // Verifica se o nome está preenchido
-    const nomeJogador = nomeJogadorInput.value.trim();
-    if (nomeJogador) {
-        socket.emit('nomeJogador', nomeJogador);  // Envia o nome para o servidor
-    } else {
-        alert('Por favor, informe seu nome.');
-    }
-
-    // Criar Sala
-    btnCriarSala.addEventListener('click', () => {
-        if (!nomeJogador) {
-            alert('Por favor, informe seu nome antes de criar uma sala.');
-            return;
-        }
-        const codigoSala = codigoSalaInput.value.trim();
+    document.getElementById('btnCriarSala').addEventListener('click', () => {
+        const codigoSala = document.getElementById('codigoSala').value;
         if (codigoSala) {
-            socket.emit('criarSala', codigoSala);
-        } else {
-            alert('Por favor, insira um código para a sala.');
+            socket.emit('criarSala', codigoSala);  
+        }else{
+            console.log('Não foi possivel criar a sala')
         }
     });
 
-    // Entrar em Sala
-    btnEntrarSala.addEventListener('click', () => {
-        if (!nomeJogador) {
-            alert('Por favor, informe seu nome antes de entrar na sala.');
-            return;
-        }
-        const codigoSala = codigoSalaInput.value.trim();
+    document.getElementById('btnEntrarSala').addEventListener('click', () => {
+        const codigoSala = document.getElementById('codigoSala').value;
         if (codigoSala) {
-            socket.emit('entrarSala', codigoSala);
-        } else {
-            alert('Por favor, insira um código de sala.');
+            socket.emit('entrarSala', codigoSala);  
+        }else{
+            console.log('Não foi possivel entrar na sala')
         }
-    });
-
-    // Receber evento de sucesso ao criar a sala
-    socket.on('salaCriada', (codigoSala) => {
-        // Redireciona para a página da sala
-        window.location.href = `/jogar/sala/${codigoSala}`;
-    });
-
-    // Receber evento de sucesso ao entrar na sala
-    socket.on('entrarSalaSucesso', (codigoSala) => {
-        // Redireciona para a página da sala
-        window.location.href = `/jogar/sala/${codigoSala}`;
-    });
-
-    // Receber erro do servidor
-    socket.on('erro', (mensagem) => {
-        alert(`Erro: ${mensagem}`);
     });
 </script>

@@ -4,72 +4,82 @@ function configurarSocket(io) {
     io.on('connection', (socket) => {
         console.log('Novo jogador conectado:', socket.id);
 
-        // Receber o nome do jogador assim que se conectar
         socket.on('nomeJogador', (nomeJogador) => {
-            if (nomeJogador && nomeJogador !== "undefined") {
-                socket.nomeJogador = nomeJogador;
-                console.log(`Jogador ${nomeJogador} conectado com id: ${socket.id}`);
-            } else {
-                console.log('Erro: Nome de jogador não fornecido');
-                socket.emit('erro', 'Nome do jogador não fornecido');
-                socket.disconnect();  // Desconectar o jogador se o nome não for fornecido
-            }
+            // Aqui você pode armazenar o nome do jogador se necessário
         });
 
-        // Criar uma nova sala
         socket.on('criarSala', (codigoSala) => {
-            console.log(`Tentando criar sala: ${codigoSala} por ${socket.nomeJogador}`);
+            // Verifica se o jogador já está na sala
+            if (salas[codigoSala] && salas[codigoSala].includes(socket.id)) {
+                console.log(`Jogador ${socket.id} já está na sala ${codigoSala}.`);
+            } else if (salas[codigoSala]) {
+                // A sala existe, mas o jogador não está nela
+                console.log(`Jogador ${socket.id} se conectando à sala ${codigoSala}.`);
+                socket.join(codigoSala);  // Adiciona o jogador na sala
+                salas[codigoSala].push(socket.id); // Adiciona o socket.id ao array de jogadores da sala
 
-            // Verifique se o nome está atribuído antes de permitir criar uma sala
-            if (!socket.nomeJogador) {
-                socket.emit('erro', 'Nome do jogador não definido');
-                return;
-            }
-
-            if (!salas[codigoSala]) {
-                salas[codigoSala] = { jogadores: [{ id: socket.id, nome: socket.nomeJogador }], estado: 'esperando' };
-                socket.emit('salaCriada', codigoSala);  // Notifica o cliente da criação
-                console.log(`Sala ${codigoSala} criada por ${socket.nomeJogador}`);
-                console.log(`Jogadores na sala ${codigoSala}:`, salas[codigoSala].jogadores);
+                // Atualiza a sessão com o código da sala
+                socket.handshake.session.sala = codigoSala;  // Atualiza a sessão com a sala
+                socket.handshake.session.save(); // Salva a sessão
             } else {
-                socket.emit('erro', 'Sala já existe');
-                console.log(`Erro: Sala ${codigoSala} já existe`);
+                // A sala não existe, cria uma nova
+                console.log(`Criando sala com id: ${codigoSala}.`);
+                salas[codigoSala] = [socket.id]; // Cria a sala e adiciona o primeiro jogador
+                socket.join(codigoSala); 
+                salas[codigoSala].push(socket.id);
+
+                // Atualiza a sessão com o código da sala
+                socket.handshake.session.sala = codigoSala; 
+                socket.handshake.session.save(); 
+                console.log(`Sala ${codigoSala} criada e jogador ${socket.id} entrou.`);
             }
+
+            // Printando a sala da sessão
+            console.log(`A sala na sessão de ${socket.id} é: ${socket.handshake.session.sala}`);
+            console.log(`Sala ${codigoSala} criada e jogador ${socket.id} entrou.`);
         });
 
-        // Entrar em uma sala existente
         socket.on('entrarSala', (codigoSala) => {
-            console.log(`Tentando entrar na sala: ${codigoSala} com jogador ${socket.nomeJogador}`);
+            if (salas[codigoSala] && salas[codigoSala].includes(socket.id)) {
+                console.log(`Jogador ${socket.id} já está na sala ${codigoSala}.`);
+            } else if (salas[codigoSala]) {
+                // A sala existe, mas o jogador não está nela
+                console.log(`Jogador ${socket.id} se conectando à sala ${codigoSala}.`);
+                socket.join(codigoSala);  // Adiciona o jogador na sala
+                salas[codigoSala].push(socket.id); 
 
-            // Verifique se o nome está atribuído antes de permitir entrar na sala
-            if (!socket.nomeJogador) {
-                socket.emit('erro', 'Nome do jogador não definido');
-                return;
-            }
-
-            if (salas[codigoSala]) {
-                salas[codigoSala].jogadores.push({ id: socket.id, nome: socket.nomeJogador });
-                socket.join(codigoSala);
-                io.to(codigoSala).emit('atualizarJogadores', salas[codigoSala].jogadores);  // Atualiza a lista de jogadores
-                console.log(`${socket.nomeJogador} entrou na sala ${codigoSala}`);
-                console.log(`Jogadores na sala ${codigoSala}:`, salas[codigoSala].jogadores);
+                // Atualiza a sessão com o código da sala
+                socket.handshake.session.sala = codigoSala; 
+                socket.handshake.session.save(); 
             } else {
-                socket.emit('erro', 'Sala não encontrada');
-                console.log(`Erro: Sala ${codigoSala} não encontrada`);
+                console.log(`Sala com id: ${codigoSala} não existe.`);
             }
         });
 
-        // Quando o jogador desconecta
         socket.on('disconnect', () => {
-            console.log(`Jogador ${socket.id} desconectado. Nome: ${socket.nomeJogador}`);
+            const sala = socket.handshake.session.sala;  // Recupera a sala do jogador
+            if (sala) {
+                // Remove o jogador da sala
+                const index = salas[sala].indexOf(socket.id);
+                if (index !== -1) {
+                    salas[sala].splice(index, 1);  // Remove o jogador da lista de jogadores da sala
+                    console.log(`Jogador ${socket.id} saiu da sala ${sala}.`);
 
-            // Remover o jogador da sala (se estiver em uma sala)
-            for (let codigoSala in salas) {
-                salas[codigoSala].jogadores = salas[codigoSala].jogadores.filter(jogador => jogador.id !== socket.id);
-                io.to(codigoSala).emit('atualizarJogadores', salas[codigoSala].jogadores);  // Atualiza a lista de jogadores
-                console.log(`Jogadores restantes na sala ${codigoSala}:`, salas[codigoSala].jogadores);
+                    // Se não houver mais jogadores na sala, apaga a sala
+                    if (salas[sala].length === 0) {
+                        delete salas[sala];  // Deleta a sala, pois não há mais jogadores
+                        console.log(`Sala ${sala} deletada, pois não há mais jogadores.`);
+                    }
+                }
+
+                // Verifica se a sessão ainda está válida e limpa a sala da sessão
+                if (socket.handshake.session) {
+                    socket.handshake.session.sala = null;
+                    socket.handshake.session.save();  // Salva as alterações na sessão
+                }
             }
         });
+        
     });
 }
 
