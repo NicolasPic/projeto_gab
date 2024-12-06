@@ -14,10 +14,12 @@ function getRandomUniqueNumbers(min, max, count) {
 
 router.get('/', isAuthenticated, (req, res) => {
     const nomeUsuario = req.user ? req.user.nome : 'Visitante'; 
+    const usuarioID = req.user ? req.user.id : null;  
     res.render('pages/jogar', { 
         title: 'Página jogar',
         customHeaderHome: true,
-        nomeJogador: nomeUsuario
+        nomeJogador: nomeUsuario,
+        usuarioID: usuarioID
     });
 });
 
@@ -102,7 +104,7 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
             pergunta_id: perguntaAtual,
             resposta_id: respostaID,
             correta: correta,
-            tempoRestante: tempoRestante // Armazena o tempo restante
+            tempoRestante: tempoRestante
         });
 
         req.session.perguntas = perguntas;

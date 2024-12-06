@@ -1,17 +1,13 @@
 const salas = {};  // Armazena as salas ativas
-const users = {};
+const usuarios = {};
 function configurarSocket(io) {
     io.on('connection', (socket) => {
         console.log('Novo jogador conectado:', socket.id);
 
-        socket.on('nomeJogador', (nomeJogador) => {
-
-        });
-
-        socket.on('sala', ({codigoSala, userId}) => {
+        socket.on('sala', ({codigoSala,usuarioID}) => {
             // Verifica se o jogador já está na sala
 
-            users[socket.id] = userId;
+            usuarios[socket.id] = usuarioID;
             if (salas[codigoSala] && salas[codigoSala].includes(socket.id)) {
                 console.log(`Jogador ${socket.id} já está na sala ${codigoSala}.`);
 
@@ -39,9 +35,9 @@ function configurarSocket(io) {
         });
 
         socket.on('disconnect', function(){
-            console.log('user ' + users[socket.id] + ' disconnected');
+            console.log('user ' + usuarios[socket.id] + ' disconnected');
             // remove saved socket from users object
-            delete users[socket.id];
+            delete usuarios[socket.id];
           });
 
     });

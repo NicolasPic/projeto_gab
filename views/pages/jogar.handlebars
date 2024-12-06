@@ -15,6 +15,7 @@
             <div class="nome-jogador-container">
                 <label for="nomeJogador">Nome do Jogador:</label>
                 <input type="text" id="nomeJogador" value="{{nomeJogador}}" readonly />
+                <p>ID do usuário: {{usuarioID}}</p>
             </div>
 
             <!-- Botões para Criar Sala e Entrar na Sala -->
@@ -30,12 +31,14 @@
 
 <script src="/socket/gameSocket.js"></script>
 <script>
-  const socket = io();
+    const socket = io();
 
     document.getElementById('btnCriarSala').addEventListener('click', () => {
         const codigoSala = document.getElementById('codigoSala').value;
+        const usuarioID = "{{usuarioID}}"; 
         if (codigoSala) {
-            socket.emit('sala', { codigoSala, userId:123 });
+            console.log("Emitindo evento 'sala' para o servidor com o código da sala:", codigoSala);
+            socket.emit('sala', {codigoSala,usuarioID});
             window.location.href = `/jogar/sala/${codigoSala}`;
         }else{
             console.log('Não foi possivel criar a sala')
@@ -43,9 +46,11 @@
     });
 
     document.getElementById('btnEntrarSala').addEventListener('click', () => {
+        const usuarioID = "{{usuarioID}}"; 
         const codigoSala = document.getElementById('codigoSala').value;
         if (codigoSala) {
-            socket.emit('sala',  { codigoSala, userId:123 });  
+            console.log("Emitindo evento 'sala' para o servidor com o código da sala:", codigoSala);
+            socket.emit('sala',  {codigoSala,usuarioID});  
             window.location.href = `/jogar/sala/${codigoSala}`;
         }else{
             console.log('Não foi possivel entrar na sala')

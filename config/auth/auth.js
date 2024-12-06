@@ -39,6 +39,7 @@ module.exports.setupPassport = function(passport){
     });
 
     passport.deserializeUser((id, done) => {
+        
         Usuario.findByPk(id).then((usuario) => {
             done(null, usuario);
         }).catch((err) => {
