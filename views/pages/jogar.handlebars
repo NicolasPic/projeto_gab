@@ -63,7 +63,7 @@
     socket.on('salaCriadaOuEntrou', (data) => {
         if (data.sucesso) {
             console.log(`Entrou na sala ${data.codigoSala} com sucesso!`);
-            window.location.href = `/jogar/${data.codigoSala}`;
+            window.location.href = `/jogar/sala/${data.codigoSala}`;
         } else {
             console.log('Falha ao entrar ou criar a sala.');
         }

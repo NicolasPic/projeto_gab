@@ -24,7 +24,7 @@ router.get('/', isAuthenticated, (req, res) => {
     });
 });
 
-router.get('/:codigo', isAuthenticated, async (req, res) => {
+router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
 
     // Validação: Verificar se o objeto `salas` está presente e é válido
