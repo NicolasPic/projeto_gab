@@ -76,7 +76,7 @@ router.get('/gabhoot', isAuthenticated, async (req, res) => {
 router.post('/proxima', isAuthenticated, async (req, res) => {
     try {
         const respostaID = parseInt(req.body.resposta, 10);
-        const tempoRestante = parseInt(req.body.tempoRestante, 10); // Tempo restante enviado pelo cliente
+        const tempoRestante = parseInt(req.body.tempoRestante, 10);
         const perguntas = req.session.perguntas || [];
 
         if (!perguntas || perguntas.length === 0) {

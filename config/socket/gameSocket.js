@@ -1,50 +1,74 @@
-const salas = {};  // Armazena as salas ativas
+const salas = {};
 const usuarios = {};
 
 function configurarSocket(io) {
     io.on('connection', (socket) => {
         console.log('Novo jogador conectado:', socket.id);
 
-        socket.on('sala', ({codigoSala, usuarioID}) => {
-            usuarios[socket.id] = usuarioID;
+        socket.on('reconectar', ({ usuarioID }) => {
+            if (usuarios[usuarioID]) {
+                const codigoSala = Object.keys(salas).find((codigo) =>
+                    salas[codigo].includes(usuarioID)
+                );
 
-            // Verifica se a sala já existe
-            if (salas[codigoSala]) {
-                // Verifica se o jogador já está na sala
-                if (salas[codigoSala].includes(socket.id)) {
-                    console.log(`Jogador ${socket.id} já está na sala ${codigoSala}.`);
-                } else {
-                    // O jogador não está na sala, então ele entra nela
-                    console.log(`Jogador ${socket.id} se conectando à sala ${codigoSala}.`);
+                if (codigoSala) {
+                    usuarios[usuarioID] = socket.id;
                     socket.join(codigoSala);
-                    salas[codigoSala].push(socket.id);
 
-                    // Salva os dados na sessão
-                    socket.handshake.session.sala = codigoSala;
-                    socket.handshake.session.usuarioID = usuarioID;
-                    socket.handshake.session.save();
-
+                    console.log(
+                        `Jogador ${usuarioID} reconectado à sala ${codigoSala}.`
+                    );
+                    socket.emit('reconectado', {
+                        codigoSala,
+                        sucesso: true,
+                    });
+                } else {
+                    console.log(`Jogador ${usuarioID} não pertence a nenhuma sala.`);
                 }
             } else {
-                // A sala não existe, cria uma nova
-                console.log(`Criando sala com id: ${codigoSala}.`);
-                socket.join(codigoSala);
-                salas[codigoSala] = salas[codigoSala] || [];
-                salas[codigoSala].push(socket.id);
-
-                // Atualiza a sessão com o código da sala
-                socket.handshake.session.sala = codigoSala;
-                socket.handshake.session.usuarioID = usuarioID;
-                socket.handshake.session.save();
-
-                console.log(`Sala ${codigoSala} criada e jogador ${socket.id} entrou.`);
+                console.log(`Nenhuma conexão anterior encontrada para ${usuarioID}.`);
             }
         });
 
-        socket.on('disconnect', function(){
-            console.log('usuario ' + socket.id + 'disconectado');
+        socket.on('sala', ({ codigoSala, usuarioID }) => {
+            usuarios[usuarioID] = socket.id;
+
+            if (salas[codigoSala]) {
+                if (!salas[codigoSala].includes(usuarioID)) {
+                    salas[codigoSala].push(usuarioID);
+                }
+            } else {
+                salas[codigoSala] = [usuarioID];
+            }
+
+            socket.join(codigoSala);
+
+            console.log(`Estado atual da sala ${codigoSala}:`, salas[codigoSala]);
+            socket.emit('salaCriadaOuEntrou', { codigoSala, sucesso: true });
         });
 
+        socket.on('disconnect', () => {
+            console.log(`Socket ${socket.id} desconectado.`);
+
+            for (const usuarioID in usuarios) {
+                if (usuarios[usuarioID] === socket.id) {
+                    usuarios[usuarioID] = null; 
+                }
+            }
+
+            console.log('Estado atual das salas após desconexão:', salas);
+        });
+
+        socket.on('imprimirSalas', () => {
+            console.log('Estado Atual das Salas:');
+            const salasInfo = {};
+            for (const codigoSala in salas) {
+                salasInfo[codigoSala] = salas[codigoSala];
+            }
+            console.log(salasInfo);
+
+            socket.emit('salasAtualizadas', salasInfo);
+        });
     });
 }
 

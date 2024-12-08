@@ -23,33 +23,53 @@
         </div>
     </div>
 </div>
-
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
+    const usuarioID = "{{usuarioID}}";
+
+    socket.on('connect', () => {
+        console.log(`Conectado com socket ID: ${socket.id}`);
+        socket.emit('reconectar', { usuarioID });
+    });
+
+    socket.on('reconectado', (data) => {
+        if (data.sucesso) {
+            console.log(`Reconectado à sala ${data.codigoSala}`);
+        } else {
+            console.log('Nenhuma sala encontrada para reconectar.');
+        }
+    });
 
     document.getElementById('btnCriarSala').addEventListener('click', () => {
-        const codigoSala = document.getElementById('codigoSala').value;
-        const usuarioID = "{{usuarioID}}";
+        const codigoSala = document.getElementById('codigoSala').value.trim();
         if (codigoSala) {
             console.log("Emitindo evento 'sala' para o servidor com o código da sala:", codigoSala);
-            socket.emit('sala', {codigoSala, usuarioID});
-            window.location.href = `/jogar/sala/${codigoSala}`;
+            socket.emit('sala', { codigoSala, usuarioID });
         } else {
-            console.log('Não foi possível criar a sala');
+            console.log('Digite um código de sala para criar.');
         }
     });
 
     document.getElementById('btnEntrarSala').addEventListener('click', () => {
-        const usuarioID = "{{usuarioID}}";
-        const codigoSala = document.getElementById('codigoSala').value;
+        const codigoSala = document.getElementById('codigoSala').value.trim();
         if (codigoSala) {
             console.log("Emitindo evento 'sala' para o servidor com o código da sala:", codigoSala);
-            socket.emit('sala', {codigoSala, usuarioID});
-            window.location.href = `/jogar/sala/${codigoSala}`;
+            socket.emit('sala', { codigoSala, usuarioID });
         } else {
-            console.log('Não foi possível entrar na sala');
+            console.log('Digite um código de sala para entrar.');
         }
     });
 
+    socket.on('salaCriadaOuEntrou', (data) => {
+        if (data.sucesso) {
+            console.log(`Entrou na sala ${data.codigoSala} com sucesso!`);
+            window.location.href = `/jogar/sala/${data.codigoSala}`;
+        } else {
+            console.log('Falha ao entrar ou criar a sala.');
+        }
+    });
+    socket.on('salasAtualizadas', (salasInfo) => {
+        console.log('Estado atualizado das salas:', salasInfo);
+    });
 </script>
