@@ -30,6 +30,16 @@ function configurarSocket(io) {
             }
         });
 
+        socket.on('redirecionarSala', ({ codigoSala }) => {
+            if (salas[codigoSala]) {
+                const url = `/jogar/sala/${codigoSala}`;
+                console.log(`Redirecionando jogadores da sala ${codigoSala} para ${url}`);
+                io.to(codigoSala).emit('redirect', url);
+            } else {
+                console.log(`Sala ${codigoSala} não encontrada para redirecionamento.`);
+            }
+        });
+
         socket.on('sala', ({ codigoSala, usuarioID }) => {
             usuarios[usuarioID] = socket.id;
 

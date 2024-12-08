@@ -33,4 +33,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
+    const codigoSala = "{{codigoSala}}";
+
+    document.getElementById('btnIniciar').addEventListener('click', () => {
+        socket.emit('redirecionarSala', { codigoSala });
+    });
 </script>
