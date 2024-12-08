@@ -7,18 +7,21 @@
 }
 
 .jogar-centro-superior-container {
+    position: absolute;        /* Coloca o contêiner sobre as metades */
+    top: 50%;                  /* Centraliza o contêiner no meio da tela */
+    left: 50%;                 /* Centraliza o contêiner no meio da tela */
+    transform: translate(-50%,-50%); /* Ajuste para garantir que o contêiner fique exatamente no meio */
+    width: 100%;              /* Largura do contêiner central */
+    height: 150px;             /* Altura do contêiner central */
+    background-color: rgba(255, 255, 255); /* Cor de fundo com opacidade */
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    width: 100%;
-    height: 150px;
-    background-color: rgba(255, 255, 255, 0.9); /* Opacidade mais suave */
 }
 
 .jogar-centro-superior-container h1 {
-    font-size: 5em; /* Reduzido para não sobrecarregar a tela */
-    color: #333; /* Cor mais suave para contraste */
+    font-size:10em;
 }
 
 .jogar-centro-inferior-container {
@@ -57,7 +60,7 @@
     color: #333;
 }
 
-.botao-sala {
+.botao-jogar {
     padding: 12px 20px;
     font-size: 1.5em;
     background-color: #747474;
@@ -68,7 +71,7 @@
     margin: 10px 0; /* Espaçamento entre os botões */
 }
 
-.botao-sala:hover {
+.botao-jogar:hover {
     background-color: #ddd;
 }
 

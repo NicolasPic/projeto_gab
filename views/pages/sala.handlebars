@@ -1,56 +1,36 @@
 <div class="sala-container">
+    <!-- Contêiner superior para Jogadores na Sala -->
+    <div class="metade-sala-container sala-superior" style="position: relative;">
+       
+        <div class="lista-jogadores-container">
+             <h2 id="tituloSala">Jogadores na Sala: {{codigoSala}}</h2>
+            <ul id="listaJogadores">
+                {{#if jogadores}}
+                    {{#each jogadores}}
+                        <li>{{this.nome}}</li>
+                    {{/each}}
+                {{else}}
+                    <li>Nenhum jogador na sala.</li>
+                {{/if}}
+            </ul>
+        </div>
+    </div>
 
-    <!-- Metade superior da tela -->
-    <div class="metade-sala-container sala-superior">
-        <h2 id="tituloSala">Jogadores na Sala:</h2>
-        <ul id="listaJogadores"></ul>
-    </div> 
-
-    <!-- Contêiner central sobrepondo as metades -->
+    <!-- Contêiner centralizado para o título GABHoot -->
     <div class="centro-sala-container">
         <h1>GABHoot</h1>
     </div>
 
-    <!-- Metade inferior da tela -->
+    <!-- Contêiner inferior para os botões -->
     <div class="metade-sala-container sala-inferior">
-        <button id="btnImprimirSalas">Atualizar Jogadores</button>
-        <button class="botao-sala" onclick="window.location.href='/jogar'">Voltar</button>
-        <button class="botao-sala" onclick="window.location.href='/jogar/gabhoot'">Iniciar</button>
+        <div class="botoes-container">      
+            <button class="botao-sala" onclick="window.location.href='/jogar/gabhoot'">Iniciar</button>
+            <button class="botao-sala" onclick="window.location.href='/jogar'">Voltar</button>
+        </div>
     </div>
-
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
-    const listaJogadores = document.getElementById('listaJogadores');
-    const tituloSala = document.getElementById('tituloSala');
-
-    // Botão para solicitar a lista de jogadores
-    document.getElementById('btnImprimirSalas').addEventListener('click', () => {
-        console.log('Solicitando lista de jogadores...');
-        socket.emit('imprimirSalas'); // Envia o evento para o servidor
-    });
-
-    // Recebe a lista de jogadores da sala do servidor
-    socket.on('jogadoresNaSala', (data) => {
-        const { codigoSala, jogadores } = data;
-
-        // Atualiza o título da sala
-        if (codigoSala) {
-            tituloSala.textContent = `Jogadores na Sala: ${codigoSala}`;
-        } else {
-            tituloSala.textContent = 'Nenhuma sala encontrada.';
-        }
-
-        // Limpa a lista anterior de jogadores
-        listaJogadores.innerHTML = '';
-
-        // Renderiza cada jogador na lista
-        jogadores.forEach((jogador) => {
-            const li = document.createElement('li');
-            li.textContent = `Nome: ${jogador.nome || 'Anônimo'}, ID: ${jogador.usuarioID}`;
-            listaJogadores.appendChild(li);
-        });
-    });
 </script>

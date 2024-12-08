@@ -1,105 +1,134 @@
+/* Container principal */
 .sala-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    align-items: center; /* Alinha o conteúdo ao centro horizontalmente */
-    justify-content: space-between; /* Espaça os elementos uniformemente */
-}
-
-.sala-centro-superior-container {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    text-align: center;
-    width: 100%;
-    height: 150px;
-    background-color: rgba(255, 255, 255, 0.9); /* Opacidade mais suave */
+    justify-content: space-between;
+    font-family: 'Arial', sans-serif;
 }
 
-.sala-centro-superior-container h1 {
-    font-size: 5em; /* Reduzido para não sobrecarregar a tela */
-    color: #333; /* Cor mais suave para contraste */
-}
-
-.sala-centro-inferior-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgb(166, 192, 216);
-    width: 50%;
-    height: auto;
-    padding: 20px;
-    border-radius: 10px; /* Bordas arredondadas para um visual mais suave */
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
-    margin-top: 20px;
-}
-
-.nome-jogador-container {
-    margin-bottom: 20px; /* Mais espaço entre o nome e os botões */
-    text-align: center;
-}
-
-.nome-jogador-container input {
-    padding: 10px;
-    font-size: 1.5em;
-    width: 80%; /* Mais largura para destacar o campo */
-    text-align: center;
-    background-color: #f0f0f0;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    margin-top: 5px;
-    cursor: not-allowed;
-}
-
-.nome-jogador-container label {
-    font-size: 1.5em;
-    color: #333;
-}
-
-.botao-sala {
-    padding: 12px 20px;
-    font-size: 1.5em;
-    background-color: #747474;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    width: 70%;
-    margin: 10px 0; /* Espaçamento entre os botões */
-}
-
-.botao-sala:hover {
-    background-color: #ddd;
-}
-
-.botao-voltar {
-    padding: 12px 20px;
-    font-size: 1.5em;
-    background-color: #b6b6b6;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    width: 70%;
-    margin-top: 20px;
-}
-
-.botao-voltar:hover {
-    background-color: #ddd;
-}
-
+/* Metades do layout */
 .metade-sala-container {
     width: 100%;
     height: 50%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
 
+/* Parte superior da tela */
 .sala-superior {
     background-color: #01438a;
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Mantém os itens no topo */
+    align-items: center; /* Centraliza horizontalmente */
+    gap: 20px; /* Espaçamento entre o título e a lista */
+    margin-top: 60px; /* Empurra toda a seção para baixo */
 }
 
-.sala-inferior {
+.sala-superior h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.lista-jogadores-container {
+    position: absolute; /* Faz o contêiner se posicionar de forma absoluta */
+    top: 70%; /* Move o contêiner mais para baixo */
+    left: 50%; /* Centraliza horizontalmente */
+    transform: translate(-50%, -50%); /* Ajusta para o centro exato */
+    background-color: rgba(255, 255, 255, 0.9); /* Fundo com opacidade */
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px; /* Limita a largura da lista */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center; /* Centraliza o texto */
+}
+
+.lista-jogadores-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.lista-jogadores-container li {
+    font-size: 1.2em;
+    padding: 10px;
+    background-color: #f4f4f4;
+    margin: 5px 0;
+    border-radius: 5px;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Garante que os itens ocupem a largura do contêiner */
+    text-align: center; /* Centraliza o texto dentro de cada item */
+}
+/* Contêiner central */
+.centro-sala-container {
+    position: absolute;   
+    top: 7%;                 
+    left: 50%;                 
+    transform: translate(-50%,-50%); 
+    width: 100%;             
+    height: 150px;             
+    background-color: rgba(255, 255, 255); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.centro-sala-container h1 {
+    font-size: 4em;
+    color: #000000;
+    margin: 0;
+}
+
+/* Parte inferior da tela */
+.metade-sala-container.sala-inferior {
     background-color: #286aa7;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Contêiner de botões */
+.botoes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaçamento maior entre os botões */
+    align-items: center; /* Garante que os botões fiquem centralizados */
+}
+
+/* Botões */
+.botao-sala {
+    padding: 30px 50px; /* Tamanho maior dos botões */
+    font-size: 2em; /* Tamanho maior da fonte */
+    font-weight: bold; /* Texto em negrito */
+    color: white;
+    background-color: #ff9800;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 300px; /* Largura fixa para os botões */
+    text-align: center; /* Garante o texto centralizado */
+}
+
+.botao-sala:hover {
+    background-color: #e68900; /* Cor mais escura ao passar o mouse */
+}
+
+.botao-sala:active {
+    transform: scale(0.95); /* Dá um efeito de clique */
 }

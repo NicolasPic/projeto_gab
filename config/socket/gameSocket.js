@@ -46,30 +46,20 @@ function configurarSocket(io) {
             console.log(`Estado atual da sala ${codigoSala}:`, salas[codigoSala]);
             socket.emit('salaCriadaOuEntrou', { codigoSala, sucesso: true });
         });
-
+        
         socket.on('disconnect', () => {
             console.log(`Socket ${socket.id} desconectado.`);
 
             for (const usuarioID in usuarios) {
                 if (usuarios[usuarioID] === socket.id) {
-                    usuarios[usuarioID] = null; 
+                    usuarios[usuarioID] = null;
                 }
             }
 
             console.log('Estado atual das salas após desconexão:', salas);
         });
 
-        socket.on('imprimirSalas', () => {
-            console.log('Estado Atual das Salas:');
-            const salasInfo = {};
-            for (const codigoSala in salas) {
-                salasInfo[codigoSala] = salas[codigoSala];
-            }
-            console.log(salasInfo);
-
-            socket.emit('salasAtualizadas', salasInfo);
-        });
     });
 }
 
-module.exports = configurarSocket;
+module.exports = { configurarSocket, salas, usuarios };

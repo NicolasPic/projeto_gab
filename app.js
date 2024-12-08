@@ -5,7 +5,7 @@ const socketIo = require("socket.io");
 const { engine } = require("express-handlebars");
 require("dotenv").config();
 const { conectarDB } = require("./config/DB/database");
-const configurarSocket = require("./config/socket/gameSocket");
+const {configurarSocket} = require("./config/socket/gameSocket");
 const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");

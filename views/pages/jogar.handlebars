@@ -1,12 +1,10 @@
 <div class="jogar-container">
-    <!-- Metade superior da tela -->
     <div class="metade-jogar-container jogar-superior">
         <div class="jogar-centro-superior-container">
             <h1>GABHoot</h1>
         </div>
     </div>
 
-    <!-- Metade inferior da tela -->
     <div class="metade-jogar-container jogar-inferior">
         <div class="jogar-centro-inferior-container">
             <div class="nome-jogador-container">
@@ -16,13 +14,14 @@
             </div>
 
             <div class="botao-jogar-container">
-                <button id="btnCriarSala" class="botao-sala">Criar Sala</button>
-                <button id="btnEntrarSala" class="botao-sala">Entrar na Sala</button>
+                <button id="btnCriarSala" class="botao-jogar">Criar Sala</button>
+                <button id="btnEntrarSala" class="botao-jogar">Entrar na Sala</button>
                 <input type="text" id="codigoSala" placeholder="Código da Sala" />
             </div>
         </div>
     </div>
 </div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
@@ -64,11 +63,12 @@
     socket.on('salaCriadaOuEntrou', (data) => {
         if (data.sucesso) {
             console.log(`Entrou na sala ${data.codigoSala} com sucesso!`);
-            window.location.href = `/jogar/sala/${data.codigoSala}`;
+            window.location.href = `/jogar/${data.codigoSala}`;
         } else {
             console.log('Falha ao entrar ou criar a sala.');
         }
     });
+
     socket.on('salasAtualizadas', (salasInfo) => {
         console.log('Estado atualizado das salas:', salasInfo);
     });

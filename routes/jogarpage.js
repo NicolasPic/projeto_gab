@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { isAuthenticated } = require('../config/auth/auth');
 const { sequelize } = require("../config/DB/database");
+const { salas } = require('../config/socket/gameSocket');
 
 function getRandomUniqueNumbers(min, max, count) {
     const numbers = Array.from({ length: max - min + 1 }, (_, i) => i + min); 
@@ -23,11 +24,78 @@ router.get('/', isAuthenticated, (req, res) => {
     });
 });
 
-router.get('/sala/:codigo', isAuthenticated, (req, res) => {
+router.get('/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
-    const nomeUsuario = req.user ? req.user.nome : 'Visitante'; 
-    res.render('pages/sala', { codigoSala, nomeJogador: nomeUsuario });
+
+    // Validação: Verificar se o objeto `salas` está presente e é válido
+    if (!salas || typeof salas !== 'object') {
+        console.error("Erro: Objeto `salas` não foi definido ou está mal configurado.");
+        return res.status(500).render('pages/sala', {
+            codigoSala: null,
+            jogadores: [],
+            error: "Erro interno: Objeto de gerenciamento de salas está indisponível."
+        });
+    }
+
+    // Validação: Verificar se o parâmetro `codigo` foi passado corretamente
+    if (!codigoSala || typeof codigoSala !== 'string' || codigoSala.trim() === '') {
+        return res.status(400).render('pages/sala', {
+            codigoSala: null,
+            jogadores: [],
+            error: "Código da sala inválido ou não fornecido."
+        });
+    }
+
+    // Validação: Verificar se a sala existe no objeto `salas`
+    if (!salas[codigoSala]) {
+        console.warn(`Sala não encontrada: ${codigoSala}`);
+        return res.status(404).render('pages/sala', {
+            codigoSala,
+            jogadores: [],
+            error: "Sala não encontrada."
+        });
+    }
+
+    try {
+        const usuariosIDs = salas[codigoSala];
+
+        // Validação: Verificar se há jogadores na sala
+        if (!Array.isArray(usuariosIDs) || usuariosIDs.length === 0) {
+            console.info(`Nenhum jogador na sala ${codigoSala}.`);
+            return res.render('pages/sala', {
+                codigoSala,
+                jogadores: [],
+                error: "Nenhum jogador na sala no momento."
+            });
+        }
+
+        // Consulta ao banco para buscar os nomes dos jogadores
+        const jogadores = await sequelize.query(
+            `SELECT id, nome FROM usuarios WHERE id IN (:ids)`,
+            {
+                replacements: { ids: usuariosIDs },
+                type: sequelize.QueryTypes.SELECT
+            }
+        );
+
+        // Renderizar a página da sala com os dados dos jogadores
+        return res.render('pages/sala', {
+            codigoSala,
+            jogadores,
+            error: null
+        });
+    } catch (error) {
+        console.error("Erro ao buscar jogadores no banco de dados:", error);
+
+        // Resposta de erro genérico para falha no banco de dados ou lógica
+        return res.status(500).render('pages/sala', {
+            codigoSala,
+            jogadores: [],
+            error: "Erro ao carregar informações da sala."
+        });
+    }
 });
+
 
 router.get('/gabhoot', isAuthenticated, async (req, res) => {
     try {
