@@ -26,13 +26,14 @@ router.get('/', isAuthenticated, (req, res) => {
 
 router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
+    const usuarioID = req.user ? req.user.id : null; 
 
-    // Validação: Verificar se o objeto `salas` está presente e é válido
     if (!salas || typeof salas !== 'object') {
         console.error("Erro: Objeto `salas` não foi definido ou está mal configurado.");
         return res.status(500).render('pages/sala', {
             codigoSala: null,
             jogadores: [],
+            usuarioID: usuarioID,
             error: "Erro interno: Objeto de gerenciamento de salas está indisponível."
         });
     }
@@ -42,6 +43,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
         return res.status(400).render('pages/sala', {
             codigoSala: null,
             jogadores: [],
+            usuarioID: usuarioID,
             error: "Código da sala inválido ou não fornecido."
         });
     }
@@ -52,6 +54,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
         return res.status(404).render('pages/sala', {
             codigoSala,
             jogadores: [],
+            usuarioID: usuarioID,
             error: "Sala não encontrada."
         });
     }
@@ -65,6 +68,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
             return res.render('pages/sala', {
                 codigoSala,
                 jogadores: [],
+                usuarioID: usuarioID,
                 error: "Nenhum jogador na sala no momento."
             });
         }
@@ -82,6 +86,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
         return res.render('pages/sala', {
             codigoSala,
             jogadores,
+            usuarioID: usuarioID,
             error: null
         });
     } catch (error) {
@@ -91,6 +96,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
         return res.status(500).render('pages/sala', {
             codigoSala,
             jogadores: [],
+            usuarioID: usuarioID,
             error: "Erro ao carregar informações da sala."
         });
     }

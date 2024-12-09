@@ -5,7 +5,7 @@ function configurarSocket(io) {
     io.on('connection', (socket) => {
         console.log('Novo jogador conectado:', socket.id);
 
-        socket.on('reconectar', ({ usuarioID }) => {
+        socket.on('reconectar', ({usuarioID}) => {
             if (usuarios[usuarioID]) {
                 const codigoSala = Object.keys(salas).find((codigo) =>
                     salas[codigo].includes(usuarioID)
@@ -32,9 +32,9 @@ function configurarSocket(io) {
 
         socket.on('redirecionarSala', ({ codigoSala }) => {
             if (salas[codigoSala]) {
-                const url = `/jogar/sala/${codigoSala}`;
-                console.log(`Redirecionando jogadores da sala ${codigoSala} para ${url}`);
-                io.to(codigoSala).emit('redirect', url);
+                const url = `/jogar/gabhoot`;
+                console.log(`Redirecionando jogadores da sala ${codigoSala}`);
+                io.to(codigoSala).emit('redirect',url);
             } else {
                 console.log(`Sala ${codigoSala} não encontrada para redirecionamento.`);
             }
@@ -59,13 +59,6 @@ function configurarSocket(io) {
         
         socket.on('disconnect', () => {
             console.log(`Socket ${socket.id} desconectado.`);
-
-            for (const usuarioID in usuarios) {
-                if (usuarios[usuarioID] === socket.id) {
-                    usuarios[usuarioID] = null;
-                }
-            }
-
             console.log('Estado atual das salas após desconexão:', salas);
         });
 

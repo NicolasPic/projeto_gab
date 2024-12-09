@@ -2,6 +2,7 @@
 
 /* Importa os arquivos CSS individuais */
 @import url('reset.css');
+@import url('alertas.css');
 @import url('header.css');
 @import url('footer.css');
 @import url('login.css');
