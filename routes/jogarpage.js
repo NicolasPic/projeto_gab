@@ -4,14 +4,6 @@ const { isAuthenticated } = require('../config/auth/auth');
 const { sequelize } = require("../config/DB/database");
 const { salas } = require('../config/socket/gameSocket');
 
-function getRandomUniqueNumbers(min, max, count) {
-    const numbers = Array.from({ length: max - min + 1 }, (_, i) => i + min); 
-    for (let i = numbers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
-    }
-    return numbers.slice(0, count); 
-}
 
 router.get('/', isAuthenticated, (req, res) => {
     const nomeUsuario = req.user ? req.user.nome : 'Visitante'; 
@@ -27,6 +19,7 @@ router.get('/', isAuthenticated, (req, res) => {
 router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
     const usuarioID = req.user ? req.user.id : null; 
+    req.session.codigoSala = codigoSala;
 
     if (!salas || typeof salas !== 'object') {
         console.error("Erro: Objeto `salas` não foi definido ou está mal configurado.");
@@ -62,7 +55,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     try {
         const usuariosIDs = salas[codigoSala];
 
-        // Validação: Verificar se há jogadores na sala
+
         if (!Array.isArray(usuariosIDs) || usuariosIDs.length === 0) {
             console.info(`Nenhum jogador na sala ${codigoSala}.`);
             return res.render('pages/sala', {
@@ -81,8 +74,6 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
                 type: sequelize.QueryTypes.SELECT
             }
         );
-
-        // Renderizar a página da sala com os dados dos jogadores
         return res.render('pages/sala', {
             codigoSala,
             jogadores,
@@ -102,56 +93,25 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     }
 });
 
-
 router.get('/gabhoot', isAuthenticated, async (req, res) => {
-    try {
-        const randomIDs = getRandomUniqueNumbers(1, 20, 10);
-        console.log('IDs gerados:', randomIDs);
-        req.session.perguntas = randomIDs;
-
-        const perguntaID = randomIDs[0];
-        const rows = await sequelize.query(`
-            SELECT p.id AS pergunta_id, p.texto AS pergunta_texto, 
-                   r.id AS resposta_id, r.texto AS resposta_texto,
-                   r.correta AS resposta_correta
-            FROM perguntas p
-            LEFT JOIN respostas r ON p.id = r.pergunta_id
-            WHERE p.id = ?
-        `, {
-            replacements: [perguntaID],
-            type: sequelize.QueryTypes.SELECT
-        });
-
-        if (!rows || rows.length === 0) {
-            console.error(`Nenhuma pergunta encontrada para o ID ${perguntaID}.`);
-            return res.status(404).send('Nenhuma pergunta encontrada.');
-        }
-
-        const pergunta = {
-            id: rows[0].pergunta_id,
-            texto: rows[0].pergunta_texto,
-            respostas: rows.map(row => ({
-                id: row.resposta_id,
-                texto: row.resposta_texto,
-                correta: row.resposta_correta
-            })).filter(resposta => resposta.id)
-        };
-
-        console.log('Dados retornados pela consulta:', rows);
-        console.log('Pergunta processada:', pergunta);
-
-        res.render('pages/gabhoot', { pergunta });
-    } catch (error) {
-        console.error('Erro ao carregar a primeira pergunta:', error);
-        res.status(500).send('Erro ao iniciar o jogo.');
+    const codigoSala = req.session.codigoSala;
+    if (!codigoSala || !salas[codigoSala]) {
+        return res.status(400).send('Sala não encontrada.');
     }
+
+    const pergunta = salas[codigoSala].perguntaAtual;
+    if (!pergunta) {
+        return res.status(404).send('Pergunta não encontrada.');
+    }
+
+    res.render('pages/gabhoot', { pergunta });
 });
 
 router.post('/proxima', isAuthenticated, async (req, res) => {
     try {
         const respostaID = parseInt(req.body.resposta, 10);
         const tempoRestante = parseInt(req.body.tempoRestante, 10);
-        const perguntas = req.session.perguntas || [];
+        const perguntas = req.session.perguntasID || [];
 
         if (!perguntas || perguntas.length === 0) {
             return res.redirect('/jogar/resultado');

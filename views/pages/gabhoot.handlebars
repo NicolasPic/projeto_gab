@@ -44,7 +44,7 @@
     const inputTempoRestante = document.getElementById('tempo-restante-valor');
 
     function selecionarResposta(valor) {
-        inputResposta.value = valor || ''; // Define "" se vazio
+        inputResposta.value = valor || ''; 
     }
 
     const contador = setInterval(() => {
@@ -53,13 +53,13 @@
 
         if (tempo <= 0) {
             clearInterval(contador);
-            inputTempoRestante.value = 0; // Define 0 como tempo restante
+            inputTempoRestante.value = 0; 
             form.submit();
         }
     }, 1000);
 
     form.addEventListener('submit', () => {
         clearInterval(contador);
-        inputTempoRestante.value = tempo; // Define o tempo restante no momento do envio
+        inputTempoRestante.value = tempo; 
     });
 </script>
