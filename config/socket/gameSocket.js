@@ -44,43 +44,55 @@ function configurarSocket(io) {
             const randomIDs = getRandomUniqueNumbers(1, 20, 10);
             console.log('IDs gerados:', randomIDs);
         
-            const perguntaID = randomIDs[0];
+            // Consulta ao banco de dados
             const rows = await sequelize.query(`
                 SELECT p.id AS pergunta_id, p.texto AS pergunta_texto, 
                     r.id AS resposta_id, r.texto AS resposta_texto,
                     r.correta AS resposta_correta
                 FROM perguntas p
                 LEFT JOIN respostas r ON p.id = r.pergunta_id
-                WHERE p.id = ?
+                WHERE p.id IN (${randomIDs.join(', ')})
             `, {
-                replacements: [perguntaID],
                 type: sequelize.QueryTypes.SELECT
             });
         
             if (!rows || rows.length === 0) {
-                console.error(`Nenhuma pergunta encontrada para o ID ${perguntaID}.`);
+                console.error(`Nenhuma pergunta encontrada para os IDs fornecidos.`);
                 return;
             }
         
-            const pergunta = {
-                id: rows[0].pergunta_id,
-                texto: rows[0].pergunta_texto,
-                respostas: rows.map(row => ({
+            // Criando as perguntas com respostas sem duplicações
+            const perguntasMap = new Map();
+        
+            rows.forEach(row => {
+                if (!perguntasMap.has(row.pergunta_id)) {
+                    perguntasMap.set(row.pergunta_id, {
+                        id: row.pergunta_id,
+                        texto: row.pergunta_texto,
+                        respostas: []
+                    });
+                }
+        
+                const pergunta = perguntasMap.get(row.pergunta_id);
+                pergunta.respostas.push({
                     id: row.resposta_id,
                     texto: row.resposta_texto,
                     correta: row.resposta_correta
-                })).filter(resposta => resposta.id)
-            };
+                });
+            });
         
-            // Armazene a pergunta na sala
+            const perguntas = Array.from(perguntasMap.values());
+        
+            // Configurando perguntas na sala
             if (salas[codigoSala]) {
-                salas[codigoSala].perguntas = randomIDs;
-                salas[codigoSala].perguntaAtual = pergunta;
+                salas[codigoSala].perguntas = perguntas;
+                salas[codigoSala].perguntaAtual = perguntas[0];
+                salas[codigoSala].respostasJogadores = {};
             }
         
-            console.log('Pergunta configurada para a sala:', pergunta);
+            console.log('Perguntas configuradas para a sala:', perguntas);
         
-            // Redireciona todos os jogadores
+            // Emitindo evento de redirecionamento
             const url = `/jogar/gabhoot`;
             io.to(codigoSala).emit('redirect', url);
         });
