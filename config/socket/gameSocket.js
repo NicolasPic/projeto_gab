@@ -83,6 +83,7 @@ function configurarSocket(io) {
         
             const perguntas = Array.from(perguntasMap.values());
         
+<<<<<<< HEAD
             // Configurando perguntas para todos os usuários na sala
             if (salas[codigoSala]) {
                 Object.keys(salas[codigoSala]).forEach(usuarioID => {
@@ -93,6 +94,16 @@ function configurarSocket(io) {
             }
         
             console.log(`Perguntas configuradas para a sala ${codigoSala}:`, perguntas);
+=======
+            // Configurando perguntas na sala
+            if (salas[codigoSala]) {
+                salas[codigoSala].perguntas = perguntas;
+                salas[codigoSala].perguntaAtual = perguntas[0];
+                salas[codigoSala].respostasJogadores = {};
+            }
+        
+            console.log('Perguntas configuradas para a sala:', perguntas);
+>>>>>>> 129f441748d6b8714e7ac969688c3d2f4ed35a5a
         
             // Emitindo evento de redirecionamento
             const url = `/jogar/gabhoot`;
