@@ -41,7 +41,7 @@
     });
 
     document.getElementById('btnIniciar').addEventListener('click', () => {
-        socket.emit('redirecionarSala',{codigoSala});
+        socket.emit('redirecionarSala',{ codigoSala, usuarioID });
     });
   
     socket.on('redirect', (url) => {
