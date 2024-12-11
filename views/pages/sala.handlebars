@@ -35,6 +35,7 @@
     const socket = io();
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
+    
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
         socket.emit('reconectar',{usuarioID});

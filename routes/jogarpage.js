@@ -148,6 +148,8 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
 });
 
 router.get('/resultado', isAuthenticated, (req, res) => {
+    const codigoSala = req.session.codigoSala;
+    const usuarioID = req.user ? req.user.id : null;
     const respostas = req.session.respostas || [];
     req.session.perguntas = null;
     req.session.respostas = null;
@@ -157,11 +159,15 @@ router.get('/resultado', isAuthenticated, (req, res) => {
         .filter(r => r.correta === 1)
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
+    salas[codigoSala][usuarioID].pontuacaoTotal = tempoTotalRestante;
+    
     console.log('Respostas registradas:', respostas);
     console.log('Total de acertos:', acertos);
     console.log('Tempo total restante (apenas acertos):', tempoTotalRestante);
 
     res.render('pages/resultado', {
+        codigoSala,
+        usuarioID: usuarioID,
         total: respostas.length,
         acertos,
         tempoTotalRestante

@@ -44,7 +44,6 @@ function configurarSocket(io) {
             const randomIDs = getRandomUniqueNumbers(1, 20, 10);
             console.log('IDs gerados:', randomIDs);
         
-            // Consulta ao banco de dados
             const rows = await sequelize.query(`
                 SELECT p.id AS pergunta_id, p.texto AS pergunta_texto, 
                     r.id AS resposta_id, r.texto AS resposta_texto,
@@ -89,12 +88,12 @@ function configurarSocket(io) {
                     salas[codigoSala][usuarioID].perguntas = [...perguntas];
                     salas[codigoSala][usuarioID].perguntaAtual = perguntas[0];
                     salas[codigoSala][usuarioID].respostasJogadores = {};
+                    salas[codigoSala][usuarioID].pontuacaoTotal = 0;
                 });
             }
         
             console.log(`Perguntas configuradas para a sala ${codigoSala}:`, perguntas);
         
-            // Emitindo evento de redirecionamento
             const url = `/jogar/gabhoot`;
             io.to(codigoSala).emit('redirect', url);
         });
