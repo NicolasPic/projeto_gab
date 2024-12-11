@@ -1,14 +1,26 @@
 <div class="resultado-container">
 
     <div class="centro-resultado-container">
-            <h1>GABHoot</h1>
-        </div>
+        <h1>GABHoot</h1>
+    </div>
+
     <!-- Metade superior da tela -->
     <div class="metade-resultado-container resultado-superior">
-
         <h1>Resultado Final</h1>
         <p>Total de acertos: {{acertos}}</p>
         <p>Pontuação: {{tempoTotalRestante}}</p>
+    </div>
+
+    <!-- Resultados de todos os jogadores -->
+    <div class="metade-resultado-container resultado-superior">
+        <h2>Resultados da Sala</h2>
+        <ul>
+            {{#each resultados}}
+                <li>
+                    Jogador: {{nome}} - Pontuação: {{pontuacaoTotal}}
+                </li>
+            {{/each}}
+        </ul>
     </div>
 
     <!-- Metade inferior da tela -->
@@ -24,6 +36,12 @@
     const socket = io();
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
+    //const resultado1 = "{{json resultados}}";
+    const acertos1 = "{{acertos}}";
+
+    console.log(acertos1)
+    console.log(resultado1)
+    console.log(codigoSala)
     
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
@@ -37,5 +55,15 @@
     socket.on('redirect', (url) => {
          window.location.href = url;
     });
+
+ window.addEventListener('load', () => {
+    const data={
+        resultado: resultado1
+
+    }
+       sessionStorage.setItem('meuJson', JSON.stringify(data));
+ 
+    });
+
 
 </script>

@@ -21,10 +21,14 @@ setupPassport(passport);
 // Salvar o middleware de sessão em uma variável para reutilizar no Socket.IO
 const sessionMiddleware = session({
     secret: "projetogab",
-    resave: true,
-    saveUninitialized: true
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    }
 });
-
 // Sessão no Express
 app.use(sessionMiddleware);
 

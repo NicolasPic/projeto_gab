@@ -69,12 +69,14 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
                 type: sequelize.QueryTypes.SELECT
             }
         );
+
         return res.render('pages/sala', {
             codigoSala,
             jogadores,
             usuarioID: usuarioID,
             error: null
         });
+
     } catch (error) {
         console.error("Erro ao buscar jogadores no banco de dados:", error);
 
@@ -147,7 +149,18 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/resultado', isAuthenticated, (req, res) => {
+router.get('/Getsession', isAuthenticated, async (req, res) => {
+    const data = {
+            acertos: req.session.acertos,
+            tempoTotalRestante:  req.session.tempoRestante,
+            resultados: req.session.resultados ,
+    }
+    
+         res.json(data);
+
+});
+
+router.get('/resultado', isAuthenticated, async (req, res) => {
     const codigoSala = req.session.codigoSala;
     const usuarioID = req.user ? req.user.id : null;
     const respostas = req.session.respostas || [];
@@ -160,18 +173,67 @@ router.get('/resultado', isAuthenticated, (req, res) => {
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
     salas[codigoSala][usuarioID].pontuacaoTotal = tempoTotalRestante;
-    
+    pontuacao = salas[codigoSala][usuarioID].pontuacaoTotal;
     console.log('Respostas registradas:', respostas);
     console.log('Total de acertos:', acertos);
     console.log('Tempo total restante (apenas acertos):', tempoTotalRestante);
 
-    res.render('pages/resultado', {
-        codigoSala,
-        usuarioID: usuarioID,
-        total: respostas.length,
-        acertos,
-        tempoTotalRestante
-    });
+    try {
+        const usuariosIDs = Object.keys(salas[codigoSala]);
+
+        if (usuariosIDs.length === 0) {
+            console.info(`Nenhum jogador na sala ${codigoSala}.`);
+            return res.render('pages/resultado', {
+                codigoSala,
+                jogadores: [],
+                usuarioID: usuarioID,
+                acertos,
+                pontuacao,
+                resultados: [],
+                error: "Nenhum jogador na sala no momento."
+            });
+        }
+
+        const jogadores = await sequelize.query(
+            `SELECT id, nome FROM usuarios WHERE id IN (:ids)`,
+            {
+                replacements: { ids: usuariosIDs },
+                type: sequelize.QueryTypes.SELECT
+            }
+        );
+
+        req.session.acertos = acertos;
+        req.session.tempoRestante = tempoTotalRestante;
+        req.session.resultados = jogadores.map(jogador => ({
+                nome: jogador.nome,
+                pontuacaoTotal: salas[codigoSala][jogador.id].pontuacaoTotal || 0
+            })),
+
+        res.render('pages/resultado', {
+            codigoSala,
+            jogadores,
+            usuarioID: usuarioID,
+            acertos: req.session.acertos,
+            tempoTotalRestante:  req.session.tempoRestante,
+            resultados: req.session.resultados,
+            error: null
+        });
+
+
+    } catch (error) {
+        console.error("Erro ao carregar jogadores no Resultado:", error);
+        res.status(500).render('pages/resultado', {
+            codigoSala,
+            jogadores: [],
+            usuarioID: usuarioID,
+            acertos,
+            tempoTotalRestante,
+            resultados: [],
+            error: "Erro ao carregar jogadores."
+        });
+    }
 });
+
+
 
 module.exports = router;
