@@ -175,16 +175,20 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
     req.session.perguntas = null;
     req.session.respostas = null;
 
+    // Cálculo de acertos e pontos individuais
     const acertos = respostas.filter(r => r.correta === 1).length;
     const pontos = respostas
         .filter(r => r.correta === 1)
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
-    salas[codigoSala][usuarioID].pontuacao = pontos;
-    pontuacaoIndividual = salas[codigoSala][usuarioID].pontuacao;
+    // Atualiza a pontuação do jogador atual no objeto 'salas'
+    if (salas[codigoSala][usuarioID]) {
+        salas[codigoSala][usuarioID].pontuacao = pontos;
+    }
+
     console.log('Respostas registradas:', respostas);
     console.log('Total de acertos:', acertos);
-    console.log('Tempo total restante (apenas acertos):', pontuacaoIndividual);
+    console.log('Pontuação calculada para o jogador:', pontos);
 
     try {
         const usuariosIDs = Object.keys(salas[codigoSala]);
@@ -196,7 +200,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
                 jogadores: [],
                 usuarioID: usuarioID,
                 acertos,
-                pontuacaoIndividual,
+                pontuacaoIndividual: pontos,
                 resultados: [],
                 error: "Nenhum jogador na sala no momento."
             });
@@ -210,33 +214,36 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             }
         );
 
-            req.session.acertos = acertos;
-            req.session.pontos = pontuacaoIndividual;
-            req.session.resultados = jogadores.map(jogador => ({
-                nome: jogador.nome,
-                pontuacaoTotalIndividual: salas[codigoSala][jogador.id].pontuacao
-            })),
+        // Criação do array de resultados para todos os jogadores na sala
+        const resultados = jogadores.map(jogador => ({
+            nome: jogador.nome,
+            pontuacaoTotalIndividual: salas[codigoSala][jogador.id]?.pontuacao || 0
+        }));
 
-            res.render('pages/resultado', {
-                codigoSala,
-                jogadores,
-                usuarioID: usuarioID,
-                acertos: req.session.acertos,
-                pontuacaoIndividual: req.session.pontos,
-                resultados: JSON.stringify(req.session.resultados),
-                error: null
-            });
-            
+        // Armazenamento na sessão para o jogador atual
+        req.session.acertos = acertos;
+        req.session.pontos = pontos;
+        req.session.resultados = resultados;
 
+        // Renderização da página de resultados
+        return res.render('pages/resultado', {
+            codigoSala,
+            jogadores,
+            usuarioID: usuarioID,
+            acertos: req.session.acertos,
+            pontuacaoIndividual: req.session.pontos,
+            resultados: JSON.stringify(req.session.resultados),
+            error: null
+        });
 
     } catch (error) {
         console.error("Erro ao carregar jogadores no Resultado:", error);
-        res.status(500).render('pages/resultado', {
+        return res.status(500).render('pages/resultado', {
             codigoSala,
             jogadores: [],
             usuarioID: usuarioID,
             acertos,
-            pontuacaoIndividual: req.session.pontos,
+            pontuacaoIndividual: pontos,
             resultados: [],
             error: "Erro ao carregar jogadores."
         });

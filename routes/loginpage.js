@@ -30,7 +30,6 @@ router.get('/criarconta', (req, res) => {
 router.post('/criarconta', (req, res) => {
     var erros = [];
 
-    // Verificações de campos obrigatórios
     if (!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null) {
         erros.push({ texto: "Nome inválido" });
     }
@@ -55,7 +54,6 @@ router.post('/criarconta', (req, res) => {
         return res.render("pages/criarconta", { erros: erros });
     }
 
-    // Verificando se já existe um usuário com o mesmo CPF
     Usuario.findOne({ where: { cpf: req.body.cpf } })
         .then((usuario) => {
             if (usuario) {
@@ -63,7 +61,6 @@ router.post('/criarconta', (req, res) => {
                 return res.redirect("/login/criarconta");
             }
 
-            // Criando o novo usuário
             const novoUsuario = new Usuario({
                 nome: req.body.nome,
                 email: req.body.email,
@@ -71,7 +68,6 @@ router.post('/criarconta', (req, res) => {
                 cpf: req.body.cpf
             });
 
-            // Criptografando a senha
             bcrypt.genSalt(10, (erro, salt) => {
                 if (erro) {
                     req.flash("error_msg", "Houve um erro durante o processo de criptografia");
@@ -84,17 +80,15 @@ router.post('/criarconta', (req, res) => {
                         return res.redirect("/login/criarconta");
                     }
 
-                    // Salvando a senha criptografada
                     novoUsuario.senha = hash;
 
-                    // Salvando o novo usuário no banco de dados
                     novoUsuario.save()
                         .then(() => {
                             req.flash("success_msg", "Usuário criado com sucesso");
                             res.redirect("/home");
                         })
                         .catch((err) => {
-                            console.log(err);  // Log para erros de banco de dados
+                            console.log(err); 
                             req.flash("error_msg", "Houve um erro ao criar o usuário, tente novamente");
                             res.redirect("/login/criarconta");
                         });
@@ -102,7 +96,7 @@ router.post('/criarconta', (req, res) => {
             });
         })
         .catch((err) => {
-            console.log(err);  // Log para erros de banco de dados
+            console.log(err); 
             req.flash("error_msg", "Houve um erro interno, tente novamente");
             res.redirect("/login/criarconta");
         });

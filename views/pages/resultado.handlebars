@@ -36,62 +36,49 @@
     const socket = io();
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
-    const pontuacaoIndividual1 = "{{pontuacaoIndividual}}";
-    const resultadosJSON =  JSON.stringify({{{resultados}}});
-    const acertos1 = {{acertos}}; 
 
-    console.log("Acertos:", acertos1);
-    console.log("pontuacaoIndividual:", pontuacaoIndividual1);
-    console.log("Resultados:", resultadosJSON);
-    console.log("Código da Sala:", codigoSala);
+    // Limpa o sessionStorage ao carregar a página
+    window.addEventListener('load', () => {
+        sessionStorage.clear();
+        console.log("Sessão limpa ao carregar a página.");
 
-    if (!sessionStorage.getItem('acertos')) {
-    sessionStorage.setItem('acertos', acertos1);
-    }
+        // Atualiza os elementos diretamente do template
+        const acertos = {{acertos}};
+        const pontuacaoIndividual = "{{pontuacaoIndividual}}";
+        const resultados = {{{resultados}}};
 
-    if (!sessionStorage.getItem('resultados')) {
-        sessionStorage.setItem('resultados', resultadosJSON);
-    }
+        console.log("Acertos:", acertos);
+        console.log("Pontuação:", pontuacaoIndividual);
+        console.log("Resultados:", resultados);
 
-    if (!sessionStorage.getItem('pontuacaoIndividual')) {
-        sessionStorage.setItem('pontuacaoIndividual', pontuacaoIndividual1);
-    }
+        // Atualiza os elementos da página com os dados do servidor
+        document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(2)').textContent = `Total de acertos: ${acertos}`;
+        document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(3)').textContent = `Pontuação: ${pontuacaoIndividual}`;
+
+        const resultadosUl = document.querySelector('.metade-resultado-container.resultado-superior ul');
+        resultadosUl.innerHTML = ''; // Garante que a lista seja limpa antes de preencher
+
+        resultados.forEach((resultado) => {
+            const li = document.createElement('li');
+            li.textContent = `Jogador: ${resultado.nome} - Pontuação: ${resultado.pontuacaoTotalIndividual}`;
+            resultadosUl.appendChild(li);
+        });
+    });
+
+    // Ação do botão "Jogar Novamente"
+    document.getElementById('btnIniciar').addEventListener('click', () => {
+        sessionStorage.clear(); // Limpa novamente antes de iniciar uma nova rodada
+        console.log("Sessão limpa antes de redirecionar.");
+        socket.emit('redirecionarSala', { codigoSala, usuarioID });
+    });
+
+    // Redirecionamento via socket
+    socket.on('redirect', (url) => {
+        window.location.href = url;
+    });
 
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
         socket.emit('reconectar', { usuarioID });
     });
-
-    document.getElementById('btnIniciar').addEventListener('click', () => {
-        sessionStorage.removeItem('acertos');
-        sessionStorage.removeItem('resultados');
-        sessionStorage.removeItem('pontuacaoIndividual');
-
-        socket.emit('redirecionarSala', { codigoSala, usuarioID });
-    });
-
-    socket.on('redirect', (url) => {
-        window.location.href = url;
-    });
-
-    window.addEventListener('load', () => {
-    const acertosSession = sessionStorage.getItem('acertos');
-    const resultadosSession = sessionStorage.getItem('resultados');
-    const pontuacaoIndividualSession = sessionStorage.getItem('pontuacaoIndividual');
-    const resultadosJSONSession = resultadosSession ? JSON.parse(resultadosSession) : [];
-
-    // Atualiza os elementos da página
-    document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(2)').textContent = `Total de acertos: ${acertosSession}`;
-    document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(3)').textContent = `Pontuação: ${pontuacaoIndividualSession}`;
-
-    const resultadosUl = document.querySelector('.metade-resultado-container.resultado-superior ul');
-    resultadosUl.innerHTML = ''; 
-
-    resultadosJSONSession.forEach((resultado) => {
-        const li = document.createElement('li');
-        li.textContent = `Jogador: ${resultado.nome} - Pontuação: ${resultado.pontuacaoTotalIndividual}`;
-        resultadosUl.appendChild(li);
-    });
-});
-
 </script>
