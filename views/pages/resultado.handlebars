@@ -1,21 +1,67 @@
 <div class="resultado-container">
 
+    <div class="centro-resultado-container">
+        <h1>GABHoot</h1>
+    </div>
+
     <!-- Metade superior da tela -->
     <div class="metade-resultado-container resultado-superior">
-        <div class="centro-resultado-container">
-            <h1>GABHoot</h1>
-        </div>
         <h1>Resultado Final</h1>
-        <p>Total de perguntas respondidas: {{total}}</p>
         <p>Total de acertos: {{acertos}}</p>
         <p>Pontuação: {{tempoTotalRestante}}</p>
     </div>
 
+    <!-- Resultados de todos os jogadores -->
+    <div class="metade-resultado-container resultado-superior">
+        <h2>Resultados da Sala</h2>
+        <ul>
+            {{#each resultados}}
+                <li>
+                    Jogador: {{nome}} - Pontuação: {{pontuacaoTotal}}
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+
     <!-- Metade inferior da tela -->
     <div class="metade-resultado-container resultado-inferior">
-        
-        <a href="/jogar/gabhoot" class="botao-resultado">Jogar Novamente</a>
+        <button class="botao-resultado" id="btnIniciar">Jogar Novamente</button>
         <a href="/home" class="botao-resultado">Voltar para o Início</a>
     </div>
 
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const usuarioID = "{{usuarioID}}";
+    const codigoSala = "{{codigoSala}}";
+    const resultadosJSON = {{{resultados}}};
+    const acertos1 = {{acertos}}; 
+
+    console.log("Acertos:", acertos1);
+    console.log("Resultados:", resultadosJSON);
+    console.log("Código da Sala:", codigoSala);
+
+    socket.on('connect', () => {
+        console.log(`Conectado com socket ID: ${socket.id}`);
+        socket.emit('reconectar', { usuarioID });
+    });
+
+    document.getElementById('btnIniciar').addEventListener('click', () => {
+        socket.emit('redirecionarSala', { codigoSala, usuarioID });
+    });
+
+    socket.on('redirect', (url) => {
+        window.location.href = url;
+    });
+
+    window.addEventListener('load', () => {
+        if (!sessionStorage.getItem('acertos')) {
+            sessionStorage.setItem('acertos', acertos1);
+        }
+        if (!sessionStorage.getItem('resultados')) {
+            sessionStorage.setItem('resultados', JSON.stringify(resultadosJSON)); 
+        }
+    });
+</script>

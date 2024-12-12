@@ -69,8 +69,8 @@
     border-radius: 5px;
     color: #333;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Garante que os itens ocupem a largura do contêiner */
-    text-align: center; /* Centraliza o texto dentro de cada item */
+    width: 100%;
+    text-align: center; 
 }
 /* Contêiner central */
 .centro-sala-container {
@@ -88,7 +88,7 @@
 }
 
 .centro-sala-container h1 {
-    font-size: 4em;
+    font-size: 10em;
     color: #000000;
     margin: 0;
 }
