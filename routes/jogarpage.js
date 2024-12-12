@@ -120,7 +120,11 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
         const perguntas = salas[codigoSala][usuarioID].perguntas || [];
 
         if (!perguntas || perguntas.length === 0) {
-            return res.redirect('/jogar/resultado');
+            salas[codigoSala][usuarioID].respondeuTodas = true;
+            return res.render('pages/espera', {
+                codigoSala,
+                usuarioID: usuarioID,
+            });
         }
 
         req.session.respostas = req.session.respostas || [];
@@ -139,7 +143,11 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
         salas[codigoSala][usuarioID].perguntaAtual = salas[codigoSala][usuarioID].perguntas[0];
 
         if (!salas[codigoSala][usuarioID].perguntaAtual) {
-            return res.redirect('/jogar/resultado');
+            salas[codigoSala][usuarioID].respondeuTodas = true;
+            return res.render('pages/espera', {
+                codigoSala,
+                usuarioID: usuarioID,
+            });
         }
 
         res.render('pages/gabhoot', { pergunta: salas[codigoSala][usuarioID].perguntaAtual });

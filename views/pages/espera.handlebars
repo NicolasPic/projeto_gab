@@ -1,0 +1,18 @@
+<h1>Aguardando outros jogadores...</h1>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const codigoSala = "{{codigoSala}}";
+    const usuarioID = "{{usuarioID}}";
+
+ socket.on('connect', () => {
+        console.log(`Conectado com socket ID: ${socket.id}`);
+        socket.emit('reconectar',{usuarioID});
+    });
+    
+    socket.emit('quemrespondeu', { codigoSala, usuarioID });
+
+    socket.on('redirect', (url) => {
+        window.location.href = url;
+    });
+</script>

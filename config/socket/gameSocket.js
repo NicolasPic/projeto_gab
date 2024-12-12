@@ -87,7 +87,7 @@ function configurarSocket(io) {
                 Object.keys(salas[codigoSala]).forEach(usuarioID => {
                     salas[codigoSala][usuarioID].perguntas = [...perguntas];
                     salas[codigoSala][usuarioID].perguntaAtual = perguntas[0];
-                    salas[codigoSala][usuarioID].respostasJogadores = {};
+                    salas[codigoSala][usuarioID].respondeuTodas = false;
                     salas[codigoSala][usuarioID].pontuacaoTotal = 0;
                 });
             }
@@ -118,6 +118,35 @@ function configurarSocket(io) {
 
             console.log(`Estado atual da sala ${codigoSala}:`, salas[codigoSala]);
             socket.emit('salaCriadaOuEntrou', { codigoSala, sucesso: true });
+        });
+
+        socket.on('quemrespondeu', ({ codigoSala, usuarioID }) => {
+            if (!salas[codigoSala]) {
+                console.error(`Sala ${codigoSala} não encontrada.`);
+                return;
+            }
+        
+            // Atualizar o estado do jogador
+            if (salas[codigoSala][usuarioID]) {
+                salas[codigoSala][usuarioID].respondeuTodas = true;
+            }
+        
+            // Verificar se todos os jogadores da sala responderam
+            const todosResponderam = Object.values(salas[codigoSala]).every(
+                (jogador) => jogador.respondeuTodas
+            );
+        
+            if (todosResponderam) {
+                console.log(`Todos os jogadores da sala ${codigoSala} terminaram.`);
+        
+                // Adicionar um pequeno delay antes de redirecionar
+                setTimeout(() => {
+                    const url2 = `/jogar/resultado`;
+                    io.to(codigoSala).emit('redirect', url2);
+                }, 1000); // 1 segundo de delay, ajustável conforme necessário
+            } else {
+                console.log(`Aguardando jogadores na sala ${codigoSala}.`);
+            }
         });
         
         socket.on('disconnect', () => {
