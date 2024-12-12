@@ -206,7 +206,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             req.session.pontos = pontuacaoIndividual;
             req.session.resultados = jogadores.map(jogador => ({
                 nome: jogador.nome,
-                pontuacaoTotalIndividual: salas[codigoSala][jogador.id].pontuacao || 0
+                pontuacaoTotalIndividual: salas[codigoSala][jogador.id].pontuacao
             })),
 
             res.render('pages/resultado', {

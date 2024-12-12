@@ -45,14 +45,17 @@
     console.log("Resultados:", resultadosJSON);
     console.log("Código da Sala:", codigoSala);
 
-    if(!sessionStorage.getItem('acertos'))
-        sessionStorage.setItem('acertos', acertos1)
+    if (!sessionStorage.getItem('acertos')) {
+    sessionStorage.setItem('acertos', acertos1);
+    }
 
-    if(!sessionStorage.getItem('resultados'))
-        sessionStorage.setItem('resultados', resultadosJSON)
+    if (!sessionStorage.getItem('resultados')) {
+        sessionStorage.setItem('resultados', resultadosJSON);
+    }
 
-    if(!sessionStorage.getItem('pontuacaoIndividual'))
-        sessionStorage.setItem('pontuacaoIndividual', pontuacaoIndividual1)
+    if (!sessionStorage.getItem('pontuacaoIndividual')) {
+        sessionStorage.setItem('pontuacaoIndividual', pontuacaoIndividual1);
+    }
 
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);

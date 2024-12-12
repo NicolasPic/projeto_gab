@@ -82,7 +82,7 @@ function configurarSocket(io) {
         
             const perguntas = Array.from(perguntasMap.values());
         
-            // Configurando perguntas para todos os usuários na sala
+
             if (salas[codigoSala]) {
                 Object.keys(salas[codigoSala]).forEach(usuarioID => {
                     salas[codigoSala][usuarioID].perguntas = [...perguntas];
