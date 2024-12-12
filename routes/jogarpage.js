@@ -235,6 +235,4 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
     }
 });
 
-
-
 module.exports = router;
