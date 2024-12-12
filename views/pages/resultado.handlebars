@@ -8,7 +8,7 @@
     <div class="metade-resultado-container resultado-superior">
         <h1>Resultado Final</h1>
         <p>Total de acertos: {{acertos}}</p>
-        <p>Pontuação: {{tempoTotalRestante}}</p>
+        <p>Pontuação: {{pontuacaoIndividual}}</p>
     </div>
 
     <!-- Resultados de todos os jogadores -->
@@ -17,7 +17,7 @@
         <ul>
             {{#each resultados}}
                 <li>
-                    Jogador: {{nome}} - Pontuação: {{pontuacaoTotal}}
+                    Jogador: {{nome}} - Pontuação: {{pontuacaoTotalIndividual}}
                 </li>
             {{/each}}
         </ul>
@@ -36,12 +36,23 @@
     const socket = io();
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
-    const resultadosJSON = {{{resultados}}};
+    const pontuacaoIndividual1 = "{{pontuacaoIndividual}}";
+    const resultadosJSON =  JSON.stringify({{{resultados}}});
     const acertos1 = {{acertos}}; 
 
     console.log("Acertos:", acertos1);
+    console.log("pontuacaoIndividual:", pontuacaoIndividual1);
     console.log("Resultados:", resultadosJSON);
     console.log("Código da Sala:", codigoSala);
+
+    if(!sessionStorage.getItem('acertos'))
+        sessionStorage.setItem('acertos', acertos1)
+
+    if(!sessionStorage.getItem('resultados'))
+        sessionStorage.setItem('resultados', resultadosJSON)
+
+    if(!sessionStorage.getItem('pontuacaoIndividual'))
+        sessionStorage.setItem('pontuacaoIndividual', pontuacaoIndividual1)
 
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
@@ -49,6 +60,10 @@
     });
 
     document.getElementById('btnIniciar').addEventListener('click', () => {
+        sessionStorage.removeItem('acertos');
+        sessionStorage.removeItem('resultados');
+        sessionStorage.removeItem('pontuacaoIndividual');
+
         socket.emit('redirecionarSala', { codigoSala, usuarioID });
     });
 
@@ -57,11 +72,23 @@
     });
 
     window.addEventListener('load', () => {
-        if (!sessionStorage.getItem('acertos')) {
-            sessionStorage.setItem('acertos', acertos1);
-        }
-        if (!sessionStorage.getItem('resultados')) {
-            sessionStorage.setItem('resultados', JSON.stringify(resultadosJSON)); 
-        }
+    const acertosSession = sessionStorage.getItem('acertos');
+    const resultadosSession = sessionStorage.getItem('resultados');
+    const pontuacaoIndividualSession = sessionStorage.getItem('pontuacaoIndividual');
+    const resultadosJSONSession = resultadosSession ? JSON.parse(resultadosSession) : [];
+
+    // Atualiza os elementos da página
+    document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(2)').textContent = `Total de acertos: ${acertosSession}`;
+    document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(3)').textContent = `Pontuação: ${pontuacaoIndividualSession}`;
+
+    const resultadosUl = document.querySelector('.metade-resultado-container.resultado-superior ul');
+    resultadosUl.innerHTML = ''; 
+
+    resultadosJSONSession.forEach((resultado) => {
+        const li = document.createElement('li');
+        li.textContent = `Jogador: ${resultado.nome} - Pontuação: ${resultado.pontuacaoTotalIndividual}`;
+        resultadosUl.appendChild(li);
     });
+});
+
 </script>

@@ -152,7 +152,7 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
 router.get('/Getsession', isAuthenticated, async (req, res) => {
     const data = {
             acertos: req.session.acertos,
-            tempoTotalRestante:  req.session.tempoRestante,
+            pontoIndividual:  req.session.pontoIndividual,
             resultados: req.session.resultados ,
     }
     
@@ -168,15 +168,15 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
     req.session.respostas = null;
 
     const acertos = respostas.filter(r => r.correta === 1).length;
-    const tempoTotalRestante = respostas
+    const pontos = respostas
         .filter(r => r.correta === 1)
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
-    salas[codigoSala][usuarioID].pontuacaoTotal = tempoTotalRestante;
-    pontuacao = salas[codigoSala][usuarioID].pontuacaoTotal;
+    salas[codigoSala][usuarioID].pontuacao = pontos;
+    pontuacaoIndividual = salas[codigoSala][usuarioID].pontuacao;
     console.log('Respostas registradas:', respostas);
     console.log('Total de acertos:', acertos);
-    console.log('Tempo total restante (apenas acertos):', tempoTotalRestante);
+    console.log('Tempo total restante (apenas acertos):', pontuacaoIndividual);
 
     try {
         const usuariosIDs = Object.keys(salas[codigoSala]);
@@ -188,7 +188,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
                 jogadores: [],
                 usuarioID: usuarioID,
                 acertos,
-                pontuacao,
+                pontuacaoIndividual,
                 resultados: [],
                 error: "Nenhum jogador na sala no momento."
             });
@@ -203,10 +203,10 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
         );
 
             req.session.acertos = acertos;
-            req.session.tempoRestante = tempoTotalRestante;
+            req.session.pontos = pontuacaoIndividual;
             req.session.resultados = jogadores.map(jogador => ({
                 nome: jogador.nome,
-                pontuacaoTotal: salas[codigoSala][jogador.id].pontuacaoTotal || 0
+                pontuacaoTotalIndividual: salas[codigoSala][jogador.id].pontuacao || 0
             })),
 
             res.render('pages/resultado', {
@@ -214,7 +214,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
                 jogadores,
                 usuarioID: usuarioID,
                 acertos: req.session.acertos,
-                tempoTotalRestante: req.session.tempoRestante,
+                pontuacaoIndividual: req.session.pontos,
                 resultados: JSON.stringify(req.session.resultados),
                 error: null
             });
@@ -228,7 +228,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             jogadores: [],
             usuarioID: usuarioID,
             acertos,
-            tempoTotalRestante,
+            pontuacaoIndividual: req.session.pontos,
             resultados: [],
             error: "Erro ao carregar jogadores."
         });
