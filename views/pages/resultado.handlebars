@@ -37,42 +37,44 @@
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
 
-    // Limpa o sessionStorage ao carregar a página
+    if (!sessionStorage.getItem('acertos')) {
+        sessionStorage.setItem('acertos', {{acertos}});
+    }
+
+    if (!sessionStorage.getItem('pontuacaoIndividual')) {
+    sessionStorage.setItem('pontuacaoIndividual', {{pontuacaoIndividual}});
+    }
+
+    if (!sessionStorage.getItem('resultados')) {
+    sessionStorage.setItem('resultados', JSON.stringify({{{resultados}}}));
+    }
+
     window.addEventListener('load', () => {
-        sessionStorage.clear();
-        console.log("Sessão limpa ao carregar a página.");
 
-        // Atualiza os elementos diretamente do template
-        const acertos = {{acertos}};
-        const pontuacaoIndividual = "{{pontuacaoIndividual}}";
-        const resultados = {{{resultados}}};
+    const acertos = sessionStorage.getItem('acertos');
+    const pontuacaoIndividual = sessionStorage.getItem('pontuacaoIndividual');
+    const resultados = JSON.parse(sessionStorage.getItem('resultados'));
 
-        console.log("Acertos:", acertos);
-        console.log("Pontuação:", pontuacaoIndividual);
-        console.log("Resultados:", resultados);
+    // Atualiza os elementos da página com os dados do sessionStorage
+    document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(2)').textContent = `Total de acertos: ${acertos}`;
+    document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(3)').textContent = `Pontuação: ${pontuacaoIndividual}`;
 
-        // Atualiza os elementos da página com os dados do servidor
-        document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(2)').textContent = `Total de acertos: ${acertos}`;
-        document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(3)').textContent = `Pontuação: ${pontuacaoIndividual}`;
+    const resultadosUl = document.querySelector('.metade-resultado-container.resultado-superior ul');
+    resultadosUl.innerHTML = ''; // Garante que a lista seja limpa antes de preencher
 
-        const resultadosUl = document.querySelector('.metade-resultado-container.resultado-superior ul');
-        resultadosUl.innerHTML = ''; // Garante que a lista seja limpa antes de preencher
-
-        resultados.forEach((resultado) => {
-            const li = document.createElement('li');
-            li.textContent = `Jogador: ${resultado.nome} - Pontuação: ${resultado.pontuacaoTotalIndividual}`;
-            resultadosUl.appendChild(li);
-        });
+    resultados.forEach((resultado) => {
+        const li = document.createElement('li');
+        li.textContent = `Jogador: ${resultado.nome} - Pontuação: ${resultado.pontuacaoTotalIndividual}`;
+        resultadosUl.appendChild(li);
     });
+});
 
-    // Ação do botão "Jogar Novamente"
     document.getElementById('btnIniciar').addEventListener('click', () => {
-        sessionStorage.clear(); // Limpa novamente antes de iniciar uma nova rodada
+        sessionStorage.clear(); 
         console.log("Sessão limpa antes de redirecionar.");
         socket.emit('redirecionarSala', { codigoSala, usuarioID });
     });
 
-    // Redirecionamento via socket
     socket.on('redirect', (url) => {
         window.location.href = url;
     });

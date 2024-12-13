@@ -157,17 +157,6 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/Getsession', isAuthenticated, async (req, res) => {
-    const data = {
-            acertos: req.session.acertos,
-            pontoIndividual:  req.session.pontoIndividual,
-            resultados: req.session.resultados ,
-    }
-    
-         res.json(data);
-
-});
-
 router.get('/resultado', isAuthenticated, async (req, res) => {
     const codigoSala = req.session.codigoSala;
     const usuarioID = req.user ? req.user.id : null;
@@ -181,7 +170,6 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
         .filter(r => r.correta === 1)
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
-    // Atualiza a pontuação do jogador atual no objeto 'salas'
     if (salas[codigoSala][usuarioID]) {
         salas[codigoSala][usuarioID].pontuacao = pontos;
     }
@@ -214,7 +202,6 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             }
         );
 
-        // Criação do array de resultados para todos os jogadores na sala
         const resultados = jogadores.map(jogador => ({
             nome: jogador.nome,
             pontuacaoTotalIndividual: salas[codigoSala][jogador.id]?.pontuacao || 0
@@ -231,7 +218,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             jogadores,
             usuarioID: usuarioID,
             acertos: req.session.acertos,
-            pontuacaoIndividual: req.session.pontos,
+            pontuacaoIndividual: pontos,
             resultados: JSON.stringify(req.session.resultados),
             error: null
         });
