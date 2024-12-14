@@ -26,7 +26,7 @@
     <!-- Metade inferior da tela -->
     <div class="metade-resultado-container resultado-inferior">
         <button class="botao-resultado" id="btnIniciar">Jogar Novamente</button>
-        <a href="/home" class="botao-resultado">Voltar para o Início</a>
+        <button class="botao-resultado" id="Voltar">Voltar</button>
     </div>
 
 </div>
@@ -50,12 +50,10 @@
     }
 
     window.addEventListener('load', () => {
-
     const acertos = sessionStorage.getItem('acertos');
     const pontuacaoIndividual = sessionStorage.getItem('pontuacaoIndividual');
     const resultados = JSON.parse(sessionStorage.getItem('resultados'));
 
-    // Atualiza os elementos da página com os dados do sessionStorage
     document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(2)').textContent = `Total de acertos: ${acertos}`;
     document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(3)').textContent = `Pontuação: ${pontuacaoIndividual}`;
 
@@ -72,7 +70,18 @@
     document.getElementById('btnIniciar').addEventListener('click', () => {
         sessionStorage.clear(); 
         console.log("Sessão limpa antes de redirecionar.");
-        socket.emit('redirecionarSala', { codigoSala, usuarioID });
+         socket.emit('resetarSala', { codigoSala, usuarioID });    
+         });
+
+    socket.on('resetarSession', () => {
+        sessionStorage.clear();
+        console.log("SessionStorage limpo por comando do servidor.");
+    });
+
+    document.getElementById('Voltar').addEventListener('click', () => {
+    console.log('Solicitando saída da sala...');
+    socket.emit('sairSala', { codigoSala, usuarioID });
+    window.location.href = '/jogar'; 
     });
 
     socket.on('redirect', (url) => {

@@ -164,7 +164,6 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
     req.session.perguntas = null;
     req.session.respostas = null;
 
-    // Cálculo de acertos e pontos individuais
     const acertos = respostas.filter(r => r.correta === 1).length;
     const pontos = respostas
         .filter(r => r.correta === 1)
