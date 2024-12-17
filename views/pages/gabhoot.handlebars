@@ -80,13 +80,11 @@ async function enviarResposta(tempoEsgotado = false) {
 
     const respostaSelecionada = inputResposta.value;
 
-    // Caso tempo não tenha esgotado, verifica se uma resposta foi selecionada
     if (!tempoEsgotado && !respostaSelecionada) {
         alert('Selecione uma resposta antes de enviar.');
-        botaoEnviar.disabled = false; // Reativa o botão em caso de erro
+        botaoEnviar.disabled = false; 
         botaoEnviar.textContent = "Enviar Resposta";
-        
-        // Reabilitar os radios se erro ocorrer
+ 
         radios.forEach((radio) => {
             radio.disabled = false;
         });
