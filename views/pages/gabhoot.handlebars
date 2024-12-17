@@ -1,65 +1,132 @@
 <div class="gabhoot-container">
 
     <!-- Contêiner central sobrepondo as metades -->
-    <div class="metade-gabhoot-container gabhoot-superior">
-        
-    </div>
+    <div class="metade-gabhoot-container gabhoot-superior"></div>
 
-    <div class='centro-gabhoot-container'>
+    <div class="centro-gabhoot-container">
         <h1>GABHoot</h1>
     </div>
-   
+
     <div class="metade-gabhoot-container gabhoot-inferior">
-        <p id="tempo-restante">Tempo restante: <span id="tempo">35</span> segundos</p>
-        <form id="form-resposta" action="/jogar/proxima" method="POST">
+        <p id="tempo-restante">Tempo restante: <span id="tempo">20</span> segundos</p>
+        <form id="form-resposta" method="POST">
             <input type="hidden" name="resposta" id="resposta-selecionada">
             <input type="hidden" name="tempoRestante" id="tempo-restante-valor">
-            
+
             <div class="pergunta">
                 <h2>{{pergunta.texto}}</h2>
                 {{#each pergunta.respostas}}
-                    <div>
-                        <label>
-                            <input 
-                                type="radio" 
-                                name="resposta" 
-                                value="{{id}}" 
-                                onchange="selecionarResposta(this.value)">
-                            {{texto}}
-                        </label>
-                    </div>
+                <div>
+                    <label>
+                        <input type="radio" name="resposta" value="{{id}}" onchange="selecionarResposta(this.value)">
+                        {{texto}}
+                    </label>
+                </div>
                 {{/each}}
             </div>
 
             <button type="submit">Enviar Resposta</button>
         </form>
+
+        <!-- Feedback -->
+        <div id="feedback" style="display: none;">
+            <p id="mensagem-feedback"></p>
+        </div>
     </div>
 </div>
 
 <script>
-    let tempo = 35;
-    const tempoRestanteEl = document.getElementById('tempo');
-    const form = document.getElementById('form-resposta');
-    const inputResposta = document.getElementById('resposta-selecionada');
-    const inputTempoRestante = document.getElementById('tempo-restante-valor');
+  let tempo = 20;
+const tempoRestanteEl = document.getElementById('tempo');
+const form = document.getElementById('form-resposta');
+const inputResposta = document.getElementById('resposta-selecionada');
+const inputTempoRestante = document.getElementById('tempo-restante-valor');
+const feedbackDiv = document.getElementById('feedback');
+const mensagemFeedback = document.getElementById('mensagem-feedback');
 
-    function selecionarResposta(valor) {
-        inputResposta.value = valor || ''; 
+function selecionarResposta(valor) {
+    inputResposta.value = valor || '';
+}
+
+const contador = setInterval(() => {
+    tempo--;
+    tempoRestanteEl.textContent = tempo;
+
+    if (tempo <= 0) {
+        clearInterval(contador);
+        inputTempoRestante.value = 0;
+        enviarResposta(true);
+    }
+}, 1000);
+
+form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    enviarResposta();
+});
+
+async function enviarResposta(tempoEsgotado = false) {
+    const botaoEnviar = form.querySelector('button[type="submit"]');
+    botaoEnviar.disabled = true;
+    botaoEnviar.textContent = "Enviando...";
+
+    // Desabilitar os inputs de radio
+    const radios = document.querySelectorAll('input[name="resposta"]');
+    radios.forEach((radio) => {
+        radio.disabled = true;
+    });
+
+    clearInterval(contador);
+    inputTempoRestante.value = tempo;
+
+    const respostaSelecionada = inputResposta.value;
+
+    // Caso tempo não tenha esgotado, verifica se uma resposta foi selecionada
+    if (!tempoEsgotado && !respostaSelecionada) {
+        alert('Selecione uma resposta antes de enviar.');
+        botaoEnviar.disabled = false; // Reativa o botão em caso de erro
+        botaoEnviar.textContent = "Enviar Resposta";
+        
+        // Reabilitar os radios se erro ocorrer
+        radios.forEach((radio) => {
+            radio.disabled = false;
+        });
+
+        return;
     }
 
-    const contador = setInterval(() => {
-        tempo--;
-        tempoRestanteEl.textContent = tempo;
+    // Força resposta vazia como incorreta se tempo expirou
+    const respostaFinal = tempoEsgotado ? "vazia" : respostaSelecionada;
 
-        if (tempo <= 0) {
-            clearInterval(contador);
-            inputTempoRestante.value = 0; 
-            form.submit();
-        }
-    }, 1000);
-
-    form.addEventListener('submit', () => {
-        clearInterval(contador);
-        inputTempoRestante.value = tempo; 
+    const response = await fetch('/jogar/proxima', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            resposta: respostaFinal,
+            tempoRestante: tempo
+        })
     });
+
+    const data = await response.json();
+
+    if (data.correta && !tempoEsgotado) {
+        mensagemFeedback.textContent = 'Resposta correta!';
+        mensagemFeedback.style.color = 'green';
+    } else {
+        mensagemFeedback.textContent = tempoEsgotado
+            ? 'Tempo esgotado. Resposta considerada incorreta.'
+            : 'Resposta incorreta.';
+        mensagemFeedback.style.color = 'red';
+    }
+
+    feedbackDiv.style.display = 'block';
+
+    setTimeout(() => {
+        if (data.proximaPergunta) {
+            window.location.href = '/jogar/gabhoot';
+        } else {
+            window.location.href = '/jogar/resultado';
+        }
+    }, 3000);
+}
+
 </script>

@@ -148,11 +148,34 @@ function configurarSocket(io) {
                 console.log(`Aguardando jogadores na sala ${codigoSala}.`);
             }
         });
+        socket.on('sairSala', ({ codigoSala, usuarioID }) => {
+            if (salas[codigoSala] && salas[codigoSala][usuarioID]) {
+                delete salas[codigoSala][usuarioID];
+                console.log(`Usuário ${usuarioID} removido da sala ${codigoSala}`);
         
-        socket.on('disconnect', () => {
-            console.log(`Socket ${socket.id} desconectado.`);
-            console.log('Estado atual das salas após desconexão:', salas);
+                if (Object.keys(salas[codigoSala]).length === 0) {
+                    delete salas[codigoSala];
+                    console.log(`Sala ${codigoSala} foi removida pois está vazia.`);
+                }
+                socket.leave(codigoSala);
+        
+                console.log(`Estado atual da sala ${codigoSala}:`, salas[codigoSala]);
+            } else {
+                console.log(`Usuário ${usuarioID} não encontrado na sala ${codigoSala}.`);
+            }
         });
+
+    socket.on('resetarSala', ({ codigoSala, usuarioID }) => {
+        console.log(`Reset solicitado pelo usuário ${usuarioID} na sala ${codigoSala}`);
+        io.to(codigoSala).emit('resetarSession');
+
+        io.to(codigoSala).emit('redirect', `/jogar/sala/${codigoSala}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`Socket ${socket.id} desconectado.`);
+        console.log('Estado atual das salas após desconexão:', salas);
+    });
 
     });
 }

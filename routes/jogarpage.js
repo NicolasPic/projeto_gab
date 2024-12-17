@@ -113,60 +113,53 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
         const codigoSala = req.session.codigoSala;
         const usuarioID = req.user ? req.user.id : null;
 
+        // Validações básicas
         if (!codigoSala || !salas[codigoSala] || !salas[codigoSala][usuarioID]) {
-            return res.status(400).send('Sala ou usuário não encontrados.');
+            return res.status(400).json({ error: 'Sala ou usuário não encontrados.' });
         }
 
         const perguntas = salas[codigoSala][usuarioID].perguntas || [];
 
+        // Caso não haja perguntas restantes
         if (!perguntas || perguntas.length === 0) {
             salas[codigoSala][usuarioID].respondeuTodas = true;
-            return res.render('pages/espera', {
-                codigoSala,
-                usuarioID: usuarioID,
+            return res.json({
+                correta: null,
+                proximaPergunta: null,
+                terminou: true
             });
         }
 
         req.session.respostas = req.session.respostas || [];
         const perguntaAtual = salas[codigoSala][usuarioID].perguntaAtual;
 
-        const respostaCorreta = perguntaAtual.respostas.find(r => r.id === respostaID)?.correta || 0;
+        // Verificar se a resposta está correta
+        const respostaCorreta = perguntaAtual.respostas.find(r => r.id === respostaID)?.correta || false;
 
+        // Salvar a resposta na sessão
         req.session.respostas.push({
             pergunta_id: perguntaAtual.id,
             resposta_id: respostaID,
-            correta: respostaCorreta,
+            correta: respostaCorreta ? 1 : 0,
             tempoRestante: tempoRestante
         });
 
+        // Atualizar próxima pergunta
         salas[codigoSala][usuarioID].perguntas.shift();
         salas[codigoSala][usuarioID].perguntaAtual = salas[codigoSala][usuarioID].perguntas[0];
 
-        if (!salas[codigoSala][usuarioID].perguntaAtual) {
-            salas[codigoSala][usuarioID].respondeuTodas = true;
-            return res.render('pages/espera', {
-                codigoSala,
-                usuarioID: usuarioID,
-            });
-        }
-
-        res.render('pages/gabhoot', { pergunta: salas[codigoSala][usuarioID].perguntaAtual });
+        // Retorna um JSON com feedback e próxima pergunta
+        res.json({
+            correta: respostaCorreta, // true ou false
+            proximaPergunta: salas[codigoSala][usuarioID].perguntaAtual || null,
+            terminou: !salas[codigoSala][usuarioID].perguntaAtual
+        });
     } catch (error) {
-        console.error('Erro ao carregar a próxima pergunta:', error);
-        res.status(500).send('Erro ao continuar o jogo.');
+        console.error('Erro ao processar resposta e carregar próxima pergunta:', error);
+        res.status(500).json({ error: 'Erro ao continuar o jogo.' });
     }
 });
 
-router.get('/Getsession', isAuthenticated, async (req, res) => {
-    const data = {
-            acertos: req.session.acertos,
-            pontoIndividual:  req.session.pontoIndividual,
-            resultados: req.session.resultados ,
-    }
-    
-         res.json(data);
-
-});
 
 router.get('/resultado', isAuthenticated, async (req, res) => {
     const codigoSala = req.session.codigoSala;
@@ -175,13 +168,11 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
     req.session.perguntas = null;
     req.session.respostas = null;
 
-    // Cálculo de acertos e pontos individuais
     const acertos = respostas.filter(r => r.correta === 1).length;
     const pontos = respostas
         .filter(r => r.correta === 1)
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
-    // Atualiza a pontuação do jogador atual no objeto 'salas'
     if (salas[codigoSala][usuarioID]) {
         salas[codigoSala][usuarioID].pontuacao = pontos;
     }
@@ -214,13 +205,11 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             }
         );
 
-        // Criação do array de resultados para todos os jogadores na sala
         const resultados = jogadores.map(jogador => ({
             nome: jogador.nome,
             pontuacaoTotalIndividual: salas[codigoSala][jogador.id]?.pontuacao || 0
         }));
 
-        // Armazenamento na sessão para o jogador atual
         req.session.acertos = acertos;
         req.session.pontos = pontos;
         req.session.resultados = resultados;
@@ -231,7 +220,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             jogadores,
             usuarioID: usuarioID,
             acertos: req.session.acertos,
-            pontuacaoIndividual: req.session.pontos,
+            pontuacaoIndividual: pontos,
             resultados: JSON.stringify(req.session.resultados),
             error: null
         });
