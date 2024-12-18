@@ -17,7 +17,6 @@ async function conectarDB() {
     await sequelize.authenticate();
     console.log('Conectado ao banco de dados com sucesso!');
     
-    // Sincroniza as tabelas com o banco de dados
     await sequelize.sync({ alter: false });
     console.log('Tabelas sincronizadas com sucesso!');
   } catch (error) {

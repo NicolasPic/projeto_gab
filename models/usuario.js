@@ -1,34 +1,33 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/DB/database');
 
-// Definindo o modelo de Usuario
 const Usuario = sequelize.define('Usuario', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
-    unique: true, 
+    unique: true,
   },
   nome: {
     type: DataTypes.STRING,
-    allowNull: false,  
+    allowNull: false,
   },
   cpf: {
     type: DataTypes.STRING,
-    allowNull: false,  
-    unique: true,      
+    allowNull: false,
+    unique: true,
   },
   senha: {
     type: DataTypes.STRING,
-    allowNull: false,  
+    allowNull: false,
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,  
-    unique: true,      
+    allowNull: false,
+    unique: true,
     validate: {
-      isEmail: true,  
+      isEmail: true,
     },
   },
   isAdmin: {
@@ -36,7 +35,7 @@ const Usuario = sequelize.define('Usuario', {
     defaultValue: false,
   },
 }, {
-  tableName: 'usuarios', 
+  tableName: 'usuarios',
   timestamps: false,
 });
 
