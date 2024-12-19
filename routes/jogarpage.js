@@ -8,6 +8,7 @@ const { Quiz, Pergunta, Resposta } = require('../models/relacionamentos');
 router.get('/', isAuthenticated, (req, res) => {
     const nomeUsuario = req.user ? req.user.nome : 'Visitante';
     const usuarioID = req.user ? req.user.id : null;
+   
     res.render('pages/jogar', {
         title: 'Página jogar',
         customHeaderHome: true,
@@ -20,7 +21,7 @@ router.get('/', isAuthenticated, (req, res) => {
 router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
     const usuarioID = req.user ? req.user.id : null;
-
+    req.session.codigoSala = codigoSala 
     if (!salas || !salas[codigoSala]) {
         console.warn(`Sala ${codigoSala} não encontrada ou não criada.`);
         return res.status(404).render('pages/sala', {
@@ -63,7 +64,6 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
         });
     }
 });
-
 
 
 router.get('/gabhoot', isAuthenticated, async (req, res) => {
@@ -204,17 +204,22 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
 });
 
 router.get('/criar-quiz', isAuthenticated, (req, res) => {
-
+    const codigoSala = req.session.codigoSala;
+    const usuarioID = req.user ? req.user.id : null;
+    console.log('sala quiz:', codigoSala);
+    console.log(usuarioID)
     res.render('pages/criarQuiz', {
         title: 'Criar Quiz',
         customHeaderHome: true,
+        codigoSala: codigoSala,
+        usuarioID: usuarioID
     });
 });
 
 router.post('/criar-quiz', isAuthenticated, async (req, res) => {
     const { nome, perguntas } = req.body;
     const usuarioID = req.user ? req.user.id : null;
-
+    const codigoSala = req.session.codigoSala;
     if (!Array.isArray(perguntas)) {
         return res.status(400).send("Formato de perguntas inválido.");
     }
@@ -241,7 +246,7 @@ router.post('/criar-quiz', isAuthenticated, async (req, res) => {
             }
         }
 
-        res.redirect(`/jogar/sala/${req.session.codigoSala}`);
+        res.redirect(`/jogar/sala/${codigoSala}`);
     } catch (error) {
         console.error("Erro ao criar quiz:", error);
         res.status(500).send("Erro ao criar quiz.");

@@ -12,11 +12,23 @@
     <button type="button" id="salvarQuiz">Salvar Quiz</button>
 </form>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
+    const socket = io();
+    const usuarioID = "{{usuarioID}}";
+    const codigoSala = "{{codigoSala}}";
+
+    // Conexão inicial com o socket
+    socket.on('connect', () => {
+        console.log(`Conectado com socket ID: ${socket.id}`);
+        socket.emit('reconectar', { usuarioID });
+    });
+
     const perguntasSalvas = [];
     const listaPerguntas = document.getElementById('listaPerguntas');
     const addPergunta = document.getElementById('addPergunta');
 
+    // Adicionar nova pergunta
     addPergunta.addEventListener('click', () => criarFormularioPergunta());
 
     function criarFormularioPergunta(pergunta = null, index = null) {
@@ -43,46 +55,48 @@
         const respostasContainer = perguntaDiv.querySelector('.respostasContainer');
         const salvarPergunta = perguntaDiv.querySelector('.salvarPergunta');
 
+        // Atualizar respostas quando o tipo mudar
         tipoSelect.addEventListener('change', () => {
             respostasContainer.innerHTML = '';
             if (tipoSelect.value === 'multipla') {
                 for (let i = 0; i < 5; i++) {
-                    const resposta = pergunta?.respostas[i] || { texto: '', correta: false };
+                    const resposta = pergunta?.respostas[i] || { texto: '', correta: 0 };
                     const respostaDiv = document.createElement('div');
                     respostaDiv.classList.add('resposta');
                     respostaDiv.innerHTML = `
                         <input type="text" placeholder="Opção ${i + 1}" value="${resposta.texto}" required>
                         <label>Correta:</label>
-                        <input type="radio" name="correta" ${resposta.correta ? 'checked' : ''}>
+                        <input type="radio" name="correta" value="${i}" ${resposta.correta === 1 ? 'checked' : ''}>
                     `;
                     respostasContainer.appendChild(respostaDiv);
                 }
             } else if (tipoSelect.value === 'vf') {
                 ['Verdadeiro', 'Falso'].forEach((texto, indexVF) => {
-                    const resposta = pergunta?.respostas[indexVF] || { texto, correta: false };
+                    const resposta = pergunta?.respostas[indexVF] || { texto, correta: 0 };
                     const respostaDiv = document.createElement('div');
                     respostaDiv.classList.add('resposta');
                     respostaDiv.innerHTML = `
                         <input type="text" value="${texto}" readonly>
                         <label>Correta:</label>
-                        <input type="radio" name="correta" ${resposta.correta ? 'checked' : ''}>
+                        <input type="radio" name="correta" value="${indexVF}" ${resposta.correta === 1 ? 'checked' : ''}>
                     `;
                     respostasContainer.appendChild(respostaDiv);
                 });
             }
         });
 
+        // Salvar pergunta
         salvarPergunta.addEventListener('click', () => {
             const textoPergunta = perguntaDiv.querySelector('.textoPergunta').value;
             const tipoPergunta = tipoSelect.value;
             const respostas = Array.from(respostasContainer.querySelectorAll('.resposta')).map(respostaDiv => {
                 return {
                     texto: respostaDiv.querySelector('input[type="text"]').value,
-                    correta: respostaDiv.querySelector('input[type="radio"]').checked,
+                    correta: respostaDiv.querySelector('input[type="radio"]').checked ? 1 : 0,
                 };
             });
 
-            if (!textoPergunta || respostas.length === 0 || !respostas.some(r => r.correta)) {
+            if (!textoPergunta || respostas.length === 0 || !respostas.some(r => r.correta === 1)) {
                 alert('Preencha todos os campos e marque uma resposta como correta.');
                 return;
             }
@@ -92,6 +106,7 @@
             } else {
                 perguntasSalvas.push({ texto: textoPergunta, tipo: tipoPergunta, respostas });
             }
+
             atualizarListaPerguntas();
             perguntaDiv.remove();
         });
@@ -127,6 +142,11 @@
             return;
         }
 
+        if (!codigoSala) {
+            alert("Código da sala não encontrado.");
+            return;
+        }
+
         try {
             const response = await fetch('/jogar/criar-quiz', {
                 method: 'POST',
@@ -136,7 +156,7 @@
 
             if (response.ok) {
                 alert("Quiz criado com sucesso!");
-                window.location.href = `/jogar/sala/${sessionStorage.getItem('codigoSala')}`;
+                window.location.href = `/jogar/sala/${codigoSala}`;
             } else {
                 alert("Erro ao criar quiz.");
             }
@@ -145,3 +165,5 @@
         }
     });
 </script>
+
+
