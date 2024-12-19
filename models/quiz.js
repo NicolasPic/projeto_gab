@@ -1,28 +1,24 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/DB/database');
 
-const Resposta = sequelize.define('Resposta', {
+const Quiz = sequelize.define('Quiz', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
     allowNull: false,
   },
-  pergunta_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  texto: {
+  nome: {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
-  correta: {
-    type: DataTypes.TINYINT(1),
+  autor_id: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 }, {
-  tableName: 'respostas',
+  tableName: 'quizzes',
   timestamps: false,
 });
 
-module.exports = Resposta;
+module.exports = Quiz;

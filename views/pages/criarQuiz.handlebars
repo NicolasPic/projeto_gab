@@ -1,0 +1,147 @@
+<h1>Criar Novo Quiz</h1>
+<form id="quizForm">
+    <label for="nome">Nome do Quiz:</label>
+    <input type="text" id="nome" name="nome" required>
+
+    <div id="perguntasContainer">
+        <h3>Perguntas Salvas</h3>
+        <ul id="listaPerguntas"></ul>
+        <button type="button" id="addPergunta">Adicionar Pergunta</button>
+    </div>
+
+    <button type="button" id="salvarQuiz">Salvar Quiz</button>
+</form>
+
+<script>
+    const perguntasSalvas = [];
+    const listaPerguntas = document.getElementById('listaPerguntas');
+    const addPergunta = document.getElementById('addPergunta');
+
+    addPergunta.addEventListener('click', () => criarFormularioPergunta());
+
+    function criarFormularioPergunta(pergunta = null, index = null) {
+        const perguntaDiv = document.createElement('div');
+        perguntaDiv.classList.add('pergunta');
+        perguntaDiv.innerHTML = `
+            <label>Pergunta:</label>
+            <input type="text" class="textoPergunta" value="${pergunta?.texto || ''}" required>
+
+            <label>Tipo:</label>
+            <select class="tipoPergunta">
+                <option value="multipla" ${pergunta?.tipo === 'multipla' ? 'selected' : ''}>Múltipla Escolha</option>
+                <option value="vf" ${pergunta?.tipo === 'vf' ? 'selected' : ''}>Verdadeiro/Falso</option>
+            </select>
+
+            <div class="respostasContainer">
+                <h4>Respostas</h4>
+            </div>
+
+            <button type="button" class="salvarPergunta">${index !== null ? 'Salvar Alterações' : 'Salvar Pergunta'}</button>
+        `;
+
+        const tipoSelect = perguntaDiv.querySelector('.tipoPergunta');
+        const respostasContainer = perguntaDiv.querySelector('.respostasContainer');
+        const salvarPergunta = perguntaDiv.querySelector('.salvarPergunta');
+
+        tipoSelect.addEventListener('change', () => {
+            respostasContainer.innerHTML = '';
+            if (tipoSelect.value === 'multipla') {
+                for (let i = 0; i < 5; i++) {
+                    const resposta = pergunta?.respostas[i] || { texto: '', correta: false };
+                    const respostaDiv = document.createElement('div');
+                    respostaDiv.classList.add('resposta');
+                    respostaDiv.innerHTML = `
+                        <input type="text" placeholder="Opção ${i + 1}" value="${resposta.texto}" required>
+                        <label>Correta:</label>
+                        <input type="radio" name="correta" ${resposta.correta ? 'checked' : ''}>
+                    `;
+                    respostasContainer.appendChild(respostaDiv);
+                }
+            } else if (tipoSelect.value === 'vf') {
+                ['Verdadeiro', 'Falso'].forEach((texto, indexVF) => {
+                    const resposta = pergunta?.respostas[indexVF] || { texto, correta: false };
+                    const respostaDiv = document.createElement('div');
+                    respostaDiv.classList.add('resposta');
+                    respostaDiv.innerHTML = `
+                        <input type="text" value="${texto}" readonly>
+                        <label>Correta:</label>
+                        <input type="radio" name="correta" ${resposta.correta ? 'checked' : ''}>
+                    `;
+                    respostasContainer.appendChild(respostaDiv);
+                });
+            }
+        });
+
+        salvarPergunta.addEventListener('click', () => {
+            const textoPergunta = perguntaDiv.querySelector('.textoPergunta').value;
+            const tipoPergunta = tipoSelect.value;
+            const respostas = Array.from(respostasContainer.querySelectorAll('.resposta')).map(respostaDiv => {
+                return {
+                    texto: respostaDiv.querySelector('input[type="text"]').value,
+                    correta: respostaDiv.querySelector('input[type="radio"]').checked,
+                };
+            });
+
+            if (!textoPergunta || respostas.length === 0 || !respostas.some(r => r.correta)) {
+                alert('Preencha todos os campos e marque uma resposta como correta.');
+                return;
+            }
+
+            if (index !== null) {
+                perguntasSalvas[index] = { texto: textoPergunta, tipo: tipoPergunta, respostas };
+            } else {
+                perguntasSalvas.push({ texto: textoPergunta, tipo: tipoPergunta, respostas });
+            }
+            atualizarListaPerguntas();
+            perguntaDiv.remove();
+        });
+
+        tipoSelect.dispatchEvent(new Event('change'));
+        perguntasContainer.appendChild(perguntaDiv);
+    }
+
+    function atualizarListaPerguntas() {
+        listaPerguntas.innerHTML = '';
+        perguntasSalvas.forEach((pergunta, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div>
+                    <strong>${index + 1}. ${pergunta.texto} (${pergunta.tipo})</strong>
+                    <button type="button" class="detalhesPergunta">Detalhes</button>
+                    <button type="button" class="editarPergunta">Editar</button>
+                </div>
+            `;
+            li.querySelector('.detalhesPergunta').addEventListener('click', () => {
+                alert(`Detalhes: ${JSON.stringify(pergunta, null, 2)}`);
+            });
+            li.querySelector('.editarPergunta').addEventListener('click', () => criarFormularioPergunta(pergunta, index));
+            listaPerguntas.appendChild(li);
+        });
+    }
+
+    document.getElementById('salvarQuiz').addEventListener('click', async () => {
+        const nome = document.getElementById('nome').value;
+
+        if (!nome) {
+            alert("Insira o nome do quiz!");
+            return;
+        }
+
+        try {
+            const response = await fetch('/jogar/criar-quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, perguntas: perguntasSalvas })
+            });
+
+            if (response.ok) {
+                alert("Quiz criado com sucesso!");
+                window.location.href = `/jogar/sala/${sessionStorage.getItem('codigoSala')}`;
+            } else {
+                alert("Erro ao criar quiz.");
+            }
+        } catch (error) {
+            console.error("Erro ao salvar quiz:", error);
+        }
+    });
+</script>

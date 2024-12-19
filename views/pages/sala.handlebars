@@ -1,9 +1,8 @@
 <div class="sala-container">
     <!-- Contêiner superior para Jogadores na Sala -->
     <div class="metade-sala-container sala-superior" style="position: relative;">
-       
         <div class="lista-jogadores-container">
-             <h2 id="tituloSala">Jogadores na Sala: {{codigoSala}}</h2>
+            <h2 id="tituloSala">Jogadores na Sala: {{codigoSala}}</h2>
             <ul id="listaJogadores">
                 {{#if jogadores}}
                     {{#each jogadores}}
@@ -23,8 +22,31 @@
 
     <!-- Contêiner inferior para os botões -->
     <div class="metade-sala-container sala-inferior">
-        <div class="botoes-container">      
-             <button class="botao-sala" id="btnIniciar">Iniciar</button>
+        <div class="botoes-container">
+            {{#if isAdmin}}
+                <!-- Botão para criar novo quiz -->
+                <button class="botao-sala" onclick="window.location.href='/jogar/criar-quiz'">Criar Quiz</button>
+
+                <!-- Barra de pesquisa e dropdown para selecionar o quiz -->
+                <form id="searchAndSelectQuizForm" action="/jogar/select-quiz" method="POST">
+                    <label for="quizSearch">Pesquisar Quiz:</label>
+                    <input type="text" id="quizSearch" placeholder="Digite o nome do quiz ou do criador...">
+
+                    <label for="quizSelecionado">Selecionar Quiz:</label>
+                    <select id="quizSelecionado" name="quizSelecionado" required>
+                        {{#each quizzes}}
+                            <option value="{{this.id}}">{{this.nome}} - Criado por {{this.autor}}</option>
+                        {{/each}}
+                    </select>
+                    <button type="submit">Selecionar Quiz</button>
+                </form>
+
+                <!-- Botão para iniciar o jogo -->
+                <button class="botao-sala" id="btnIniciar" style="display: block;">Iniciar</button>
+            {{else}}
+                <button class="botao-sala" id="btnIniciar" style="display: none;">Iniciar</button>
+            {{/if}}
+
             <button class="botao-sala" onclick="window.location.href='/jogar'">Voltar</button>
         </div>
     </div>
@@ -35,18 +57,29 @@
     const socket = io();
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
-    
+
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
-        socket.emit('reconectar',{usuarioID});
+        socket.emit('reconectar', { usuarioID });
     });
 
     document.getElementById('btnIniciar').addEventListener('click', () => {
-        socket.emit('redirecionarSala',{ codigoSala, usuarioID });
-    });
-  
-    socket.on('redirect', (url) => {
-         window.location.href = url;
+        socket.emit('redirecionarSala', { codigoSala, usuarioID });
     });
 
+    socket.on('redirect', (url) => {
+        window.location.href = url;
+    });
+
+    // Lógica de pesquisa de quizzes
+    const quizSearch = document.getElementById('quizSearch');
+    const quizSelecionado = document.getElementById('quizSelecionado');
+
+    quizSearch.addEventListener('input', () => {
+        const filter = quizSearch.value.toLowerCase();
+        Array.from(quizSelecionado.options).forEach(option => {
+            const text = option.textContent.toLowerCase();
+            option.style.display = text.includes(filter) ? 'block' : 'none';
+        });
+    });
 </script>

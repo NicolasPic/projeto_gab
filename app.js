@@ -11,14 +11,12 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const ioSession = require("express-socket.io-session");
 const { setupPassport } = require("./config/auth/auth");
+const { Quiz, Pergunta, Resposta, Usuario } = require('./models/relacionamentos');
 
-// Conectar ao banco de dados
 conectarDB();
 
-// Configuração do Passport
 setupPassport(passport);
 
-// Salvar o middleware de sessão em uma variável para reutilizar no Socket.IO
 const sessionMiddleware = session({
     secret: "projetogab",
     resave: false,
@@ -29,7 +27,7 @@ const sessionMiddleware = session({
         maxAge: 24 * 60 * 60 * 1000 // 24 horas
     }
 });
-// Sessão no Express
+
 app.use(sessionMiddleware);
 
 app.use(passport.initialize());
@@ -54,7 +52,6 @@ app.use((req, res, next) => {
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Integração do middleware de sessão com o Socket.IO
 io.use(ioSession(sessionMiddleware, {
     autoSave: true 
 }));
@@ -70,19 +67,17 @@ io.use((socket, next) => {
     return next(new Error("Usuário não autenticado"));
 });
 
-// Configuração do Socket.IO
 configurarSocket(io);
 
-// Configuração do Handlebars
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-// Middleware para parsing de dados
+
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Importação das rotas
+
 const inicialpage = require("./routes/inicialpage");
 const loginpage = require("./routes/loginpage");
 const homepage = require("./routes/homepage");
@@ -93,7 +88,7 @@ app.use("/login", loginpage);
 app.use("/home", homepage);
 app.use("/jogar", jogarpage);
 
-// Inicia o servidor
+
 server.listen(8081, () => {
     console.log("Servidor rodando na URL http://localhost:8081");
 });

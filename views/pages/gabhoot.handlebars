@@ -8,7 +8,7 @@
     </div>
 
     <div class="metade-gabhoot-container gabhoot-inferior">
-        <p id="tempo-restante">Tempo restante: <span id="tempo">35</span> segundos</p>
+        <p id="tempo-restante">Tempo restante: <span id="tempo">20</span> segundos</p>
         <form id="form-resposta" method="POST">
             <input type="hidden" name="resposta" id="resposta-selecionada">
             <input type="hidden" name="tempoRestante" id="tempo-restante-valor">
@@ -31,85 +31,100 @@
         <!-- Feedback -->
         <div id="feedback" style="display: none;">
             <p id="mensagem-feedback"></p>
-            <button id="proxima-pergunta-btn" style="display: none;">Próxima Pergunta</button>
         </div>
     </div>
 </div>
 
 <script>
-    let tempo = 35;
-    const tempoRestanteEl = document.getElementById('tempo');
-    const form = document.getElementById('form-resposta');
-    const inputResposta = document.getElementById('resposta-selecionada');
-    const inputTempoRestante = document.getElementById('tempo-restante-valor');
-    const feedbackDiv = document.getElementById('feedback');
-    const mensagemFeedback = document.getElementById('mensagem-feedback');
-    const proximaPerguntaBtn = document.getElementById('proxima-pergunta-btn');
+  let tempo = 20;
+const tempoRestanteEl = document.getElementById('tempo');
+const form = document.getElementById('form-resposta');
+const inputResposta = document.getElementById('resposta-selecionada');
+const inputTempoRestante = document.getElementById('tempo-restante-valor');
+const feedbackDiv = document.getElementById('feedback');
+const mensagemFeedback = document.getElementById('mensagem-feedback');
 
-    function selecionarResposta(valor) {
-        inputResposta.value = valor || '';
+function selecionarResposta(valor) {
+    inputResposta.value = valor || '';
+}
+
+const contador = setInterval(() => {
+    tempo--;
+    tempoRestanteEl.textContent = tempo;
+
+    if (tempo <= 0) {
+        clearInterval(contador);
+        inputTempoRestante.value = 0;
+        enviarResposta(true);
     }
+}, 1000);
 
-    const contador = setInterval(() => {
-        tempo--;
-        tempoRestanteEl.textContent = tempo;
+form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    enviarResposta();
+});
 
-        if (tempo <= 0) {
-            clearInterval(contador);
-            inputTempoRestante.value = 0;
-            enviarResposta();
-        }
-    }, 1000);
+async function enviarResposta(tempoEsgotado = false) {
+    const botaoEnviar = form.querySelector('button[type="submit"]');
+    botaoEnviar.disabled = true;
+    botaoEnviar.textContent = "Enviando...";
 
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        enviarResposta();
+    // Desabilitar os inputs de radio
+    const radios = document.querySelectorAll('input[name="resposta"]');
+    radios.forEach((radio) => {
+        radio.disabled = true;
     });
 
-    async function enviarResposta() {
-        clearInterval(contador);
-        inputTempoRestante.value = tempo;
+    clearInterval(contador);
+    inputTempoRestante.value = tempo;
 
-        const respostaSelecionada = inputResposta.value;
+    const respostaSelecionada = inputResposta.value;
 
-        if (!respostaSelecionada) {
-            alert('Selecione uma resposta antes de enviar.');
-            return;
-        }
-
-        // Enviar resposta via fetch
-        const response = await fetch('/jogar/proxima', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                resposta: respostaSelecionada,
-                tempoRestante: tempo
-            })
+    if (!tempoEsgotado && !respostaSelecionada) {
+        alert('Selecione uma resposta antes de enviar.');
+        botaoEnviar.disabled = false; 
+        botaoEnviar.textContent = "Enviar Resposta";
+ 
+        radios.forEach((radio) => {
+            radio.disabled = false;
         });
 
-        const data = await response.json();
-
-        // Mostrar feedback
-        if (data.correta) {
-            mensagemFeedback.textContent = 'Resposta correta! 🎉';
-            mensagemFeedback.style.color = 'green';
-        } else {
-            mensagemFeedback.textContent = 'Resposta incorreta. 😢';
-            mensagemFeedback.style.color = 'red';
-        }
-
-        feedbackDiv.style.display = 'block';
-        proximaPerguntaBtn.style.display = 'block';
-
-        // Botão para avançar
-        proximaPerguntaBtn.onclick = () => {
-            if (data.proximaPergunta) {
-                window.location.href = '/jogar/gabhoot';
-            } else {
-                window.location.href = '/jogar/resultado';
-            }
-        };
-
-        setTimeout(() => proximaPerguntaBtn.click(), 3000);
+        return;
     }
+
+    // Força resposta vazia como incorreta se tempo expirou
+    const respostaFinal = tempoEsgotado ? "vazia" : respostaSelecionada;
+
+    const response = await fetch('/jogar/proxima', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            resposta: respostaFinal,
+            tempoRestante: tempo
+        })
+    });
+
+    const data = await response.json();
+
+    if (data.correta && !tempoEsgotado) {
+        mensagemFeedback.textContent = 'Resposta correta!';
+        mensagemFeedback.style.color = 'green';
+    } else {
+        mensagemFeedback.textContent = tempoEsgotado
+            ? 'Tempo esgotado. Resposta considerada incorreta.'
+            : 'Resposta incorreta.';
+        mensagemFeedback.style.color = 'red';
+    }
+
+    feedbackDiv.style.display = 'block';
+
+    setTimeout(() => {
+        if (data.proximaPergunta) {
+            window.location.href = '/jogar/gabhoot';
+        } else {
+            window.location.href = '/jogar/resultado';
+        }
+    }, 3000);
+}
+
 </script>

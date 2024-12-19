@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/DB/database'); 
+const { sequelize } = require('../config/DB/database');
 
 const Pergunta = sequelize.define('Pergunta', {
   id: {
@@ -16,9 +16,13 @@ const Pergunta = sequelize.define('Pergunta', {
     type: DataTypes.ENUM('multipla', 'vf'),
     allowNull: false,
   },
+  quiz_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
 }, {
   tableName: 'perguntas',
-  timestamps: false
+  timestamps: false,
 });
 
 module.exports = Pergunta;

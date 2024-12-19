@@ -3,6 +3,7 @@ const router = express.Router();
 const { isAuthenticated } = require('../config/auth/auth');
 const { sequelize } = require("../config/DB/database");
 const { salas } = require('../config/socket/gameSocket');
+const { Quiz, Pergunta, Resposta } = require('../models/relacionamentos');
 
 router.get('/', isAuthenticated, (req, res) => {
     const nomeUsuario = req.user ? req.user.nome : 'Visitante';
@@ -15,52 +16,25 @@ router.get('/', isAuthenticated, (req, res) => {
     });
 });
 
+
 router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
     const usuarioID = req.user ? req.user.id : null;
-    req.session.codigoSala = codigoSala;
 
-    if (!salas || typeof salas !== 'object') {
-        console.error("Erro: Objeto `salas` não foi definido ou está mal configurado.");
-        return res.status(500).render('pages/sala', {
-            codigoSala: null,
-            jogadores: [],
-            usuarioID: usuarioID,
-            error: "Erro interno: Objeto de gerenciamento de salas está indisponível."
-        });
-    }
-
-    if (!codigoSala || typeof codigoSala !== 'string' || codigoSala.trim() === '') {
-        return res.status(400).render('pages/sala', {
-            codigoSala: null,
-            jogadores: [],
-            usuarioID: usuarioID,
-            error: "Código da sala inválido ou não fornecido."
-        });
-    }
-
-    if (!salas[codigoSala]) {
-        console.warn(`Sala não encontrada: ${codigoSala}`);
+    if (!salas || !salas[codigoSala]) {
+        console.warn(`Sala ${codigoSala} não encontrada ou não criada.`);
         return res.status(404).render('pages/sala', {
-            codigoSala,
+            codigoSala: null,
             jogadores: [],
-            usuarioID: usuarioID,
+            usuarioID,
+            isAdmin: false,
             error: "Sala não encontrada."
         });
     }
 
     try {
-        const usuariosIDs = Object.keys(salas[codigoSala]);
-
-        if (usuariosIDs.length === 0) {
-            console.info(`Nenhum jogador na sala ${codigoSala}.`);
-            return res.render('pages/sala', {
-                codigoSala,
-                jogadores: [],
-                usuarioID: usuarioID,
-                error: "Nenhum jogador na sala no momento."
-            });
-        }
+        const isAdmin = salas[codigoSala].admin == usuarioID;
+        const usuariosIDs = Object.keys(salas[codigoSala].jogadores);
 
         const jogadores = await sequelize.query(
             `SELECT id, nome FROM usuarios WHERE id IN (:ids)`,
@@ -73,31 +47,34 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
         return res.render('pages/sala', {
             codigoSala,
             jogadores,
-            usuarioID: usuarioID,
+            usuarioID,
+            isAdmin,
             error: null
         });
 
     } catch (error) {
-        console.error("Erro ao buscar jogadores no banco de dados:", error);
-
+        console.error("Erro ao carregar jogadores da sala:", error);
         return res.status(500).render('pages/sala', {
-            codigoSala,
+            codigoSala: null,
             jogadores: [],
-            usuarioID: usuarioID,
+            usuarioID,
+            isAdmin: false,
             error: "Erro ao carregar informações da sala."
         });
     }
 });
 
+
+
 router.get('/gabhoot', isAuthenticated, async (req, res) => {
     const codigoSala = req.session.codigoSala;
     const usuarioID = req.user ? req.user.id : null;
 
-    if (!codigoSala || !salas[codigoSala] || !salas[codigoSala][usuarioID]) {
+    if (!codigoSala || !salas[codigoSala] || !salas[codigoSala].jogadores[usuarioID]) {
         return res.status(400).send('Sala ou usuário não encontrados.');
     }
 
-    const pergunta = salas[codigoSala][usuarioID].perguntaAtual;
+    const pergunta = salas[codigoSala].jogadores[usuarioID].perguntaAtual;
 
     if (!pergunta) {
         return res.status(404).send('Pergunta não encontrada.');
@@ -113,16 +90,14 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
         const codigoSala = req.session.codigoSala;
         const usuarioID = req.user ? req.user.id : null;
 
-        // Validações básicas
-        if (!codigoSala || !salas[codigoSala] || !salas[codigoSala][usuarioID]) {
+        if (!codigoSala || !salas[codigoSala] || !salas[codigoSala].jogadores[usuarioID]) {
             return res.status(400).json({ error: 'Sala ou usuário não encontrados.' });
         }
 
-        const perguntas = salas[codigoSala][usuarioID].perguntas || [];
+        const perguntas = salas[codigoSala].jogadores[usuarioID].perguntas || [];
 
-        // Caso não haja perguntas restantes
         if (!perguntas || perguntas.length === 0) {
-            salas[codigoSala][usuarioID].respondeuTodas = true;
+            salas[codigoSala].jogadores[usuarioID].respondeuTodas = true;
             return res.json({
                 correta: null,
                 proximaPergunta: null,
@@ -131,35 +106,29 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
         }
 
         req.session.respostas = req.session.respostas || [];
-        const perguntaAtual = salas[codigoSala][usuarioID].perguntaAtual;
+        const perguntaAtual = salas[codigoSala].jogadores[usuarioID].perguntaAtual;
 
-        // Verificar se a resposta está correta
         const respostaCorreta = perguntaAtual.respostas.find(r => r.id === respostaID)?.correta || false;
 
-        // Salvar a resposta na sessão
         req.session.respostas.push({
             pergunta_id: perguntaAtual.id,
             resposta_id: respostaID,
             correta: respostaCorreta ? 1 : 0,
             tempoRestante: tempoRestante
         });
+        salas[codigoSala].jogadores[usuarioID].perguntas.shift();
+        salas[codigoSala].jogadores[usuarioID].perguntaAtual = salas[codigoSala].jogadores[usuarioID].perguntas[0];
 
-        // Atualizar próxima pergunta
-        salas[codigoSala][usuarioID].perguntas.shift();
-        salas[codigoSala][usuarioID].perguntaAtual = salas[codigoSala][usuarioID].perguntas[0];
-
-        // Retorna um JSON com feedback e próxima pergunta
         res.json({
-            correta: respostaCorreta, // true ou false
-            proximaPergunta: salas[codigoSala][usuarioID].perguntaAtual || null,
-            terminou: !salas[codigoSala][usuarioID].perguntaAtual
+            correta: respostaCorreta, 
+            proximaPergunta: salas[codigoSala].jogadores[usuarioID].perguntaAtual || null,
+            terminou: !salas[codigoSala].jogadores[usuarioID].perguntaAtual
         });
     } catch (error) {
         console.error('Erro ao processar resposta e carregar próxima pergunta:', error);
         res.status(500).json({ error: 'Erro ao continuar o jogo.' });
     }
 });
-
 
 router.get('/resultado', isAuthenticated, async (req, res) => {
     const codigoSala = req.session.codigoSala;
@@ -173,16 +142,12 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
         .filter(r => r.correta === 1)
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
-    if (salas[codigoSala][usuarioID]) {
-        salas[codigoSala][usuarioID].pontuacao = pontos;
+    if (salas[codigoSala].jogadores[usuarioID]) {
+        salas[codigoSala].jogadores[usuarioID].pontuacao = pontos;
     }
 
-    console.log('Respostas registradas:', respostas);
-    console.log('Total de acertos:', acertos);
-    console.log('Pontuação calculada para o jogador:', pontos);
-
     try {
-        const usuariosIDs = Object.keys(salas[codigoSala]);
+        const usuariosIDs = Object.keys(salas[codigoSala].jogadores);
 
         if (usuariosIDs.length === 0) {
             console.info(`Nenhum jogador na sala ${codigoSala}.`);
@@ -207,14 +172,13 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
 
         const resultados = jogadores.map(jogador => ({
             nome: jogador.nome,
-            pontuacaoTotalIndividual: salas[codigoSala][jogador.id]?.pontuacao || 0
+            pontuacaoTotalIndividual: salas[codigoSala].jogadores[jogador.id]?.pontuacao || 0
         }));
 
         req.session.acertos = acertos;
         req.session.pontos = pontos;
         req.session.resultados = resultados;
 
-        // Renderização da página de resultados
         return res.render('pages/resultado', {
             codigoSala,
             jogadores,
@@ -238,5 +202,51 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
         });
     }
 });
+
+router.get('/criar-quiz', isAuthenticated, (req, res) => {
+
+    res.render('pages/criarQuiz', {
+        title: 'Criar Quiz',
+        customHeaderHome: true,
+    });
+});
+
+router.post('/criar-quiz', isAuthenticated, async (req, res) => {
+    const { nome, perguntas } = req.body;
+    const usuarioID = req.user ? req.user.id : null;
+
+    if (!Array.isArray(perguntas)) {
+        return res.status(400).send("Formato de perguntas inválido.");
+    }
+
+    try {
+        const novoQuiz = await Quiz.create({
+            nome,
+            autor_id: usuarioID
+        });
+
+        for (const pergunta of perguntas) {
+            const novaPergunta = await Pergunta.create({
+                texto: pergunta.texto,
+                tipo: pergunta.tipo,
+                quiz_id: novoQuiz.id
+            });
+
+            for (const resposta of pergunta.respostas) {
+                await Resposta.create({
+                    texto: resposta.texto,
+                    correta: resposta.correta,
+                    pergunta_id: novaPergunta.id
+                });
+            }
+        }
+
+        res.redirect(`/jogar/sala/${req.session.codigoSala}`);
+    } catch (error) {
+        console.error("Erro ao criar quiz:", error);
+        res.status(500).send("Erro ao criar quiz.");
+    }
+});
+
 
 module.exports = router;
