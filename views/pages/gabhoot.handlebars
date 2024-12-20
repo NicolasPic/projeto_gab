@@ -28,7 +28,6 @@
             <button type="submit">Enviar Resposta</button>
         </form>
 
-        <!-- Feedback -->
         <div id="feedback" style="display: none;">
             <p id="mensagem-feedback"></p>
         </div>
@@ -69,7 +68,6 @@ async function enviarResposta(tempoEsgotado = false) {
     botaoEnviar.disabled = true;
     botaoEnviar.textContent = "Enviando...";
 
-    // Desabilitar os inputs de radio
     const radios = document.querySelectorAll('input[name="resposta"]');
     radios.forEach((radio) => {
         radio.disabled = true;
@@ -92,7 +90,6 @@ async function enviarResposta(tempoEsgotado = false) {
         return;
     }
 
-    // Força resposta vazia como incorreta se tempo expirou
     const respostaFinal = tempoEsgotado ? "vazia" : respostaSelecionada;
 
     const response = await fetch('/jogar/proxima', {
@@ -105,7 +102,7 @@ async function enviarResposta(tempoEsgotado = false) {
     });
 
     const data = await response.json();
-
+    console.log('teste',data.correta )
     if (data.correta && !tempoEsgotado) {
         mensagemFeedback.textContent = 'Resposta correta!';
         mensagemFeedback.style.color = 'green';
