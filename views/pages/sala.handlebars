@@ -15,12 +15,10 @@
         </div>
     </div>
 
-    <!-- Contêiner centralizado para o título GABHoot -->
     <div class="centro-sala-container">
         <h1>GABHoot</h1>
     </div>
 
-    <!-- Contêiner inferior para os botões -->
     <div class="metade-sala-container sala-inferior">
         <div class="botoes-container">
             {{#if isAdmin}}
@@ -35,7 +33,9 @@
                     <label for="quizSelecionado">Selecionar Quiz:</label>
                     <select id="quizSelecionado" name="quizSelecionado" required>
                         {{#each quizzes}}
-                            <option value="{{this.id}}">{{this.nome}} - Criado por {{this.autor}}</option>
+                            <option value="{{this.id}}" data-autor="{{this.autor}}" data-nome="{{this.nome}}">
+                                {{this.nome}} - Criado por {{this.autor}}
+                            </option>
                         {{/each}}
                     </select>
                     <button type="submit">Selecionar Quiz</button>
@@ -71,15 +71,23 @@
         window.location.href = url;
     });
 
-    // Lógica de pesquisa de quizzes
     const quizSearch = document.getElementById('quizSearch');
     const quizSelecionado = document.getElementById('quizSelecionado');
 
     quizSearch.addEventListener('input', () => {
         const filter = quizSearch.value.toLowerCase();
+
         Array.from(quizSelecionado.options).forEach(option => {
-            const text = option.textContent.toLowerCase();
-            option.style.display = text.includes(filter) ? 'block' : 'none';
+            const nome = option.getAttribute('data-nome').toLowerCase();
+            const autor = option.getAttribute('data-autor').toLowerCase();
+            const matches = nome.includes(filter) || autor.includes(filter);
+
+            option.style.display = matches ? '' : 'none';
         });
+
+        const visibleOptions = Array.from(quizSelecionado.options).filter(option => option.style.display !== 'none');
+        if (visibleOptions.length > 0) {
+            quizSelecionado.value = visibleOptions[0].value;
+        }
     });
 </script>

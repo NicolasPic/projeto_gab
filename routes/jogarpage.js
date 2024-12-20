@@ -21,14 +21,29 @@ router.get('/', isAuthenticated, (req, res) => {
 router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
     const usuarioID = req.user ? req.user.id : null;
-    req.session.codigoSala = codigoSala 
-    if (!salas || !salas[codigoSala]) {
-        console.warn(`Sala ${codigoSala} não encontrada ou não criada.`);
-        return res.status(404).render('pages/sala', {
+
+    if (!codigoSala || typeof codigoSala !== 'string' || codigoSala.trim() === '') {
+        console.warn("Código da sala inválido.");
+        return res.status(400).render('pages/sala', {
             codigoSala: null,
             jogadores: [],
             usuarioID,
             isAdmin: false,
+            quizzes: [],
+            error: "Código da sala inválido."
+        });
+    }
+
+    req.session.codigoSala = codigoSala;
+
+    if (!salas || typeof salas !== 'object' || !salas[codigoSala]) {
+        console.warn(`Sala ${codigoSala} não encontrada ou não criada.`);
+        return res.status(404).render('pages/sala', {
+            codigoSala,
+            jogadores: [],
+            usuarioID,
+            isAdmin: false,
+            quizzes: [],
             error: "Sala não encontrada."
         });
     }
@@ -44,26 +59,36 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
                 type: sequelize.QueryTypes.SELECT
             }
         );
+        const quizzes = await sequelize.query(
+            `SELECT q.id, q.nome, u.nome AS autor FROM quizzes q 
+             INNER JOIN usuarios u ON q.autor_id = u.id`,
+            {
+                type: sequelize.QueryTypes.SELECT
+            }
+        );
 
         return res.render('pages/sala', {
             codigoSala,
             jogadores,
             usuarioID,
             isAdmin,
+            quizzes, 
             error: null
         });
 
     } catch (error) {
-        console.error("Erro ao carregar jogadores da sala:", error);
+        console.error("Erro ao carregar informações da sala:", error);
         return res.status(500).render('pages/sala', {
             codigoSala: null,
             jogadores: [],
             usuarioID,
             isAdmin: false,
+            quizzes: [],
             error: "Erro ao carregar informações da sala."
         });
     }
 });
+
 
 
 router.get('/gabhoot', isAuthenticated, async (req, res) => {
