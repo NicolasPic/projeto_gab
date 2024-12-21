@@ -7,8 +7,9 @@
     <!-- Metade superior da tela -->
     <div class="metade-resultado-container resultado-superior">
         <h1>Resultado Final</h1>
-        <p>Total de acertos: {{acertos}}</p>
-        <p>Pontuação: {{pontuacaoIndividual}}</p>
+        <p>Total de acertos: {{#if acertos}}{{acertos}}{{else}}0{{/if}}</p>
+        <p>Pontuação: {{#if pontuacaoIndividual}}{{pontuacaoIndividual}}{{else}}0{{/if}}</p>
+
     </div>
 
     <!-- Resultados de todos os jogadores -->
@@ -58,7 +59,7 @@
     document.querySelector('.metade-resultado-container.resultado-superior p:nth-child(3)').textContent = `Pontuação: ${pontuacaoIndividual}`;
 
     const resultadosUl = document.querySelector('.metade-resultado-container.resultado-superior ul');
-    resultadosUl.innerHTML = ''; // Garante que a lista seja limpa antes de preencher
+    resultadosUl.innerHTML = ''; 
 
     resultados.forEach((resultado) => {
         const li = document.createElement('li');

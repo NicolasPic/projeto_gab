@@ -26,20 +26,17 @@
                 <button class="botao-sala" onclick="window.location.href='/jogar/criar-quiz'">Criar Quiz</button>
 
                 <!-- Barra de pesquisa e dropdown para selecionar o quiz -->
-                <form id="searchAndSelectQuizForm" action="/jogar/select-quiz" method="POST">
-                    <label for="quizSearch">Pesquisar Quiz:</label>
-                    <input type="text" id="quizSearch" placeholder="Digite o nome do quiz ou do criador...">
+                <label for="quizSearch">Pesquisar Quiz:</label>
+                <input type="text" id="quizSearch" placeholder="Digite o nome do quiz ou do criador...">
 
-                    <label for="quizSelecionado">Selecionar Quiz:</label>
-                    <select id="quizSelecionado" name="quizSelecionado" required>
-                        {{#each quizzes}}
-                            <option value="{{this.id}}" data-autor="{{this.autor}}" data-nome="{{this.nome}}">
-                                {{this.nome}} - Criado por {{this.autor}}
-                            </option>
-                        {{/each}}
-                    </select>
-                    <button type="submit">Selecionar Quiz</button>
-                </form>
+                <label for="quizSelecionado">Selecionar Quiz:</label>
+                <select id="quizSelecionado" required>
+                    {{#each quizzes}}
+                        <option value="{{this.id}}" data-autor="{{this.autor}}" data-nome="{{this.nome}}">
+                            {{this.nome}} - Criado por {{this.autor}}
+                        </option>
+                    {{/each}}
+                </select>
 
                 <!-- Botão para iniciar o jogo -->
                 <button class="botao-sala" id="btnIniciar" style="display: block;">Iniciar</button>
@@ -64,7 +61,12 @@
     });
 
     document.getElementById('btnIniciar').addEventListener('click', () => {
-        socket.emit('redirecionarSala', { codigoSala, usuarioID });
+        const quizId = document.getElementById('quizSelecionado').value;
+        if (quizId) {
+            socket.emit('redirecionarSala', { codigoSala, usuarioID, quizId });
+        } else {
+            alert("Por favor, selecione um quiz antes de iniciar.");
+        }
     });
 
     socket.on('redirect', (url) => {

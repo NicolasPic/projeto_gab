@@ -2,15 +2,6 @@ const salas = {};
 const usuarios = {};
 const { sequelize } = require("../DB/database");
 
-function getRandomUniqueNumbers(min, max, count) {
-    const numbers = Array.from({ length: max - min + 1 }, (_, i) => i + min);
-    for (let i = numbers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
-    }
-    return numbers.slice(0, count);
-}
-
 function configurarSocket(io) {
     io.on('connection', (socket) => {
         console.log('Novo jogador conectado:', socket.id);
@@ -35,60 +26,66 @@ function configurarSocket(io) {
             }
         });
 
-        socket.on('redirecionarSala', async ({ codigoSala }) => {
-            const randomIDs = getRandomUniqueNumbers(1, 20, 10);
-            console.log('IDs gerados:', randomIDs);
-
-            const rows = await sequelize.query(`
-                SELECT p.id AS pergunta_id, p.texto AS pergunta_texto, 
-                    r.id AS resposta_id, r.texto AS resposta_texto,
-                    r.correta AS resposta_correta
-                FROM perguntas p
-                LEFT JOIN respostas r ON p.id = r.pergunta_id
-                WHERE p.id IN (${randomIDs.join(', ')})
-            `, {
-                type: sequelize.QueryTypes.SELECT
-            });
-
-            if (!rows || rows.length === 0) {
-                console.error(`Nenhuma pergunta encontrada para os IDs fornecidos.`);
-                return;
-            }
-
-            const perguntasMap = new Map();
-
-            rows.forEach(row => {
-                if (!perguntasMap.has(row.pergunta_id)) {
-                    perguntasMap.set(row.pergunta_id, {
-                        id: row.pergunta_id,
-                        texto: row.pergunta_texto,
-                        respostas: []
-                    });
+        socket.on('redirecionarSala', async ({ codigoSala, usuarioID, quizId }) => {
+            try {
+                if (!salas[codigoSala]) {
+                    console.error(`Sala ${codigoSala} não encontrada.`);
+                    return;
                 }
 
-                const pergunta = perguntasMap.get(row.pergunta_id);
-                pergunta.respostas.push({
-                    id: row.resposta_id,
-                    texto: row.resposta_texto,
-                    correta: row.resposta_correta
+                const rows = await sequelize.query(
+                    `SELECT p.id AS pergunta_id, p.texto AS pergunta_texto, 
+                    r.id AS resposta_id, r.texto AS resposta_texto, r.correta AS resposta_correta
+                    FROM perguntas p
+                    LEFT JOIN respostas r ON p.id = r.pergunta_id
+                    WHERE p.quiz_id = :quizId`,
+                    {
+                        replacements: { quizId },
+                        type: sequelize.QueryTypes.SELECT
+                    }
+                );
+    
+                if (!rows || rows.length === 0) {
+                    console.error(`Nenhuma pergunta encontrada para o quiz ${quizId}.`);
+                    return;
+                }
+
+                const perguntasMap = new Map();
+
+                rows.forEach(row => {
+                    if (!perguntasMap.has(row.pergunta_id)) {
+                        perguntasMap.set(row.pergunta_id, {
+                            id: row.pergunta_id,
+                            texto: row.pergunta_texto,
+                            respostas: []
+                        });
+                    }
+
+                    const pergunta = perguntasMap.get(row.pergunta_id);
+                    pergunta.respostas.push({
+                        id: row.resposta_id,
+                        texto: row.resposta_texto,
+                        correta: row.resposta_correta 
+                    });
+                    console.log('Resposta carregada:', row);
                 });
-            });
 
-            const perguntas = Array.from(perguntasMap.values());
+                const perguntas = Array.from(perguntasMap.values());
 
-            if (salas[codigoSala]) {
                 Object.keys(salas[codigoSala].jogadores).forEach(usuarioID => {
                     salas[codigoSala].jogadores[usuarioID].perguntas = [...perguntas];
                     salas[codigoSala].jogadores[usuarioID].perguntaAtual = perguntas[0];
                     salas[codigoSala].jogadores[usuarioID].respondeuTodas = false;
                     salas[codigoSala].jogadores[usuarioID].pontuacaoTotal = 0;
                 });
+
+                console.log(`Perguntas configuradas para a sala ${codigoSala}:`, perguntas);
+
+                const url = `/jogar/gabhoot`;
+                io.to(codigoSala).emit('redirect', url);
+            } catch (error) {
+                console.error('Erro ao redirecionar sala:', error);
             }
-
-            console.log(`Perguntas configuradas para a sala ${codigoSala}:`, perguntas);
-
-            const url = `/jogar/gabhoot`;
-            io.to(codigoSala).emit('redirect', url);
         });
 
         socket.on('sala', ({ codigoSala, usuarioID }) => {
@@ -172,6 +169,7 @@ function configurarSocket(io) {
                 socket.leave(codigoSala);
 
                 console.log(`Estado atual da sala ${codigoSala}:`, salas[codigoSala]);
+                io.to(codigoSala).emit('resetarSession');
             } else {
                 console.log(`Usuário ${usuarioID} não encontrado na sala ${codigoSala}.`);
             }
