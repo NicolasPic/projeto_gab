@@ -1,6 +1,3 @@
-/* public/css/styles.css */
-
-/* Importa os arquivos CSS individuais */
 @import url('reset.css');
 @import url('alertas.css');
 @import url('header.css');

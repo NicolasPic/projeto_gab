@@ -24,7 +24,7 @@ const sessionMiddleware = session({
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+        maxAge: 24 * 60 * 60 * 1000
     }
 });
 
@@ -78,10 +78,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 
-const inicialpage = require("./routes/inicialpage");
-const loginpage = require("./routes/loginpage");
-const homepage = require("./routes/homepage");
-const jogarpage = require("./routes/jogarpage");
+const inicialpage = require("./controlers/inicialpageController");
+const loginpage = require("./controlers/loginpageController");
+const homepage = require("./controlers/homepageController");
+const jogarpage = require("./controlers/jogarpageController");
 
 app.use("/inicial", inicialpage);
 app.use("/login", loginpage);

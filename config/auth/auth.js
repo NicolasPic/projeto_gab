@@ -2,7 +2,6 @@ const localStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const Usuario = require('../../models/usuario');
 
-// Função isAuthenticated
 module.exports.isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();
@@ -10,7 +9,6 @@ module.exports.isAuthenticated = (req, res, next) => {
     res.redirect('/login');
 };
 
-// Configuração do Passport
 module.exports.setupPassport = function(passport){
     passport.use(new localStrategy({usernameField: 'cpf'}, (cpf, senha, done) => {
         Usuario.findOne({ where: { cpf: cpf } }).then((usuario) => {
