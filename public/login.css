@@ -1,94 +1,90 @@
-
-/* Contêiner principal que vai envolver as metades */
+/* Contêiner principal */
 .login-container {
-    display: flex;             /* Aplica o Flexbox */
-    flex-direction: column;    /* Altera a direção do Flexbox para coluna */
-    height: 100vh;             
+    display: flex;               /* Aplica Flexbox */
+    flex-direction: column;      /* Organização vertical */
+    height: 100vh;               /* Ocupa toda a altura da viewport */
+    position: relative;          /* Configura para posicionamento absoluto interno */
 }
 
-.login-centro-container {
-    position: absolute;        /* Coloca o contêiner sobre as metades */
-    top: 50%;                  /* Centraliza o contêiner no meio da tela */
-    left: 50%;                 /* Centraliza o contêiner no meio da tela */
-    transform: translate(-50%,-50%); /* Ajuste para garantir que o contêiner fique exatamente no meio */
-    width: 30%;              /* Largura do contêiner central */
-    height: 400px;             /* Altura automática para ajustar ao conteúdo */
-    background-color: rgba(255, 255, 255, 0.9); /* Cor de fundo com opacidade */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;            /* Espaçamento interno */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
-    border-radius: 10px;   
-}
-
-.login-centro-container h1{
-    font-size:10em;
-}
-
+/* Metades da tela */
 .metade-login-container {
-    width: 100%;                /* Cada metade ocupa 100% da largura */
-    height: 50%;               /* Cada metade ocupa 50% da altura */
-    display: flex;             /* Aplica o Flexbox dentro de cada metade */
-    justify-content: center;   /* Centraliza o conteúdo horizontalmente */
-    align-items: flex-start;   /* Alinha o conteúdo na parte superior */
-    text-align: center;        /* Centraliza o texto dentro de cada metade */
+    width: 100%;                 /* Largura total */
+    height: 50%;                 /* Cada metade ocupa 50% da tela */
+    position: absolute;          /* Para fixar as cores de fundo */
+    z-index: 1;                  /* Mantém no fundo */
+}
+
+.login-superior {
+    top: 0;                      /* Superior no topo */
+    background-color: #01438a;   /* Fundo azul */
+}
+
+.login-inferior {
+    bottom: 0;                   /* Inferior no rodapé */
+    background-color: #286aa7;   /* Fundo azul mais claro */
+}
+
+/* Contêiner central para o formulário */
+.login-centro-container {
+    position: relative;          /* Centralização com Flexbox */
+    margin: auto;                /* Centraliza automaticamente */
+    z-index: 2;                  /* Garante que fique acima das metades */
+    display: flex;               /* Flexbox interno */
+    flex-direction: column;      /* Organização vertical */
+    align-items: center;         /* Centraliza horizontalmente */
+    justify-content: center;     /* Centraliza verticalmente */
+    background-color: rgba(255, 255, 255, 0.9); /* Fundo branco */
+    width: 30%;                  /* Largura fixa */
+    padding: 20px;               /* Espaçamento interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
+    border-radius: 10px;         /* Bordas arredondadas */
+    text-align: center;
+}
+
+.botao-login {
+    padding: 10px 20px;         /* Espaçamento interno */
+    font-size: 1.2em;           /* Tamanho da fonte */
+    background-color: #ffffff;  /* Cor de fundo do botão */
+    border: none;               /* Remove a borda padrão */
+    border-radius: 5px;         /* Bordas arredondadas */
+    cursor: pointer;            /* Cursor de ponteiro ao passar sobre o botão */
+    margin: 10px;               /* Espaçamento entre os botões */
+}
+
+.botao-login:hover {
+    background-color: #ddd;     /* Cor de fundo ao passar o mouse */
+}
+
+.input-group {
+    margin-bottom: 20px;        /* Espaçamento inferior entre os grupos de entrada */
+    text-align: left;           /* Alinhamento do texto à esquerda */
+    width: 100%;
+}
+
+.input-group label {
+    display: block;             /* Exibir o rótulo como bloco */
+    margin-bottom: 5px;         /* Espaçamento inferior do rótulo */
+    font-weight: bold;          /* Negrito no rótulo */
+}
+
+.input-group input {
+    width: 100%;                /* Largura total do campo de entrada */
+    padding: 10px;              /* Espaçamento interno do campo de entrada */
+    border: 1px solid #ccc;     /* Borda do campo de entrada */
+    border-radius: 5px;         /* Bordas arredondadas */
+    box-sizing: border-box;     /* Incluir borda e preenchimento no tamanho total */
 }
 
 .metade-metade-login-container {
     width: 100%;                /* Cada metade ocupa 100% da largura */
-    height: 30%;               /* Cada metade ocupa 50% da altura */
-    display: flex;
-    background-color: rgba(255, 255, 255);             /* Aplica o Flexbox dentro de cada metade */
-    justify-content: center;   /* Centraliza o conteúdo horizontalmente */
-    align-items: center;   
-    text-align: center;        /* Centraliza o texto dentro de cada metade */
+    height: 30%;                /* Define altura */
+    display: flex;              /* Aplica Flexbox */
+    background-color: rgba(255, 255, 255); /* Fundo branco */
+    justify-content: center;    /* Centraliza horizontalmente */
+    align-items: center;        /* Centraliza verticalmente */
+    text-align: center;         /* Centraliza o texto */
 }
 
-.metade-metade-login-container h1{
-    font-size:9em;
-}
-
-/* Primeira metade da tela com fundo azul */
-.login-superior {
-    background-color: #01438a;
-}
-
-/* Segunda metade da tela com fundo verde */
-.login-inferior {
-    background-color: #286aa7;
-}
-
-.botao-login {
-    padding: 10px 20px;        /* Reduz o espaçamento interno do botão */
-    font-size: 3em;          /* Reduz ligeiramente o tamanho da fonte */
-    background-color: #ffffff; /* Cor de fundo do botão */
-    border: none;              /* Remove a borda padrão */
-    border-radius: 5px;        /* Bordas arredondadas */
-    cursor: pointer;           /* Cursor de ponteiro ao passar sobre o botão */
-    margin: 10px;              /* Espaçamento entre os botões */
-}
-
-.botao-login:hover {
-    background-color: #ddd;    /* Cor de fundo ao passar o mouse */
-}
-
-.input-group {
-    margin-bottom: 20px;       /* Espaçamento inferior entre os grupos de entrada */
-    text-align: left;          /* Alinhamento do texto à esquerda */
-}
-
-.input-group label {
-    display: block;            /* Exibir o rótulo como bloco */
-    margin-bottom: 5px;        /* Espaçamento inferior do rótulo */
-    font-weight: bold;         /* Negrito no rótulo */
-}
-
-.input-group input {
-    width: 100%;               /* Largura total do campo de entrada */
-    padding: 10px;             /* Espaçamento interno do campo de entrada */
-    border: 1px solid #ccc;    /* Borda do campo de entrada */
-    border-radius: 5px;        /* Bordas arredondadas */
-    box-sizing: border-box;    /* Incluir borda e preenchimento no tamanho total */
+.metade-metade-login-container h1 {
+    font-size: 9em;
 }
