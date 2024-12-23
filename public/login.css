@@ -1,90 +1,95 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; 
+    box-sizing: border-box; 
+}
+
 /* Contêiner principal */
 .login-container {
-    display: flex;               /* Aplica Flexbox */
-    flex-direction: column;      /* Organização vertical */
-    height: 100vh;               /* Ocupa toda a altura da viewport */
-    position: relative;          /* Configura para posicionamento absoluto interno */
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Ocupa toda a altura da viewport */
+    position: relative;
 }
 
-/* Metades da tela */
+/* Metades superiores e inferiores */
 .metade-login-container {
-    width: 100%;                 /* Largura total */
-    height: 50%;                 /* Cada metade ocupa 50% da tela */
-    position: absolute;          /* Para fixar as cores de fundo */
-    z-index: 1;                  /* Mantém no fundo */
-}
-
-.login-superior {
-    top: 0;                      /* Superior no topo */
-    background-color: #01438a;   /* Fundo azul */
-}
-
-.login-inferior {
-    bottom: 0;                   /* Inferior no rodapé */
-    background-color: #286aa7;   /* Fundo azul mais claro */
-}
-
-/* Contêiner central para o formulário */
-.login-centro-container {
-    position: relative;          /* Centralização com Flexbox */
-    margin: auto;                /* Centraliza automaticamente */
-    z-index: 2;                  /* Garante que fique acima das metades */
-    display: flex;               /* Flexbox interno */
-    flex-direction: column;      /* Organização vertical */
-    align-items: center;         /* Centraliza horizontalmente */
-    justify-content: center;     /* Centraliza verticalmente */
-    background-color: rgba(255, 255, 255, 0.9); /* Fundo branco */
-    width: 30%;                  /* Largura fixa */
-    padding: 20px;               /* Espaçamento interno */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
-    border-radius: 10px;         /* Bordas arredondadas */
+    flex: 1; /* Divide dinamicamente o espaço entre as metades */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
     text-align: center;
 }
 
+.login-superior {
+    background-color: #01438a;
+}
+
+.login-inferior {
+    background-color: #286aa7;
+}
+
+/* Contêiner central sobrepondo */
+.login-centro-container {
+    position: absolute; /* Posiciona sobre as metades */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centraliza completamente */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.95); /* Fundo branco semitransparente */
+    width: 90%; /* Responsivo: largura até 90% da tela */
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    border-radius: 10px;
+    text-align: center;
+}
+
+.metade-metade-login-container h1 {
+    font-size: clamp(3em, 5vw, 9em); 
+    color: #ffffff; 
+    margin: 0;
+}
+
+
 .botao-login {
-    padding: 10px 20px;         /* Espaçamento interno */
-    font-size: 1.2em;           /* Tamanho da fonte */
-    background-color: #ffffff;  /* Cor de fundo do botão */
-    border: none;               /* Remove a borda padrão */
-    border-radius: 5px;         /* Bordas arredondadas */
-    cursor: pointer;            /* Cursor de ponteiro ao passar sobre o botão */
-    margin: 10px;               /* Espaçamento entre os botões */
+    padding: 10px 20px;
+    font-size: clamp(1em, 2vw, 1.2em); 
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: background-color 0.3s;
 }
 
 .botao-login:hover {
-    background-color: #ddd;     /* Cor de fundo ao passar o mouse */
+    background-color: #ddd;
 }
 
+
 .input-group {
-    margin-bottom: 20px;        /* Espaçamento inferior entre os grupos de entrada */
-    text-align: left;           /* Alinhamento do texto à esquerda */
+    margin-bottom: 20px;
+    text-align: left;
     width: 100%;
 }
 
 .input-group label {
-    display: block;             /* Exibir o rótulo como bloco */
-    margin-bottom: 5px;         /* Espaçamento inferior do rótulo */
-    font-weight: bold;          /* Negrito no rótulo */
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
 .input-group input {
-    width: 100%;                /* Largura total do campo de entrada */
-    padding: 10px;              /* Espaçamento interno do campo de entrada */
-    border: 1px solid #ccc;     /* Borda do campo de entrada */
-    border-radius: 5px;         /* Bordas arredondadas */
-    box-sizing: border-box;     /* Incluir borda e preenchimento no tamanho total */
-}
-
-.metade-metade-login-container {
-    width: 100%;                /* Cada metade ocupa 100% da largura */
-    height: 30%;                /* Define altura */
-    display: flex;              /* Aplica Flexbox */
-    background-color: rgba(255, 255, 255); /* Fundo branco */
-    justify-content: center;    /* Centraliza horizontalmente */
-    align-items: center;        /* Centraliza verticalmente */
-    text-align: center;         /* Centraliza o texto */
-}
-
-.metade-metade-login-container h1 {
-    font-size: 9em;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
 }

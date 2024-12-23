@@ -11,20 +11,22 @@
     <div class="login-centro-container">
         <div class="card">
             <div class="card-body">
-                <form action="/login" method="POST">
-                    <div class="input-group">
-                        <label for="cpf">CPF:</label>
-                        <input type="text" id="cpf" name="cpf" placeholder="Digite seu cpf" required>
-                    </div>
+                <form action="/login" method="POST" aria-label="Formulário de login">
+    <fieldset>
+        <legend>Login</legend>
+        <div class="input-group">
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" name="cpf" placeholder="Digite seu cpf" required>
+        </div>
+        <div class="input-group">
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+        </div>
+        <button type="submit" class="botao-login">Logar</button>
+    </fieldset>
+</form>
+<button type="button" class="botao-login" onclick="window.location.href='/login/criarconta'">Criar Conta</button>
 
-                    <div class="input-group">
-                        <label for="password">Senha:</label>
-                        <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
-                    </div>
-                    <button type="submit" class="botao-login">Logar</button>
-                    
-                </form>
-                <button type="button" class="botao-login" onclick="window.location.href='/login/criarconta'">Criar Conta</button>
             </div>
         </div>
     </div>

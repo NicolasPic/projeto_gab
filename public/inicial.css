@@ -1,57 +1,72 @@
+/* Remove margens globais */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Garante que o body ocupe toda a tela */
+    overflow: hidden; /* Remove barras de rolagem indesejadas */
+}
 
 /* Contêiner principal que vai envolver as metades */
 .inicial-container {
-    display: flex;             /* Aplica o Flexbox */
-    flex-direction: column;    /* Altera a direção do Flexbox para coluna */
-    height: 100vh;             
+    display: flex;             
+    flex-direction: column;    
+    height: 100vh; /* Ocupa toda a altura da viewport */
 }
 
+/* Contêiner centralizado */
 .centro-inicial-container {
-    position: absolute;        /* Coloca o contêiner sobre as metades */
-    top: 50%;                  /* Centraliza o contêiner no meio da tela */
-    left: 50%;                 /* Centraliza o contêiner no meio da tela */
-    transform: translate(-50%,-50%); /* Ajuste para garantir que o contêiner fique exatamente no meio */
-    width: 100%;              /* Largura do contêiner central */
-    height: 150px;             /* Altura do contêiner central */
-    background-color: rgba(255, 255, 255); /* Cor de fundo com opacidade */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;              
+    max-height: 50%; /* Limita a altura para evitar overflow */
+    background-color: rgba(255, 255, 255, 0.9); /* Fundo com leve transparência */
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+    padding: 10px; /* Adiciona espaçamento interno */
+    box-sizing: border-box; /* Inclui padding no cálculo da largura/altura */
 }
 
-.centro-inicial-container h1{
-    font-size:10em;
+/* Texto central responsivo */
+.centro-inicial-container h1 {
+    font-size: clamp(4em, 8vw, 10em); /* Tamanho responsivo */
+    margin: 0;
 }
 
+/* Configuração das metades */
 .metade-inicial-container {
-    width: 100%;                /* Cada metade ocupa 100% da largura */
-    height: 50%;               /* Cada metade ocupa 50% da altura */
-    display: flex;             /* Aplica o Flexbox dentro de cada metade */
-    justify-content: center;   /* Centraliza o conteúdo horizontalmente */
-    align-items: center;       /* Centraliza o conteúdo verticalmente */
-    text-align: center;        /* Centraliza o texto dentro de cada metade */
+    width: 100%;                
+    flex: 1; /* Cada metade ocupa proporcionalmente o espaço disponível */
+    display: flex;             
+    justify-content: center;   
+    align-items: center;       
+    text-align: center;        
 }
 
-/* Primeira metade da tela com fundo azul */
+/* Primeira metade com fundo azul */
 .inicial-superior {
     background-color: #01438a;
 }
 
-/* Segunda metade da tela com fundo verde */
+/* Segunda metade com fundo verde */
 .inicial-inferior {
     background-color: #286aa7;
 }
 
+/* Botão central */
 .botao-inicial {
-    padding: 20px 40px;        /* Espaçamento interno do botão */
-    font-size: 3em;            /* Tamanho da fonte do botão */
-    background-color: #ffffff;    /* Cor de fundo do botão */
-    border: none;              /* Remove a borda padrão */
-    border-radius: 5px;        /* Bordas arredondadas */
-    cursor: pointer;           /* Cursor de ponteiro ao passar sobre o botão */
+    padding: 15px 30px;        
+    font-size: clamp(1.5em, 3vw, 2.5em); /* Ajusta dinamicamente o tamanho do botão */
+    background-color: #ffffff;
+    border: none;              
+    border-radius: 5px;        
+    cursor: pointer;           
+    transition: background-color 0.3s;
 }
 
 .botao-inicial:hover {
-    background-color: #ddd;    /* Cor de fundo ao passar o mouse */
+    background-color: #ddd;    
 }

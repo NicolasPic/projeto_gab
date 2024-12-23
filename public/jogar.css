@@ -1,102 +1,29 @@
+/* Reset global */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Remove barras de rolagem desnecessárias */
+    box-sizing: border-box; /* Garante que padding não cause overflow */
+}
+
+/* Contêiner principal */
 .jogar-container {
     display: flex;
     flex-direction: column;
-    height:94vh;
-    align-items: center; 
-    justify-content: space-between; 
-}
-
-.jogar-centro-superior-container {
-    position: absolute;       
-    top: 50%;                  
-    left: 50%;                 
-    transform: translate(-50%,-50%);
-    width: 100%;              
-    height: 150px;            
-    background-color: rgba(255, 255, 255); 
-    display: flex;
-    justify-content: center;
+    height: 100vh; /* Ocupa toda a altura da viewport */
     align-items: center;
-    text-align: center;
+    justify-content: space-between;
 }
 
-.jogar-centro-superior-container h1 {
-    font-size:10em;
-}
-
-.jogar-centro-inferior-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgb(166, 192, 216);
-    width: 30%;
-    height: auto;
-    padding: 20px;
-    border-radius: 10px; /* Bordas arredondadas para um visual mais suave */
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
-    margin-top: 20px;
-}
-
-.nome-jogador-container {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.nome-jogador-container input {
-    padding: 10px;
-    font-size: 1.5em;
-    width: 80%; /* Mais largura para destacar o campo */
-    text-align: center;
-    background-color: #f0f0f0;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    margin-top: 5px;
-    cursor: not-allowed;
-}
-
-.nome-jogador-container label {
-    font-size: 1.5em;
-    color: #333;
-}
-
-.botao-jogar {
-    padding: 12px 20px;
-    font-size: 1.5em;
-    background-color: #747474;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    width: 70%;
-    margin: 10px 0; /* Espaçamento entre os botões */
-}
-
-.botao-jogar:hover {
-    background-color: #ddd;
-}
-
-.botao-voltar {
-    padding: 12px 20px;
-    font-size: 1.5em;
-    background-color: #b6b6b6;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    width: 70%;
-    margin-top: 20px;
-}
-
-.botao-voltar:hover {
-    background-color: #ddd;
-}
-
+/* Metades superiores e inferiores */
 .metade-jogar-container {
-    width: 100%;
-    height: 50%;
+    flex: 1; 
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+    width: 100%;
 }
 
 .jogar-superior {
@@ -105,4 +32,97 @@
 
 .jogar-inferior {
     background-color: #286aa7;
+}
+
+.jogar-centro-superior-container {
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: none;
+    height: 12%; 
+    padding: 15px 20px; 
+    background-color: #ffffff; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border: none; /* Remove qualquer borda */
+    box-shadow: none; /* Remove sombras */
+}
+
+/* Texto dentro da faixa */
+.jogar-centro-superior-container h1 {
+    font-size: clamp(3em, 5vw, 6em); 
+    margin: 0;
+    color: #000; 
+}
+/* Contêiner inferior */
+.jogar-centro-inferior-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(166, 192, 216);
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 10px auto;
+    text-align: center;
+}
+
+/* Campo de entrada e rótulos */
+.nome-jogador-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.nome-jogador-container input {
+    padding: 10px;
+    font-size: 1.2em;
+    width: 100%; 
+    text-align: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: not-allowed;
+    box-sizing: border-box;
+}
+
+.nome-jogador-container label {
+    font-size: 1.2em;
+    color: #000; /* Texto preto */
+}
+
+/* Botões */
+.botao-jogar, .botao-voltar {
+    padding: 12px 20px;
+    font-size: clamp(1em, 2vw, 1.2em); /* Responsivo */
+    background-color: #747474;
+    color: #000; /* Texto preto */
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    width: 100%;
+    margin: 10px 0;
+    transition: background-color 0.3s;
+}
+
+.botao-jogar:hover, .botao-voltar:hover {
+    background-color: #ddd;
+}
+
+/* Campo para o código da sala */
+.botao-jogar-container input[type="text"] {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    color: #000; /* Texto preto */
 }

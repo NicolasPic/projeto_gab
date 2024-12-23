@@ -18,7 +18,6 @@
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
 
-    // Conexão inicial com o socket
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
         socket.emit('reconectar', { usuarioID });
@@ -54,7 +53,7 @@
         const respostasContainer = perguntaDiv.querySelector('.respostasContainer');
         const salvarPergunta = perguntaDiv.querySelector('.salvarPergunta');
 
-        // Atualizar respostas quando o tipo mudar
+
         tipoSelect.addEventListener('change', () => {
             respostasContainer.innerHTML = '';
             if (tipoSelect.value === 'multipla') {
@@ -84,7 +83,7 @@
             }
         });
 
-        // Salvar pergunta
+
         salvarPergunta.addEventListener('click', () => {
             const textoPergunta = perguntaDiv.querySelector('.textoPergunta').value;
             const tipoPergunta = tipoSelect.value;
