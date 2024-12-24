@@ -6,14 +6,15 @@ html, body {
     box-sizing: border-box; 
 }
 
-.login-container {
+.criarquiz-container {
     display: flex;
     flex-direction: column;
-    height: 100vh; 
+    height: 100vh; /* Ocupa toda a altura da janela */
     position: relative;
 }
 
-.metade-login-container {
+/* Metades para o fundo */
+.metade-criarquiz-container {
     flex: 1;
     display: flex;
     justify-content: center;
@@ -22,25 +23,26 @@ html, body {
     text-align: center;
 }
 
-.login-superior {
+.criarquiz-superior {
     background-color: #01438a;
 }
 
-.login-inferior {
+.criarquiz-inferior {
     background-color: #286aa7;
 }
 
-.login-centro-container {
-    position: absolute; 
+/* Contêiner central sobrepondo */
+.criarquiz-centro-container {
+    position: absolute; /* Posiciona sobre as metades */
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); 
+    transform: translate(-50%, -50%); /* Centraliza completamente */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: rgba(255, 255, 255, 0.95); 
-    width: 90%; 
+    background-color: rgba(255, 255, 255, 0.95); /* Fundo branco semitransparente */
+    width: 90%; /* Responsivo: largura até 90% da tela */
     max-width: 400px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
@@ -48,40 +50,14 @@ html, body {
     text-align: center;
 }
 
-.metade-metade-login-container h1 {
-    font-size: clamp(3em, 5vw, 9em); 
-    color: #ffffff; 
-    margin: 0;
+.criarquiz-titulo {
+    font-size: clamp(2em, 5vw, 3em); 
+    margin-bottom: 20px;
+    color: #000;
 }
 
-/* Faixa branca no topo com o título */
-.login-centro-superior-container {
-    position: absolute;
-    top: 20%; /* Ajuste para descer a faixa */
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%; /* Agora cobre toda a largura da tela */
-    height: 10%; /* Altura proporcional */
-    padding: 15px 20px;
-    background-color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    border: none; /* Remove bordas extras */
-    box-shadow: none; /* Remove sombras */
-    border-radius: 0; /* Remove bordas arredondadas */
-}
-
-/* Texto dentro da faixa */
-.login-centro-superior-container h1 {
-    font-size: clamp(2.5em, 4vw, 4.5em); /* Tamanho responsivo */
-    margin: 0;
-    color: #000; /* Cor do texto */
-}
-
-
-.botao-login {
+/* Botões */
+.botao-criarquiz {
     padding: 10px 20px;
     font-size: clamp(1em, 2vw, 1.2em); 
     background-color: #ffffff;
@@ -92,8 +68,17 @@ html, body {
     transition: background-color 0.3s;
 }
 
-.botao-login:hover {
+.botao-criarquiz:hover {
     background-color: #ddd;
+}
+
+/* Formulário */
+.criarquiz-form {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .input-group {
@@ -114,4 +99,17 @@ html, body {
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
+}
+
+/* Contêiner de perguntas */
+.criarquiz-perguntas-container {
+    padding: 15px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.criarquiz-lista-perguntas {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
 }

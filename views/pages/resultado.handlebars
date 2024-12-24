@@ -14,15 +14,16 @@
 
     <!-- Resultados de todos os jogadores -->
     <div class="metade-resultado-container resultado-superior">
-        <h2>Resultados da Sala</h2>
-        <ul>
-            {{#each resultados}}
-                <li>
-                    Jogador: {{nome}} - Pontuação: {{pontuacaoTotalIndividual}}
-                </li>
-            {{/each}}
-        </ul>
-    </div>
+    <h2>Resultados da Sala</h2>
+    <ul>
+        {{#each resultados}}
+        <li>
+            <span>Jogador: {{nome}}</span>
+            <span>Pontuação: {{pontuacaoTotalIndividual}}</span>
+        </li>
+        {{/each}}
+    </ul>
+</div>
 
     <!-- Metade inferior da tela -->
     <div class="metade-resultado-container resultado-inferior">

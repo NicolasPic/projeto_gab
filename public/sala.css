@@ -11,7 +11,7 @@
 /* Metades do layout */
 .metade-sala-container {
     width: 100%;
-    flex: 1; /* Cada metade ocupa metade da tela */
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,23 +27,25 @@
 }
 
 .lista-jogadores-container {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(4, 0, 255, 0.9);
     border-radius: 10px;
     padding: 20px;
     width: 90%;
     max-width: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    text-align: left;
 }
 
-/* Contêiner central */
+.lista-jogadores-container h2 {
+    text-align: center;
+    margin: 0;
+}
+
 .centro-sala-container {
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     padding: 20px;
     width: 80%;
     max-width: 600px;
@@ -56,7 +58,6 @@
     margin: 0;
 }
 
-/* Parte inferior */
 .metade-sala-container.sala-inferior {
     background-color: #286aa7;
     padding: 20px;
@@ -86,7 +87,7 @@
 
 .campos-quiz-container {
     display: flex;
-    gap: 20px; /* Define um espaçamento maior entre os campos */
+    gap: 20px; 
     justify-content: center;
     align-items: center;
     width: 100%;
@@ -101,7 +102,7 @@
     border-radius: 5px;
     box-sizing: border-box;
     min-width: 200px;
-    max-width: 300px; /* Evita que os campos fiquem muito largos */
+    max-width: 300px;
 }
 
 .botao-sala {

@@ -3,6 +3,7 @@
     flex-direction: column;
     height: 100vh;  
 }
+
 .centro-resultado-container {
     top: 0%;
     left: 0; 
@@ -20,8 +21,8 @@
 }
 
 .metade-resultado-container.resultado-superior {
-    margin: 0; /* Garante que não haja margem */
-    padding: 0; /* Remove qualquer padding */
+    margin: 0;
+    padding: 0; 
     width: 100%;
     height: 55%; 
     display: flex;
@@ -38,6 +39,7 @@
     padding: 20px;
     margin-bottom: 20px;
 }
+
 .resultado-superior p {
     font-size: 2em;
     color: white;
@@ -45,6 +47,36 @@
     padding: 15px;
     margin: 10px 0;
     border-radius: 5px;
+}
+
+/* Estilização para a lista de resultados */
+.resultado-superior ul {
+    list-style: none; /* Remove marcadores da lista */
+    padding: 0;
+    margin: 20px 0;
+    width: 80%; /* Centraliza a lista e define largura */
+}
+
+.resultado-superior ul li {
+    font-size: 1.5em;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6); /* Fundo com opacidade */
+    margin: 10px 0;
+    padding: 10px 15px; /* Espaçamento interno */
+    border-radius: 8px; /* Bordas arredondadas */
+    text-align: left; /* Alinha o texto à esquerda */
+    display: flex; /* Alinhamento de itens na mesma linha */
+    justify-content: space-between; /* Espaça nome e pontuação */
+}
+
+.resultado-superior ul li span {
+    flex: 1;
+}
+
+.resultado-superior > h2 {
+    font-size: 2.5em;
+    color: white;
+    margin-bottom: 15px;
 }
 
 .metade-resultado-container.resultado-inferior {

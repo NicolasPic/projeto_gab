@@ -1,5 +1,4 @@
 <div class="gabhoot-container">
-
     <!-- Contêiner central sobrepondo as metades -->
     <div class="metade-gabhoot-container gabhoot-superior"></div>
 
@@ -9,28 +8,30 @@
 
     <div class="metade-gabhoot-container gabhoot-inferior">
         <p id="tempo-restante">Tempo restante: <span id="tempo">20</span> segundos</p>
+
         <form id="form-resposta" method="POST">
-            <input type="hidden" name="resposta" id="resposta-selecionada">
-            <input type="hidden" name="tempoRestante" id="tempo-restante-valor">
+    <input type="hidden" name="resposta" id="resposta-selecionada">
+    <input type="hidden" name="tempoRestante" id="tempo-restante-valor">
 
-            <div class="pergunta">
-                <h2>{{pergunta.texto}}</h2>
-                {{#each pergunta.respostas}}
-                <div>
-                    <label>
-                        <input type="radio" name="resposta" value="{{id}}" onchange="selecionarResposta(this.value)">
-                        {{texto}}
-                    </label>
-                </div>
-                {{/each}}
-            </div>
-
-            <button type="submit">Enviar Resposta</button>
-        </form>
-
-        <div id="feedback" style="display: none;">
-            <p id="mensagem-feedback"></p>
+    <div class="pergunta">
+        <h2>{{pergunta.texto}}</h2>
+        {{#each pergunta.respostas}}
+        <div class="resposta">
+            <label>
+                <input type="radio" name="resposta" value="{{id}}" onchange="selecionarResposta(this.value)">
+                {{texto}}
+            </label>
         </div>
+        {{/each}}
+    </div>
+
+    <!-- Feedback aparece acima do botão -->
+    <div id="feedback" class="correct" style="display: none;">
+        <p id="mensagem-feedback">Resposta correta!</p>
+    </div>
+
+    <button type="submit" class="botao-gabhoot">Enviar Resposta</button>
+</form>
     </div>
 </div>
 
@@ -80,9 +81,9 @@ async function enviarResposta(tempoEsgotado = false) {
 
     if (!tempoEsgotado && !respostaSelecionada) {
         alert('Selecione uma resposta antes de enviar.');
-        botaoEnviar.disabled = false; 
+        botaoEnviar.disabled = false;
         botaoEnviar.textContent = "Enviar Resposta";
- 
+
         radios.forEach((radio) => {
             radio.disabled = false;
         });
@@ -102,15 +103,15 @@ async function enviarResposta(tempoEsgotado = false) {
     });
 
     const data = await response.json();
-    console.log('teste',data.correta )
+    feedbackDiv.classList.remove('correct', 'incorrect');
     if (data.correta == 1 && !tempoEsgotado) {
         mensagemFeedback.textContent = 'Resposta correta!';
-        mensagemFeedback.style.color = 'green';
+        feedbackDiv.classList.add('correct');
     } else {
         mensagemFeedback.textContent = tempoEsgotado
             ? 'Tempo esgotado. Resposta considerada incorreta.'
             : 'Resposta incorreta.';
-        mensagemFeedback.style.color = 'red';
+        feedbackDiv.classList.add('incorrect');
     }
 
     feedbackDiv.style.display = 'block';

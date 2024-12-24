@@ -1,16 +1,28 @@
-<h1>Criar Novo Quiz</h1>
-<form id="quizForm">
-    <label for="nome">Nome do Quiz:</label>
-    <input type="text" id="nome" name="nome" required>
+<div class="criarquiz-container">
+    <div class="metade-criarquiz-container criarquiz-superior"></div>
+    <div class="metade-criarquiz-container criarquiz-inferior">
+        <div class="criarquiz-centro-container">
+            <h1 class="criarquiz-titulo">Criar Novo Quiz</h1>
+            <form id="quizForm" class="criarquiz-form">
+                <div class="input-group">
+                    <label for="nome">Nome do Quiz:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
 
-    <div id="perguntasContainer">
-        <h3>Perguntas Salvas</h3>
-        <ul id="listaPerguntas"></ul>
-        <button type="button" id="addPergunta">Adicionar Pergunta</button>
+                <div id="perguntasContainer" class="criarquiz-perguntas-container">
+                    <h3>Perguntas Salvas</h3>
+                    <ul id="listaPerguntas" class="criarquiz-lista-perguntas"></ul>
+                    <button type="button" id="addPergunta" class="botao-criarquiz">Adicionar Pergunta</button>
+                </div>
+
+                <button type="button" id="salvarQuiz" class="botao-criarquiz">Salvar Quiz</button>
+            </form>
+
+            <button type="button" id="voltarSala" class="botao-criarquiz">Voltar</button>
+        </div>
     </div>
+</div>
 
-    <button type="button" id="salvarQuiz">Salvar Quiz</button>
-</form>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -162,6 +174,14 @@
             console.error("Erro ao salvar quiz:", error);
         }
     });
+
+    document.getElementById('voltarSala').addEventListener('click', () => {
+    if (codigoSala) {
+        window.location.href = `/jogar/sala/${codigoSala}`;
+    } else {
+        alert("Código da sala não encontrado.");
+    }
+});
 </script>
 
 

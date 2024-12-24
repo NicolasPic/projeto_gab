@@ -1,4 +1,4 @@
-/* Contêiner principal que vai envolver as metades */
+
 .gabhoot-container {
     display: flex;             /* Aplica o Flexbox */
     flex-direction: column;    /* Altera a direção do Flexbox para coluna */
@@ -18,6 +18,7 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+    
 }
 
 .centro-gabhoot-container h1{
@@ -89,13 +90,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para destaque */
 }
 
-/* Estilo do título da pergunta */
-.pergunta h2 {
-    font-size: 1.75rem;
-    color: #01438a;
-    margin-bottom: 15px;
-    padding: 0; /* Remove o padding extra, se houver */
-}
 
 /* Estilo dos inputs de radio */
 .pergunta input[type="radio"] {
@@ -135,4 +129,53 @@
 
 .botao-gabhoot:hover {
     background-color: #ddd;    /* Cor de fundo ao passar o mouse */
+}
+
+/* Contêiner da pergunta com flexbox para alinhar feedback e pergunta */
+.pergunta-container {
+    display: flex;
+    flex-direction: column; /* Alinhar feedback e pergunta verticalmente */
+    align-items: center; /* Centralizar horizontalmente */
+    justify-content: flex-start; /* Posicionar feedback acima da pergunta */
+    width: 80%;
+    margin: 0 auto; /* Centralizar na tela */
+    padding: 20px;
+    background-color: #ffffff;
+    color: #01438a;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Feedback ajustado */
+#feedback {
+    width: 100%; /* Para ocupar toda a largura do contêiner */
+    margin-top: -10px; /* Ajusta a distância em relação ao botão */
+    margin-bottom: 10px; /* Pequeno espaçamento abaixo */
+    padding: 5px 10px; /* Espaçamento interno */
+    border-radius: 8px;
+    font-size: 1.2rem; /* Ajuste do tamanho da fonte */
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Suaviza a sombra */
+    display: none; /* Escondido por padrão */
+    position: relative; /* Posicionamento relativo ao contêiner */
+    background-color: #d4edda; /* Verde claro para correto */
+    color: #155724; /* Cor do texto para correto */
+}
+
+#feedback.correct {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+#feedback.incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Pergunta */
+.pergunta h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
 }

@@ -58,6 +58,7 @@ html, body {
     margin: 0;
     color: #000; 
 }
+
 /* Contêiner inferior */
 .jogar-centro-inferior-container {
     display: flex;
@@ -88,13 +89,24 @@ html, body {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
-    cursor: not-allowed;
     box-sizing: border-box;
 }
 
 .nome-jogador-container label {
     font-size: 1.2em;
     color: #000; /* Texto preto */
+}
+
+/* Mensagem de erro */
+.mensagem-erro {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.2em;
 }
 
 /* Botões */
@@ -125,4 +137,15 @@ html, body {
     border-radius: 5px;
     box-sizing: border-box;
     color: #000; /* Texto preto */
+}
+
+.mensagem-erro {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.2em;
 }

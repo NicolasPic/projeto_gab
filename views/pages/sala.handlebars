@@ -19,20 +19,12 @@
     <div class="centro-sala-container">
         <h1>GABHoot</h1>
     </div>
-
-    <!-- Parte inferior com os botões e campos -->
     <div class="metade-sala-container sala-inferior">
         <div class="botoes-container">
             {{#if isAdmin}}
-                <!-- Botão para criar novo quiz -->
-                <button class="botao-sala" onclick="window.location.href='/jogar/criar-quiz'">Criar Quiz</button>
-
-                <!-- Texto indicando o filtro -->
                 <div class="filtro-container">
                     <label class="filtro-label" for="quizSearch">Filtre os quizzes disponíveis abaixo:</label>
                 </div>
-
-                <!-- Campos para pesquisa e seleção de quiz -->
                 <div class="campos-quiz-container">
                     <input type="text" id="quizSearch" placeholder="Digite o nome do quiz ou do criador...">
                     <select id="quizSelecionado" required>
@@ -44,14 +36,12 @@
                         {{/each}}
                     </select>
                 </div>
-
-                <!-- Botão para iniciar o jogo -->
+                
                 <button class="botao-sala" id="btnIniciar">Iniciar</button>
+                <button class="botao-sala" onclick="window.location.href='/jogar/criar-quiz'">Criar Quiz</button>
             {{else}}
                 <button class="botao-sala" id="btnIniciar" style="display: none;">Iniciar</button>
             {{/if}}
-
-            <!-- Botão para voltar -->
             <button class="botao-sala" onclick="window.location.href='/jogar'">Voltar</button>
         </div>
     </div>

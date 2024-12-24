@@ -1,93 +1,118 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+}
 
-/* Contêiner principal que vai envolver as metades */
 .criarconta-container {
-    display: flex;             /* Aplica o Flexbox */
-    flex-direction: column;    /* Altera a direção do Flexbox para coluna */
-    height: 92.8vh;             
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Metades para o fundo */
+.metade-criarconta-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+}
+
+.criarconta-superior {
+    background-color: #01438a;
+    width: 100%;
+}
+
+.criarconta-inferior {
+    background-color: #286aa7;
+    width: 100%;
 }
 
 .criarconta-centro-container {
-    position: absolute;        /* Coloca o contêiner sobre as metades */
-    top: 50%;                  /* Centraliza o contêiner no meio da tela */
-    left: 50%;                 /* Centraliza o contêiner no meio da tela */
-    transform: translate(-50%,-50%); /* Ajuste para garantir que o contêiner fique exatamente no meio */
-    width: 40%;              /* Largura do contêiner central */
-    height: 510px;             /* Altura automática para ajustar ao conteúdo */
-    background-color: rgba(255, 255, 255, 0.9); /* Cor de fundo com opacidade */
+    position: absolute;
+    top: 55%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.9); 
+    width: 90%; 
+    max-width: 400px; 
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    border-radius: 10px; 
+    z-index: 2; 
+}
+
+/* Remove o fundo branco do título */
+.metade-metade-criarconta-container {
+    width: 100%;
+    height: 30%;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 20px;            /* Espaçamento interno */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para destaque */
-    border-radius: 10px;   
 }
 
-.criarconta-centro-container h1{
-    font-size:10em;
-}
-
-.metade-criarconta-container {
-    width: 100%;                /* Cada metade ocupa 100% da largura */
-    height: 50%;               /* Cada metade ocupa 50% da altura */
-    display: flex;             /* Aplica o Flexbox dentro de cada metade */
-    justify-content: center;   /* Centraliza o conteúdo horizontalmente */
-    align-items: flex-start;   /* Alinha o conteúdo na parte superior */
-    text-align: center;        /* Centraliza o texto dentro de cada metade */
-}
-
-.metade-metade-criarconta-container {
-    width: 100%;                /* Cada metade ocupa 100% da largura */
-    height: 30%;               /* Cada metade ocupa 50% da altura */
-    display: flex;
-    background-color: rgba(255, 255, 255);             /* Aplica o Flexbox dentro de cada metade */
-    justify-content: center;   /* Centraliza o conteúdo horizontalmente */
-    align-items: center;   
-    text-align: center;        /* Centraliza o texto dentro de cada metade */
-}
-
-.metade-metade-criarconta-container h1{
-    font-size:9em;
-}
-
-/* Primeira metade da tela com fundo azul */
-.criarconta-superior {
-    background-color: #01438a;
-}
-
-/* Segunda metade da tela com fundo verde */
-.criarconta-inferior {
-    background-color: #286aa7;
+.metade-metade-criarconta-container h1 {
+    font-size: clamp(3em, 5vw, 9em); 
+    color: #ffffff; 
+    margin: 0;
 }
 
 .botao-criarconta {
-    padding: 20px 40px;        /* Espaçamento interno do botão */
-    font-size: 3em;            /* Tamanho da fonte do botão */
-    background-color: #ffffff;    /* Cor de fundo do botão */
-    border: none;              /* Remove a borda padrão */
-    border-radius: 5px;        /* Bordas arredondadas */
-    cursor: pointer;           /* Cursor de ponteiro ao passar sobre o botão */
+    padding: 10px 20px;
+    font-size: clamp(1em, 2vw, 1.2em);
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: background-color 0.3s;
 }
 
 .botao-criarconta:hover {
-    background-color: #ddd;    /* Cor de fundo ao passar o mouse */
+    background-color: #ddd;
 }
 
 .input-group {
-    margin-bottom: 15px;       /* Espaçamento inferior entre os grupos de entrada */
-    text-align: left;          /* Alinhamento do texto à esquerda */
+    margin-bottom: 20px;
+    text-align: left;
+    width: 100%;
 }
 
 .input-group label {
-    display: block;            /* Exibir o rótulo como bloco */
-    margin-bottom: 5px;        /* Espaçamento inferior do rótulo */
-    font-weight: bold;         /* Negrito no rótulo */
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
 .input-group input {
-    width: 100%;               /* Largura total do campo de entrada */
-    padding: 10px;             /* Espaçamento interno do campo de entrada */
-    border: 1px solid #ccc;    /* Borda do campo de entrada */
-    border-radius: 5px;        /* Bordas arredondadas */
-    box-sizing: border-box;    /* Incluir borda e preenchimento no tamanho total */
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.metade-metade-criarconta-container {
+    width: 100%;
+    height: 30%;
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.95);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.metade-metade-criarconta-container h1 {
+    font-size: clamp(3em, 5vw, 9em); 
+    color: #000000; 
+    margin: 0;
 }

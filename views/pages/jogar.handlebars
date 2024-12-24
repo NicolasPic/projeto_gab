@@ -13,11 +13,16 @@
                 <p>ID do usuário: {{usuarioID}}</p>
             </div>
 
+            <!-- Contêiner de mensagens de erro -->
+            <div id="mensagemErro" class="mensagem-erro" style="display: none;"></div>
+
             <div class="botao-jogar-container">
                 <button id="btnCriarSala" class="botao-jogar">Criar Sala</button>
                 <button id="btnEntrarSala" class="botao-jogar">Entrar na Sala</button>
                 <input type="text" id="codigoSala" placeholder="Código da Sala" />
             </div>
+
+            <button id="btnVoltarHome" class="botao-jogar">Voltar para Home</button>
         </div>
     </div>
 </div>
@@ -60,6 +65,10 @@ document.getElementById('btnEntrarSala').addEventListener('click', () => {
     }
 });
 
+document.getElementById('btnVoltarHome').addEventListener('click', () => {
+    window.location.href = '/home';
+});
+
     socket.on('salaCriadaOuEntrou', (data) => {
         if (data.sucesso) {
             console.log(`Entrou na sala ${data.codigoSala} com sucesso!`);
@@ -72,4 +81,20 @@ document.getElementById('btnEntrarSala').addEventListener('click', () => {
     socket.on('salasAtualizadas', (salasInfo) => {
         console.log('Estado atualizado das salas:', salasInfo);
     });
+
+    socket.on('salaErro', (data) => {
+        console.log('Erro ao entrar na sala:', data.mensagem);
+        exibirErro(data.mensagem);
+    });
+
+    // Função para exibir a mensagem de erro
+    function exibirErro(mensagem) {
+        const mensagemErroEl = document.getElementById('mensagemErro');
+        mensagemErroEl.textContent = mensagem;
+        mensagemErroEl.style.display = 'block';
+
+        setTimeout(() => {
+            mensagemErroEl.style.display = 'none';
+        }, 3000); // Oculta a mensagem após 5 segundos
+    }
 </script>
