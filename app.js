@@ -12,10 +12,14 @@ const passport = require("passport");
 const ioSession = require("express-socket.io-session");
 const { setupPassport } = require("./config/auth/auth");
 const { Quiz, Pergunta, Resposta, Usuario } = require('./models/relacionamentos');
+const criarUsuarioAdmin = require('./config/auth/adminSetup');
+
 
 conectarDB();
 
 setupPassport(passport);
+
+criarUsuarioAdmin();
 
 const sessionMiddleware = session({
     secret: "projetogab",
@@ -69,8 +73,16 @@ io.use((socket, next) => {
 
 configurarSocket(io);
 
-app.engine("handlebars", engine({ defaultLayout: "main" }));
-app.set("view engine", "handlebars");
+app.engine(
+    "handlebars",
+    engine({
+      defaultLayout: "main",
+      helpers: {
+        json: (context) => JSON.stringify(context), // Adiciona o helper json
+      },
+    })
+  );
+  app.set("view engine", "handlebars");
 
 
 app.use(express.static("public"));
@@ -82,12 +94,13 @@ const inicialpage = require("./controlers/inicialpageController");
 const loginpage = require("./controlers/loginpageController");
 const homepage = require("./controlers/homepageController");
 const jogarpage = require("./controlers/jogarpageController");
+const adminpage = require("./controlers/adminpageController");
 
 app.use("/inicial", inicialpage);
 app.use("/login", loginpage);
 app.use("/home", homepage);
 app.use("/jogar", jogarpage);
-
+app.use("/admin", adminpage)
 
 server.listen(8081, () => {
     console.log("Servidor rodando na URL http://localhost:8081");

@@ -39,6 +39,7 @@
                 
                 <button class="botao-sala" id="btnIniciar">Iniciar</button>
                 <button class="botao-sala" onclick="window.location.href='/jogar/criar-quiz'">Criar Quiz</button>
+                <button class="botao-sala" id="btnEditarQuiz">Editar Quiz</button>
             {{else}}
                 <button class="botao-sala" id="btnIniciar" style="display: none;">Iniciar</button>
             {{/if}}
@@ -81,6 +82,17 @@
     socket.on('redirect', (url) => {
         window.location.href = url;
     });
+
+    document.getElementById('btnEditarQuiz').addEventListener('click', () => {
+        const quizId = document.getElementById('quizSelecionado').value;
+        if (quizId) {
+            const codigoSala = "{{codigoSala}}"; 
+            window.location.href = `/admin/editar-quiz/${quizId}?context=sala&codigoSala=${codigoSala}`;
+        } else {
+            alert("Por favor, selecione um quiz antes de editar.");
+        }
+    });
+
 
     const quizSearch = document.getElementById('quizSearch');
     const quizSelecionado = document.getElementById('quizSelecionado');

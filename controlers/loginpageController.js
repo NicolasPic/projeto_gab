@@ -30,23 +30,23 @@ router.get('/criarconta', (req, res) => {
 router.post('/criarconta', (req, res) => {
     var erros = [];
 
-    if (!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null) {
+    if (!req.body.nome || typeof req.body.nome === undefined || req.body.nome === null) {
         erros.push({ texto: "Nome inválido" });
     }
 
-    if (!req.body.email || typeof req.body.email == undefined || req.body.email == null) {
+    if (!req.body.username || typeof req.body.username === undefined || req.body.username === null) {
+        erros.push({ texto: "Username inválido" });
+    }
+
+    if (!req.body.email || typeof req.body.email === undefined || req.body.email === null) {
         erros.push({ texto: "Email inválido" });
     }
 
-    if (!req.body.password || typeof req.body.password == undefined || req.body.password == null) {
+    if (!req.body.password || typeof req.body.password === undefined || req.body.password === null) {
         erros.push({ texto: "Senha inválida" });
     }
 
-    if (!req.body.cpf || typeof req.body.cpf == undefined || req.body.cpf == null) {
-        erros.push({ texto: "CPF inválido" });
-    }
-
-    if (req.body.password != req.body.password2) {
+    if (req.body.password !== req.body.password2) {
         erros.push({ texto: "As suas senhas são diferentes" });
     }
 
@@ -54,18 +54,18 @@ router.post('/criarconta', (req, res) => {
         return res.render("pages/criarconta", { erros: erros });
     }
 
-    Usuario.findOne({ where: { cpf: req.body.cpf } })
-        .then((usuario) => {
-            if (usuario) {
-                req.flash("error_msg", "Já existe uma conta com esse CPF");
+    Usuario.findOne({ where: { username: req.body.username } })
+        .then((usuarioExistente) => {
+            if (usuarioExistente) {
+                req.flash("error_msg", "Já existe uma conta com esse username");
                 return res.redirect("/login/criarconta");
             }
 
             const novoUsuario = new Usuario({
                 nome: req.body.nome,
+                username: req.body.username,
                 email: req.body.email,
                 senha: req.body.password,
-                cpf: req.body.cpf
             });
 
             bcrypt.genSalt(10, (erro, salt) => {
@@ -81,7 +81,7 @@ router.post('/criarconta', (req, res) => {
                     }
 
                     novoUsuario.senha = hash;
-
+                    
                     novoUsuario.save()
                         .then(() => {
                             req.flash("success_msg", "Usuário criado com sucesso");

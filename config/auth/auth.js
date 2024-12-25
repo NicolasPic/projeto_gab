@@ -10,8 +10,8 @@ module.exports.isAuthenticated = (req, res, next) => {
 };
 
 module.exports.setupPassport = function(passport){
-    passport.use(new localStrategy({usernameField: 'cpf'}, (cpf, senha, done) => {
-        Usuario.findOne({ where: { cpf: cpf } }).then((usuario) => {
+    passport.use(new localStrategy({ usernameField: 'username' }, (username, senha, done) => {
+        Usuario.findOne({ where: { username: username } }).then((usuario) => {
             if (!usuario) {
                 return done(null, false, { message: "Esta conta não existe" });
             }
@@ -37,7 +37,6 @@ module.exports.setupPassport = function(passport){
     });
 
     passport.deserializeUser((id, done) => {
-        
         Usuario.findByPk(id).then((usuario) => {
             done(null, usuario);
         }).catch((err) => {

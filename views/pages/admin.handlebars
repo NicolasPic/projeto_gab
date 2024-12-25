@@ -1,0 +1,67 @@
+<div class="admin-container">
+    <!-- Contêiner superior -->
+    <div class="metade-admin-container admin-superior"></div>
+
+    <!-- Contêiner central -->
+    <div class="centro-admin-container">
+        <h1>Administração de Quizzes</h1>
+        <div class="filtro-container">
+            <label class="filtro-label" for="quizSearch">Filtre os quizzes disponíveis abaixo:</label>
+            <input type="text" id="quizSearch" placeholder="Digite o nome do quiz ou do criador...">
+        </div>
+        <div class="lista-quizzes-container">
+            <ul id="listaQuizzes">
+                {{#if quizzes}}
+                    {{#each quizzes}}
+                        <li>
+                            {{this.nome}} - Criado por {{this.autor}}
+                            <button onclick="window.location.href='/admin/editar-quiz/{{this.id}}'">Editar</button>
+                            <button onclick="confirmarExclusao({{this.id}}, '{{this.nome}}')">Excluir</button>
+                        </li>
+                    {{/each}}
+                {{else}}
+                    <li>Nenhum quiz encontrado.</li>
+                {{/if}}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Contêiner inferior -->
+    <div class="metade-admin-container admin-inferior">
+        <button class="botao-admin" onclick="window.location.href='/home'">Voltar</button>
+    </div>
+</div>
+
+<script>
+    const quizSearch = document.getElementById('quizSearch');
+    const listaQuizzes = document.getElementById('listaQuizzes');
+    quizSearch.addEventListener('input', () => {
+        const filter = quizSearch.value.toLowerCase();
+
+        Array.from(listaQuizzes.getElementsByTagName('li')).forEach(quiz => {
+            const texto = quiz.textContent.toLowerCase();
+            quiz.style.display = texto.includes(filter) ? '' : 'none';
+        });
+    });
+
+    function confirmarExclusao(quizId, quizNome) {
+        const mensagem = `Tem certeza de que deseja excluir o quiz "${quizNome}"?`;
+        if (confirm(mensagem)) {
+            excluirQuiz(quizId);
+        }
+    }
+
+
+    function excluirQuiz(quizId) {
+        fetch(`/admin/excluir-quiz/${quizId}`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    alert('Quiz excluído com sucesso.');
+                    location.reload(); // Atualiza a página após a exclusão
+                } else {
+                    alert('Erro ao excluir o quiz.');
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+    }
+</script>
