@@ -15,8 +15,8 @@
                     {{#each quizzes}}
                         <li>
                             {{this.nome}} - Criado por {{this.autor}}
-                            <button onclick="window.location.href='/admin/editar-quiz/{{this.id}}'">Editar</button>
-                            <button onclick="confirmarExclusao({{this.id}}, '{{this.nome}}')">Excluir</button>
+                            <button class="botao-admin" onclick="window.location.href='/admin/editar-quiz/{{this.id}}'">Editar</button>
+                            <button class="botao-admin" onclick="excluirQuiz({{this.id}})">Excluir</button>
                         </li>
                     {{/each}}
                 {{else}}

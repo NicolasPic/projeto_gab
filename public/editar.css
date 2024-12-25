@@ -1,0 +1,115 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.editarquiz-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+}
+
+/* Metades para o fundo */
+.metade-editarquiz-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+}
+
+.editarquiz-superior {
+    background-color: #01438a;
+}
+
+.editarquiz-inferior {
+    background-color: #286aa7;
+}
+
+/* Contêiner central sobrepondo */
+.editarquiz-centro-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    width: 90%;
+    max-width: 600px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.editarquiz-titulo {
+    font-size: clamp(2em, 5vw, 3em);
+    margin-bottom: 20px;
+    color: #000;
+}
+
+/* Botões */
+.botao-editarquiz {
+    padding: 10px 20px;
+    font-size: clamp(1em, 2vw, 1.2em);
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: background-color 0.3s;
+}
+
+.botao-editarquiz:hover {
+    background-color: #ddd;
+}
+
+/* Formulário */
+.editarquiz-form {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+    width: 100%;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Lista de perguntas */
+.editarquiz-perguntas-container {
+    padding: 15px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.editarquiz-lista-perguntas {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}

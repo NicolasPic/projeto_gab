@@ -1,0 +1,100 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+}
+
+/* Metades para o fundo */
+.metade-admin-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+}
+
+.admin-superior {
+    background-color: #01438a;
+}
+
+.admin-inferior {
+    background-color: #286aa7;
+}
+
+/* Contêiner central sobrepondo */
+.centro-admin-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.centro-admin-container h1 {
+    font-size: clamp(2em, 5vw, 3em);
+    margin-bottom: 20px;
+    color: #000;
+}
+
+/* Botões */
+.botao-admin {
+    padding: 10px 20px;
+    font-size: clamp(1em, 2vw, 1.2em);
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: background-color 0.3s;
+}
+
+.botao-admin:hover {
+    background-color: #ddd;
+}
+
+/* Lista de quizzes */
+.lista-quizzes-container {
+    width: 100%;
+}
+
+.lista-quizzes-container ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.lista-quizzes-container li {
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.filtro-label {
+    font-size: 1em;
+    color: #000;
+    margin-bottom: 10px;
+    display: block;
+    text-align: center;
+}

@@ -10,8 +10,8 @@ router.get('/', isAuthenticated, async (req, res) => {
         const nomeUsuario = req.user.nome;
 
         const quizzes = await Quiz.findAll({
-            where: isAdmin ? {} : { autor_id: usuarioID }, 
-            include: [{ model: Usuario, attributes: ['nome'] }]
+            where: isAdmin ? {} : { autor_id: usuarioID },
+            include: [{ model: Usuario, as: 'Usuario', attributes: ['nome'] }] 
         });
 
         const quizzesFormatados = quizzes.map(quiz => ({
@@ -68,15 +68,22 @@ router.get('/editar-quiz/:id', isAuthenticated, async (req, res) => {
         const quizId = req.params.id;
         const usuarioID = req.user.id;
         const isAdmin = req.user.isAdmin;
-        const context = req.query.context; // Obter o contexto da query string
-        const codigoSala = req.query.codigoSala; // Obter o código da sala, se aplicável
+        const context = req.query.context;
+        const codigoSala = req.query.codigoSala;
 
-        // Buscar o quiz e suas perguntas
         const quiz = await Quiz.findByPk(quizId, {
-            include: {
-                model: Pergunta,
-                include: [Resposta]
-            }
+            include: [
+                {
+                    model: Pergunta,
+                    as: 'Perguntas',
+                    include: [
+                        {
+                            model: Resposta,
+                            as: 'Respostas',
+                        }
+                    ]
+                }
+            ]
         });
 
         if (!quiz) {
@@ -89,19 +96,20 @@ router.get('/editar-quiz/:id', isAuthenticated, async (req, res) => {
         const quizFormatado = {
             id: quiz.id,
             nome: quiz.nome,
-            perguntas: quiz.Pergunta.map(pergunta => ({
+            perguntas: quiz.Perguntas.map(pergunta => ({
                 id: pergunta.id,
                 texto: pergunta.texto,
                 tipo: pergunta.tipo,
-                respostas: pergunta.Resposta.map(resposta => ({
+                respostas: pergunta.Respostas.map(resposta => ({
                     id: resposta.id,
                     texto: resposta.texto,
                     correta: resposta.correta
                 }))
             }))
         };
+        
+        console.log(quizFormatado);
 
-        // Determinar a rota de "Voltar" com base no contexto
         let voltarUrl = '/admin';
         if (context === 'sala' && codigoSala) {
             voltarUrl = `/jogar/sala/${codigoSala}`;
@@ -110,8 +118,10 @@ router.get('/editar-quiz/:id', isAuthenticated, async (req, res) => {
         res.render('pages/editarQuiz', {
             title: 'Editar Quiz',
             quiz: quizFormatado,
-            voltarUrl: voltarUrl, // Passar a URL dinâmica para a view
+            voltarUrl: voltarUrl,
+            customHeaderHome: true
         });
+
     } catch (error) {
         console.error("Erro ao carregar quiz para edição:", error);
         res.status(500).send('Erro ao carregar quiz para edição.');

@@ -30,7 +30,7 @@
                     <select id="quizSelecionado" required>
                         <option value="" disabled selected>Selecione um quiz</option>
                         {{#each quizzes}}
-                            <option value="{{this.id}}" data-autor="{{this.autor}}" data-nome="{{this.nome}}">
+                            <option value="{{this.id}}" data-autor-id="{{this.autor_id}}" data-nome="{{this.nome}}">
                                 {{this.nome}} - Criado por {{this.autor}}
                             </option>
                         {{/each}}
@@ -53,6 +53,7 @@
     const socket = io();
     const usuarioID = "{{usuarioID}}";
     const codigoSala = "{{codigoSala}}";
+    const isAdminGeral = {{isAdminGeral}}; 
 
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
@@ -73,7 +74,7 @@
             alert("Você agora é o administrador da sala.");
         }
     });
-    
+
     document.getElementById('btnVoltar').addEventListener('click', () => {
         socket.emit('sairSala', { codigoSala, usuarioID });
         window.location.href = '/jogar';
@@ -84,14 +85,30 @@
     });
 
     document.getElementById('btnEditarQuiz').addEventListener('click', () => {
-        const quizId = document.getElementById('quizSelecionado').value;
-        if (quizId) {
-            const codigoSala = "{{codigoSala}}"; 
-            window.location.href = `/admin/editar-quiz/${quizId}?context=sala&codigoSala=${codigoSala}`;
-        } else {
-            alert("Por favor, selecione um quiz antes de editar.");
-        }
-    });
+    const quizSelecionado = document.getElementById('quizSelecionado');
+    const quizId = quizSelecionado.value;
+    const autorId = quizSelecionado.options[quizSelecionado.selectedIndex]?.getAttribute('data-autor-id');
+
+    console.log(`Selecionado: Quiz ID = ${quizId}, Autor ID = ${autorId}`);
+
+    if (!quizId) {
+        alert("Por favor, selecione um quiz antes de editar.");
+        return;
+    }
+
+    // Verificar permissões
+    if (isAdminGeral) {
+        window.location.href = `/admin/editar-quiz/${quizId}?context=sala&codigoSala=${codigoSala}`;
+        return;
+    }
+
+    if (usuarioID === autorId) {
+        window.location.href = `/admin/editar-quiz/${quizId}?context=sala&codigoSala=${codigoSala}`;
+        return;
+    }
+
+    alert("Você não tem permissão para editar este quiz.");
+});
 
 
     const quizSearch = document.getElementById('quizSearch');
@@ -102,7 +119,7 @@
 
         Array.from(quizSelecionado.options).forEach(option => {
             const nome = option.getAttribute('data-nome').toLowerCase();
-            const autor = option.getAttribute('data-autor').toLowerCase();
+            const autor = option.getAttribute('data-autor-id');
             const matches = nome.includes(filter) || autor.includes(filter);
 
             option.style.display = matches ? '' : 'none';

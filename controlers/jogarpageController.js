@@ -21,7 +21,7 @@ router.get('/', isAuthenticated, (req, res) => {
 router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
     const codigoSala = req.params.codigo;
     const usuarioID = req.user ? req.user.id : null;
-
+    const isAdminGeral = req.user.isAdmin;
     if (!codigoSala || typeof codigoSala !== 'string' || codigoSala.trim() === '') {
         console.warn("Código da sala inválido.");
         return res.status(400).render('pages/sala', {
@@ -60,7 +60,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
             }
         );
         const quizzes = await sequelize.query(
-            `SELECT q.id, q.nome, u.nome AS autor FROM quizzes q 
+            `SELECT q.id, q.nome, q.autor_id, u.nome AS autor FROM quizzes q 
              INNER JOIN usuarios u ON q.autor_id = u.id`,
             {
                 type: sequelize.QueryTypes.SELECT
@@ -72,6 +72,7 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
             jogadores,
             usuarioID,
             isAdmin,
+            isAdminGeral: isAdminGeral,
             quizzes, 
             error: null
         });

@@ -18,20 +18,38 @@
                 <button type="button" id="salvarQuiz" class="botao-editarquiz">Salvar Alterações</button>
             </form>
 
-            <!-- Botão Voltar usando a URL dinâmica -->
             <button type="button" onclick="window.location.href='{{voltarUrl}}'" class="botao-editarquiz">Voltar</button>
         </div>
     </div>
 </div>
 
-
 <script>
-    const quizId = "{{quiz.id}}";
-    const perguntasSalvas = {{{json quiz.perguntas}}};
+    const perguntasSalvas = {{{json quiz.perguntas}}}; // Converte perguntas do backend para JSON utilizável
     const listaPerguntas = document.getElementById('listaPerguntas');
     const addPergunta = document.getElementById('addPergunta');
 
     addPergunta.addEventListener('click', () => criarFormularioPergunta());
+
+    function atualizarListaPerguntas() {
+        listaPerguntas.innerHTML = '';
+        perguntasSalvas.forEach((pergunta, index) => {
+            const li = document.createElement('li');
+            li.classList.add('pergunta-item');
+            li.innerHTML = `
+                <div>
+                    <strong>${index + 1}. ${pergunta.texto} (${pergunta.tipo})</strong>
+                    <button type="button" class="editarPergunta">Editar</button>
+                    <button type="button" class="removerPergunta">Remover</button>
+                </div>
+            `;
+            li.querySelector('.editarPergunta').addEventListener('click', () => criarFormularioPergunta(pergunta, index));
+            li.querySelector('.removerPergunta').addEventListener('click', () => {
+                perguntasSalvas.splice(index, 1);
+                atualizarListaPerguntas();
+            });
+            listaPerguntas.appendChild(li);
+        });
+    }
 
     function criarFormularioPergunta(pergunta = null, index = null) {
         const perguntaDiv = document.createElement('div');
@@ -89,12 +107,10 @@
         salvarPergunta.addEventListener('click', () => {
             const textoPergunta = perguntaDiv.querySelector('.textoPergunta').value;
             const tipoPergunta = tipoSelect.value;
-            const respostas = Array.from(respostasContainer.querySelectorAll('.resposta')).map(respostaDiv => {
-                return {
-                    texto: respostaDiv.querySelector('input[type="text"]').value,
-                    correta: respostaDiv.querySelector('input[type="radio"]').checked ? 1 : 0,
-                };
-            });
+            const respostas = Array.from(respostasContainer.querySelectorAll('.resposta')).map(respostaDiv => ({
+                texto: respostaDiv.querySelector('input[type="text"]').value,
+                correta: respostaDiv.querySelector('input[type="radio"]').checked ? 1 : 0
+            }));
 
             if (!textoPergunta || respostas.length === 0 || !respostas.some(r => r.correta === 1)) {
                 alert('Preencha todos os campos e marque uma resposta como correta.');
@@ -115,25 +131,6 @@
         listaPerguntas.appendChild(perguntaDiv);
     }
 
-    function atualizarListaPerguntas() {
-        listaPerguntas.innerHTML = '';
-        perguntasSalvas.forEach((pergunta, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div>
-                    <strong>${index + 1}. ${pergunta.texto} (${pergunta.tipo})</strong>
-                    <button type="button" class="detalhesPergunta">Detalhes</button>
-                    <button type="button" class="editarPergunta">Editar</button>
-                </div>
-            `;
-            li.querySelector('.detalhesPergunta').addEventListener('click', () => {
-                alert(`Detalhes: ${JSON.stringify(pergunta, null, 2)}`);
-            });
-            li.querySelector('.editarPergunta').addEventListener('click', () => criarFormularioPergunta(pergunta, index));
-            listaPerguntas.appendChild(li);
-        });
-    }
-
     document.getElementById('salvarQuiz').addEventListener('click', async () => {
         const nome = document.getElementById('nome').value;
 
@@ -143,7 +140,7 @@
         }
 
         try {
-            const response = await fetch(`/admin/editar-quiz/${quizId}`, {
+            const response = await fetch(`/admin/editar-quiz/${quiz.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, perguntas: perguntasSalvas })
@@ -158,10 +155,6 @@
         } catch (error) {
             console.error("Erro ao salvar quiz:", error);
         }
-    });
-
-    document.getElementById('voltarAdmin').addEventListener('click', () => {
-        window.location.href = `/admin`;
     });
 
     atualizarListaPerguntas();
