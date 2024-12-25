@@ -87,7 +87,6 @@ document.getElementById('btnVoltarHome').addEventListener('click', () => {
         exibirErro(data.mensagem);
     });
 
-    // Função para exibir a mensagem de erro
     function exibirErro(mensagem) {
         const mensagemErroEl = document.getElementById('mensagemErro');
         mensagemErroEl.textContent = mensagem;
@@ -95,6 +94,6 @@ document.getElementById('btnVoltarHome').addEventListener('click', () => {
 
         setTimeout(() => {
             mensagemErroEl.style.display = 'none';
-        }, 3000); // Oculta a mensagem após 5 segundos
+        }, 3000); 
     }
 </script>

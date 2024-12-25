@@ -159,15 +159,21 @@ function configurarSocket(io) {
 
         socket.on('sairSala', ({ codigoSala, usuarioID }) => {
             if (salas[codigoSala] && salas[codigoSala].jogadores[usuarioID]) {
-                delete salas[codigoSala].jogadores[usuarioID];
+                const sala = salas[codigoSala];
+                const isAdmin = sala.admin === usuarioID;
+                delete sala.jogadores[usuarioID];
                 console.log(`Usuário ${usuarioID} removido da sala ${codigoSala}`);
-
-                if (Object.keys(salas[codigoSala].jogadores).length === 0) {
+        
+                if (Object.keys(sala.jogadores).length === 0) {
                     delete salas[codigoSala];
                     console.log(`Sala ${codigoSala} foi removida pois está vazia.`);
+                } else if (isAdmin) {
+                    const novoAdmin = Object.keys(sala.jogadores)[0];
+                    sala.admin = novoAdmin;
+                    console.log(`Admin da sala ${codigoSala} transferido para o jogador ${novoAdmin}`);
+                    io.to(codigoSala).emit('novoAdmin', { novoAdmin });
                 }
                 socket.leave(codigoSala);
-
                 console.log(`Estado atual da sala ${codigoSala}:`, salas[codigoSala]);
                 io.to(codigoSala).emit('resetarSession');
             } else {

@@ -42,11 +42,10 @@
             {{else}}
                 <button class="botao-sala" id="btnIniciar" style="display: none;">Iniciar</button>
             {{/if}}
-            <button class="botao-sala" onclick="window.location.href='/jogar'">Voltar</button>
+            <button class="botao-sala" id="btnVoltar">Voltar</button>
         </div>
     </div>
 </div>
-
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -66,6 +65,17 @@
         } else {
             alert("Por favor, selecione um quiz antes de iniciar.");
         }
+    });
+
+    socket.on('novoAdmin', ({ novoAdmin }) => {
+        if (usuarioID === novoAdmin) {
+            alert("Você agora é o administrador da sala.");
+        }
+    });
+    
+    document.getElementById('btnVoltar').addEventListener('click', () => {
+        socket.emit('sairSala', { codigoSala, usuarioID });
+        window.location.href = '/jogar';
     });
 
     socket.on('redirect', (url) => {
