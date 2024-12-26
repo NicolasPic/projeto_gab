@@ -1,18 +1,42 @@
-<h1>Aguardando outros jogadores...</h1>
+<div class="espera-container">
+    <!-- Contêiner superior -->
+    <div class="metade-espera-container espera-superior"></div>
+
+    <!-- Contêiner central -->
+    <div class="centro-espera-container">
+        <h1>Aguardando outros jogadores...</h1>
+        <h2 id="jogadoresFaltantes">Jogadores restantes: --</h2>
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Contêiner inferior -->
+    <div class="metade-espera-container espera-inferior"></div>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
     const codigoSala = "{{codigoSala}}";
     const usuarioID = "{{usuarioID}}";
 
- socket.on('connect', () => {
+    socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
-        socket.emit('reconectar',{usuarioID});
+        socket.emit('reconectar', { usuarioID });
     });
-    
+
     socket.emit('quemrespondeu', { codigoSala, usuarioID });
 
     socket.on('redirect', (url) => {
         window.location.href = url;
+    });
+    
+    socket.on('jogadoresFaltantes', ({ faltando }) => {
+        console.log(`Recebido: Jogadores restantes: ${faltando}`); // Depuração
+        const jogadoresFaltantesElement = document.getElementById('jogadoresFaltantes');
+        if (jogadoresFaltantesElement) {
+            jogadoresFaltantesElement.textContent = `Jogadores restantes: ${faltando}`;
+        } else {
+            console.error('Elemento #jogadoresFaltantes não encontrado no DOM.');
+        }
     });
 </script>

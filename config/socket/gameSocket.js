@@ -136,24 +136,31 @@ function configurarSocket(io) {
                 console.error(`Sala ${codigoSala} não encontrada.`);
                 return;
             }
-
+        
             if (salas[codigoSala].jogadores[usuarioID]) {
                 salas[codigoSala].jogadores[usuarioID].respondeuTodas = true;
             }
-
-            const todosResponderam = Object.values(salas[codigoSala].jogadores).every(
-                (jogador) => jogador.respondeuTodas
+        
+            // Calcular quantos jogadores ainda não responderam
+            const jogadoresFaltantes = Object.values(salas[codigoSala].jogadores).filter(
+                (jogador) => !jogador.respondeuTodas
             );
-
+        
+            // Enviar o número de jogadores restantes para todos os jogadores na sala
+            io.to(codigoSala).emit('jogadoresFaltantes', { faltando: jogadoresFaltantes.length });
+        
+            // Verificar se todos já responderam
+            const todosResponderam = jogadoresFaltantes.length === 0;
+        
             if (todosResponderam) {
                 console.log(`Todos os jogadores da sala ${codigoSala} terminaram.`);
-
+        
                 setTimeout(() => {
                     const url2 = `/jogar/resultado`;
                     io.to(codigoSala).emit('redirect', url2);
                 }, 1000);
             } else {
-                console.log(`Aguardando jogadores na sala ${codigoSala}.`);
+                console.log(`Aguardando jogadores na sala ${codigoSala}: ${jogadoresFaltantes.length} restantes.`);
             }
         });
 

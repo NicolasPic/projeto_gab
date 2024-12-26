@@ -1,0 +1,65 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Remove barras de rolagem indesejadas */
+}
+
+.espera-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+.metade-espera-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.espera-superior {
+    background-color: #01438a; /* Cor similar à superior no home */
+}
+
+.espera-inferior {
+    background-color: #286aa7; /* Cor similar à inferior no home */
+}
+
+.centro-espera-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 15px 30px;
+    flex-shrink: 0;
+    height: 12%;
+}
+
+.centro-espera-container h1 {
+    font-size: clamp(2.5em, 4vw, 4.5em);
+    margin: 0;
+    color: #000000; 
+}
+
+.spinner {
+    margin-top: 20px;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #ffffff; /* Círculo branco para o spinner */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
