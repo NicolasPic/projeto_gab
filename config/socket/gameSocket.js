@@ -141,15 +141,12 @@ function configurarSocket(io) {
                 salas[codigoSala].jogadores[usuarioID].respondeuTodas = true;
             }
         
-            // Calcular quantos jogadores ainda não responderam
             const jogadoresFaltantes = Object.values(salas[codigoSala].jogadores).filter(
                 (jogador) => !jogador.respondeuTodas
             );
         
-            // Enviar o número de jogadores restantes para todos os jogadores na sala
             io.to(codigoSala).emit('jogadoresFaltantes', { faltando: jogadoresFaltantes.length });
         
-            // Verificar se todos já responderam
             const todosResponderam = jogadoresFaltantes.length === 0;
         
             if (todosResponderam) {

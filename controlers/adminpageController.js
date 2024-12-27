@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const express = require("express");
 const router = express.Router();
 const { isAuthenticated } = require('../config/auth/auth');
@@ -128,49 +129,104 @@ router.get('/editar-quiz/:id', isAuthenticated, async (req, res) => {
     }
 });
 
+router.delete('/excluir-pergunta/:id', isAuthenticated, async (req, res) => {
+    try {
+        const perguntaId = req.params.id;
+
+        const pergunta = await Pergunta.findByPk(perguntaId);
+        if (!pergunta) {
+            return res.status(404).send('Pergunta não encontrada.');
+        }
+
+        await pergunta.destroy();
+        res.status(200).send('Pergunta excluída com sucesso.');
+    } catch (error) {
+        console.error('Erro ao excluir a pergunta:', error);
+        res.status(500).send('Erro ao excluir a pergunta.');
+    }
+});
+
 router.put('/editar-quiz/:id', isAuthenticated, async (req, res) => {
     try {
         const quizId = req.params.id;
         const usuarioID = req.user.id;
         const isAdmin = req.user.isAdmin;
         const { nome, perguntas } = req.body;
-        const quiz = await Quiz.findByPk(quizId);
 
+        const quiz = await Quiz.findByPk(quizId);
         if (!quiz) {
             return res.status(404).send('Quiz não encontrado.');
         }
+
         if (!isAdmin && quiz.autor_id !== usuarioID) {
             return res.status(403).send('Você não tem permissão para editar este quiz.');
         }
 
+        // Atualizar nome do quiz
         quiz.nome = nome;
         await quiz.save();
 
+        // Processar perguntas
         for (const pergunta of perguntas) {
-            let perguntaDb = await Pergunta.findByPk(pergunta.id);
-            if (perguntaDb) {
-                perguntaDb.texto = pergunta.texto;
-                perguntaDb.tipo = pergunta.tipo;
-                await perguntaDb.save();
-            } else {
+            let perguntaDb;
+
+            if (pergunta.id) {
+                // Tentar encontrar a pergunta pelo ID
+                perguntaDb = await Pergunta.findOne({
+                    where: { id: pergunta.id, quiz_id: quizId },
+                });
+
+                if (perguntaDb) {
+                    // Atualizar pergunta existente
+                    perguntaDb.texto = pergunta.texto;
+                    perguntaDb.tipo = pergunta.tipo;
+                    await perguntaDb.save();
+                }
+            }
+
+            if (!perguntaDb) {
+                // Criar nova pergunta se não existir
                 perguntaDb = await Pergunta.create({
                     texto: pergunta.texto,
                     tipo: pergunta.tipo,
-                    quiz_id: quizId
+                    quiz_id: quizId,
                 });
             }
 
+            // Processar respostas
+            const respostaIds = pergunta.respostas.map(r => r.id).filter(id => id); // IDs válidos
+
+            // Remover respostas que não estão mais presentes
+            await Resposta.destroy({
+                where: {
+                    pergunta_id: perguntaDb.id,
+                    id: { [Sequelize.Op.notIn]: respostaIds },
+                },
+            });
+
             for (const resposta of pergunta.respostas) {
-                let respostaDb = await Resposta.findByPk(resposta.id);
-                if (respostaDb) {
-                    respostaDb.texto = resposta.texto;
-                    respostaDb.correta = resposta.correta;
-                    await respostaDb.save();
-                } else {
+                let respostaDb;
+
+                if (resposta.id) {
+                    // Tentar encontrar a resposta pelo ID
+                    respostaDb = await Resposta.findOne({
+                        where: { id: resposta.id, pergunta_id: perguntaDb.id },
+                    });
+
+                    if (respostaDb) {
+                        // Atualizar resposta existente
+                        respostaDb.texto = resposta.texto;
+                        respostaDb.correta = resposta.correta;
+                        await respostaDb.save();
+                    }
+                }
+
+                if (!respostaDb) {
+                    // Criar nova resposta se não existir
                     await Resposta.create({
                         texto: resposta.texto,
                         correta: resposta.correta,
-                        pergunta_id: perguntaDb.id
+                        pergunta_id: perguntaDb.id,
                     });
                 }
             }
@@ -182,6 +238,7 @@ router.put('/editar-quiz/:id', isAuthenticated, async (req, res) => {
         res.status(500).send('Erro ao salvar alterações no quiz.');
     }
 });
+
 
 
 module.exports = router;

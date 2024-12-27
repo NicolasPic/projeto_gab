@@ -31,7 +31,7 @@
     });
     
     socket.on('jogadoresFaltantes', ({ faltando }) => {
-        console.log(`Recebido: Jogadores restantes: ${faltando}`); // Depuração
+        console.log(`Recebido: Jogadores restantes: ${faltando}`); 
         const jogadoresFaltantesElement = document.getElementById('jogadoresFaltantes');
         if (jogadoresFaltantesElement) {
             jogadoresFaltantesElement.textContent = `Jogadores restantes: ${faltando}`;
