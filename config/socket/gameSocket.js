@@ -205,40 +205,6 @@ function configurarSocket(io) {
 
         socket.on('disconnect', () => {
             console.log(`Socket ${socket.id} desconectado.`);
-            
-            // Verifique se o jogador está em uma sala
-            const usuarioID = Object.keys(usuarios).find((id) => usuarios[id] === socket.id);
-            if (!usuarioID) {
-                console.log('Desconexão de um cliente não registrado.');
-                return;
-            }
-        
-            const codigoSala = Object.keys(salas).find((codigo) =>
-                Object.keys(salas[codigo].jogadores).includes(usuarioID)
-            );
-        
-            if (codigoSala) {
-                console.log(`Usuário ${usuarioID} desconectado da sala ${codigoSala}.`);
-                
-                // Marcar o jogador como desconectado temporariamente
-                salas[codigoSala].jogadores[usuarioID].desconectado = true;
-        
-                setTimeout(() => {
-                    if (usuarios[usuarioID] === socket.id) { // Ainda não reconectou
-                        console.log(`Usuário ${usuarioID} não reconectou. Removendo da sala ${codigoSala}.`);
-                        delete salas[codigoSala].jogadores[usuarioID];
-        
-                        // Verifica se a sala está vazia
-                        if (Object.keys(salas[codigoSala].jogadores).length === 0) {
-                            delete salas[codigoSala];
-                            console.log(`Sala ${codigoSala} foi removida pois está vazia.`);
-                        }
-        
-                        delete usuarios[usuarioID];
-                    }
-                }, 10000); // 10 segundos para tolerar reconexão
-            }
-        
             console.log('Estado atual das salas após desconexão:', salas);
         });
 

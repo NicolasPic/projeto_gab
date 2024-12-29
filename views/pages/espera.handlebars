@@ -37,7 +37,7 @@
         });
 
        socket.on('progressoJogadores', ({ atual, total }) => {
-    console.log(`Recebido progresso: ${atual}/${total}`);
+        console.log(`Recebido progresso: ${atual}/${total}`);
 
     const numeroFaltantesElement = document.getElementById('numeroFaltantes');
     if (numeroFaltantesElement) {
