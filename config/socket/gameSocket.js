@@ -11,20 +11,22 @@ function configurarSocket(io) {
                 const codigoSala = Object.keys(salas).find((codigo) =>
                     Object.keys(salas[codigo].jogadores).includes(usuarioID)
                 );
-
+        
                 if (codigoSala) {
-                    usuarios[usuarioID] = socket.id;
+                    usuarios[usuarioID] = socket.id; 
                     socket.join(codigoSala);
-
+        
+                    salas[codigoSala].jogadores[usuarioID].desconectado = false;
+        
                     console.log(`Jogador ${usuarioID} reconectado à sala ${codigoSala}.`);
-
+        
                     const jogadoresFaltantes = Object.values(salas[codigoSala].jogadores).filter(
                         (jogador) => !jogador.respondeuTodas
                     ).length;
-
+        
                     socket.emit('jogadoresFaltantes', { faltando: jogadoresFaltantes });
                     io.to(codigoSala).emit('jogadoresFaltantes', { faltando: jogadoresFaltantes });
-
+        
                     socket.emit('reconectado', { codigoSala, sucesso: true });
                 } else {
                     console.log(`Jogador ${usuarioID} não pertence a nenhuma sala.`);
@@ -33,6 +35,7 @@ function configurarSocket(io) {
                 console.log(`Nenhuma conexão anterior encontrada para ${usuarioID}.`);
             }
         });
+        
 
         socket.on('redirecionarSala', async ({ codigoSala, usuarioID, quizId }) => {
             try {
@@ -75,7 +78,6 @@ function configurarSocket(io) {
                         texto: row.resposta_texto,
                         correta: row.resposta_correta 
                     });
-                    console.log('Resposta carregada:', row);
                 });
 
                 const perguntas = Array.from(perguntasMap.values());
@@ -86,8 +88,6 @@ function configurarSocket(io) {
                     salas[codigoSala].jogadores[usuarioID].respondeuTodas = false;
                     salas[codigoSala].jogadores[usuarioID].pontuacaoTotal = 0;
                 });
-
-                console.log(`Perguntas configuradas para a sala ${codigoSala}:`, perguntas);
 
                 const url = `/jogar/gabhoot`;
                 io.to(codigoSala).emit('redirect', url);
@@ -144,14 +144,12 @@ function configurarSocket(io) {
                 console.error(`Sala ${codigoSala} não encontrada.`);
                 return;
             }
-        
-            // Atualiza o estado do jogador
+
             if (salas[codigoSala].jogadores[usuarioID]) {
                 salas[codigoSala].jogadores[usuarioID].respondeuTodas = true;
                 console.log(`Jogador ${usuarioID} marcou como respondeu todas as perguntas na sala ${codigoSala}.`);
             }
-        
-            // Recalcula o progresso
+
             const jogadoresTotal = Object.keys(salas[codigoSala].jogadores).length;
             const jogadoresFaltantes = Object.values(salas[codigoSala].jogadores).filter(
                 (jogador) => !jogador.respondeuTodas
@@ -159,7 +157,6 @@ function configurarSocket(io) {
         
             const etapaAtual = jogadoresTotal - jogadoresFaltantes;
         
-            // Emite o progresso para a sala
             io.to(codigoSala).emit('progressoJogadores', {
                 atual: etapaAtual,
                 total: jogadoresTotal,
@@ -208,6 +205,40 @@ function configurarSocket(io) {
 
         socket.on('disconnect', () => {
             console.log(`Socket ${socket.id} desconectado.`);
+            
+            // Verifique se o jogador está em uma sala
+            const usuarioID = Object.keys(usuarios).find((id) => usuarios[id] === socket.id);
+            if (!usuarioID) {
+                console.log('Desconexão de um cliente não registrado.');
+                return;
+            }
+        
+            const codigoSala = Object.keys(salas).find((codigo) =>
+                Object.keys(salas[codigo].jogadores).includes(usuarioID)
+            );
+        
+            if (codigoSala) {
+                console.log(`Usuário ${usuarioID} desconectado da sala ${codigoSala}.`);
+                
+                // Marcar o jogador como desconectado temporariamente
+                salas[codigoSala].jogadores[usuarioID].desconectado = true;
+        
+                setTimeout(() => {
+                    if (usuarios[usuarioID] === socket.id) { // Ainda não reconectou
+                        console.log(`Usuário ${usuarioID} não reconectou. Removendo da sala ${codigoSala}.`);
+                        delete salas[codigoSala].jogadores[usuarioID];
+        
+                        // Verifica se a sala está vazia
+                        if (Object.keys(salas[codigoSala].jogadores).length === 0) {
+                            delete salas[codigoSala];
+                            console.log(`Sala ${codigoSala} foi removida pois está vazia.`);
+                        }
+        
+                        delete usuarios[usuarioID];
+                    }
+                }, 10000); // 10 segundos para tolerar reconexão
+            }
+        
             console.log('Estado atual das salas após desconexão:', salas);
         });
 

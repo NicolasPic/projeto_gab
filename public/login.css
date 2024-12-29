@@ -1,0 +1,26 @@
+/* login.css - Ajuste apenas dos inputs */
+.login-input-group {
+    margin: 15px 0;
+    text-align: left;
+}
+
+.login-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.login-input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.login-input-group input::placeholder {
+    color: #999;
+    font-size: 0.9rem;
+    text-align: left; 
+}
