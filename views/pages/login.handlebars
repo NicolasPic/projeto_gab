@@ -1,35 +1,30 @@
-<div class="login-container">
-
-    <!-- Metade superior da tela -->
-    <div class="metade-login-container login-superior">
-        <!-- Faixa do título -->
-        <div class="login-centro-superior-container">
-            <h1>GABHoot</h1>
-        </div>
+<div class="body-container">
+    <div class="half-container superior">
+        <!-- Metade superior com fundo azul escuro -->
     </div>
 
-    <!-- Contêiner central sobrepondo as metades -->
-    <div class="login-centro-container">
-        <div class="card">
-            <div class="card-body">
-                <form action="/login" method="POST" aria-label="Formulário de login">
-                    <div class="input-group">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" placeholder="Digite seu username" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="password">Senha:</label>
-                        <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
-                    </div>
-                    <button type="submit" class="botao-login">Logar</button>
-                </form>
-                <button type="button" class="botao-login" onclick="window.location.href='/login/criarconta'">Criar Conta</button>
+    <div class="central-banner">
+        GABHoot
+    </div>
+
+    <div class="half-container inferior">
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
+                    <form action="/login" method="POST">
+                        <div class="input-group">
+                            <label for="username">Username:</label>
+                            <input type="text" id="username" name="username" placeholder="Digite seu username" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Senha:</label>
+                            <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+                        </div>
+                        <button type="submit" class="button">Logar</button>
+                    </form>
+                    <button type="button" class="button" onclick="window.location.href='/login/criarconta'">Criar Conta</button>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Metade inferior da tela -->
-    <div class="metade-login-container login-inferior">
-    </div>
-
 </div>

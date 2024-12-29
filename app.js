@@ -76,13 +76,15 @@ configurarSocket(io);
 app.engine(
     "handlebars",
     engine({
-      defaultLayout: "main",
-      helpers: {
-        json: (context) => JSON.stringify(context), // Adiciona o helper json
-      },
+        defaultLayout: "main",
+        helpers: {
+            json: (context) => JSON.stringify(context),
+            increment: (index) => index + 1,
+            slice: (array, start, end) => array.slice(start, end)
+        },
     })
-  );
-  app.set("view engine", "handlebars");
+);
+app.set("view engine", "handlebars");
 
 
 app.use(express.static("public"));

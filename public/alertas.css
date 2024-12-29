@@ -1,25 +1,52 @@
 .alert {
-    position: fixed;            /* Fixa o alerta no topo da página */
-    top: 20px;                  /* Distância do topo da página */
-    left: 50%;                  /* Centraliza horizontalmente */
-    transform: translateX(-50%);/* Centraliza com precisão */
-    width: 90%;                 /* Largura do alerta (ajustável) */
-    z-index: 9999;              /* Garante que o alerta fique por cima de outros elementos */
-    margin: 0 auto;             /* Remove margens automáticas */
-    font-size: 1.2em;           /* Tamanho da fonte */
-    padding: 15px;              /* Espaçamento interno */
-    border-radius: 5px;         /* Bordas arredondadas */
-}
-
-/* Opções de estilo para diferentes tipos de alertas */
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-color: #f5c6cb;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-size: 1em;
+    text-align: center;
 }
 
 .alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border-color: #c3e6cb;
+    background-color: var(--success-background);
+    color: var(--success-text);
+}
+
+.alert-danger {
+    background-color: var(--danger-background);
+    color: var(--danger-text);
+}
+
+/* Feedback */
+.alert.feedback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 5px;
+    margin-top: 15px;
+    box-shadow: 0 2px 4px var(--shadow-light);
+}
+
+.feedback.correct {
+    color: var(--success-text);
+    background-color: var(--success-background);
+    border: 1px solid #c3e6cb;
+}
+
+.feedback.incorrect {
+    color: var(--danger-text);
+    background-color: var(--danger-background);
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 15px;
+    }
 }

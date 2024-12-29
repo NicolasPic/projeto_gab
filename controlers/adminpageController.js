@@ -162,22 +162,18 @@ router.put('/editar-quiz/:id', isAuthenticated, async (req, res) => {
             return res.status(403).send('Você não tem permissão para editar este quiz.');
         }
 
-        // Atualizar nome do quiz
         quiz.nome = nome;
         await quiz.save();
 
-        // Processar perguntas
         for (const pergunta of perguntas) {
             let perguntaDb;
 
             if (pergunta.id) {
-                // Tentar encontrar a pergunta pelo ID
                 perguntaDb = await Pergunta.findOne({
                     where: { id: pergunta.id, quiz_id: quizId },
                 });
 
                 if (perguntaDb) {
-                    // Atualizar pergunta existente
                     perguntaDb.texto = pergunta.texto;
                     perguntaDb.tipo = pergunta.tipo;
                     await perguntaDb.save();
@@ -185,7 +181,6 @@ router.put('/editar-quiz/:id', isAuthenticated, async (req, res) => {
             }
 
             if (!perguntaDb) {
-                // Criar nova pergunta se não existir
                 perguntaDb = await Pergunta.create({
                     texto: pergunta.texto,
                     tipo: pergunta.tipo,
@@ -193,10 +188,8 @@ router.put('/editar-quiz/:id', isAuthenticated, async (req, res) => {
                 });
             }
 
-            // Processar respostas
-            const respostaIds = pergunta.respostas.map(r => r.id).filter(id => id); // IDs válidos
+            const respostaIds = pergunta.respostas.map(r => r.id).filter(id => id); 
 
-            // Remover respostas que não estão mais presentes
             await Resposta.destroy({
                 where: {
                     pergunta_id: perguntaDb.id,
@@ -208,13 +201,11 @@ router.put('/editar-quiz/:id', isAuthenticated, async (req, res) => {
                 let respostaDb;
 
                 if (resposta.id) {
-                    // Tentar encontrar a resposta pelo ID
                     respostaDb = await Resposta.findOne({
                         where: { id: resposta.id, pergunta_id: perguntaDb.id },
                     });
 
                     if (respostaDb) {
-                        // Atualizar resposta existente
                         respostaDb.texto = resposta.texto;
                         respostaDb.correta = resposta.correta;
                         await respostaDb.save();
@@ -222,7 +213,6 @@ router.put('/editar-quiz/:id', isAuthenticated, async (req, res) => {
                 }
 
                 if (!respostaDb) {
-                    // Criar nova resposta se não existir
                     await Resposta.create({
                         texto: resposta.texto,
                         correta: resposta.correta,

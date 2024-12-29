@@ -1,42 +1,44 @@
-<div class="gabhoot-container">
-    <!-- Contêiner central sobrepondo as metades -->
-    <div class="metade-gabhoot-container gabhoot-superior"></div>
-
-    <div class="centro-gabhoot-container">
-        <h1>GABHoot</h1>
+<div class="body-container">
+    <div class="half-container superior">
     </div>
 
-    <div class="metade-gabhoot-container gabhoot-inferior">
-        <p id="tempo-restante">Tempo restante: <span id="tempo">20</span> segundos</p>
+    <div class="central-banner">
+        GABHoot
+    </div>
 
-        <form id="form-resposta" method="POST">
-    <input type="hidden" name="resposta" id="resposta-selecionada">
-    <input type="hidden" name="tempoRestante" id="tempo-restante-valor">
+    <div class="half-container inferior">
+        <div class="container" style="margin-top: -400px; justify-content: flex-start; gap: 15px; background-color: rgba(var(--background-light), 0.9);">
+            <p id="tempo-restante">Tempo restante: <span id="tempo">20</span> segundos</p>
 
-    <div class="pergunta">
-        <h2>{{pergunta.texto}}</h2>
-        {{#each pergunta.respostas}}
-        <div class="resposta">
-            <label>
-                <input type="radio" name="resposta" value="{{id}}" onchange="selecionarResposta(this.value)">
-                {{texto}}
-            </label>
+            <form id="form-resposta" method="POST">
+                <input type="hidden" name="resposta" id="resposta-selecionada">
+                <input type="hidden" name="tempoRestante" id="tempo-restante-valor">
+
+                <div class="pergunta">
+                    <h2>{{pergunta.texto}}</h2>
+                    {{#each pergunta.respostas}}
+                    <div class="resposta">
+                        <label>
+                            <input type="radio" name="resposta" value="{{id}}" onchange="selecionarResposta(this.value)">
+                            {{texto}}
+                        </label>
+                    </div>
+                    {{/each}}
+                </div>
+
+                <div id="feedback" class="alert feedback correct" style="display: none;">
+                    <p id="mensagem-feedback">Resposta correta!</p>
+                </div>
+
+                <button type="submit" class="button">Enviar Resposta</button>
+            </form>
         </div>
-        {{/each}}
-    </div>
-
-    <!-- Feedback aparece acima do botão -->
-    <div id="feedback" class="correct" style="display: none;">
-        <p id="mensagem-feedback">Resposta correta!</p>
-    </div>
-
-    <button type="submit" class="botao-gabhoot">Enviar Resposta</button>
-</form>
     </div>
 </div>
 
+
 <script>
-  let tempo = 20;
+let tempo = 20;
 const tempoRestanteEl = document.getElementById('tempo');
 const form = document.getElementById('form-resposta');
 const inputResposta = document.getElementById('resposta-selecionada');
@@ -55,7 +57,7 @@ const contador = setInterval(() => {
     if (tempo <= 0) {
         clearInterval(contador);
         inputTempoRestante.value = 0;
-        enviarResposta(true);
+        enviarResposta(true); // Enviar resposta ao esgotar o tempo
     }
 }, 1000);
 
@@ -93,36 +95,48 @@ async function enviarResposta(tempoEsgotado = false) {
 
     const respostaFinal = tempoEsgotado ? "vazia" : respostaSelecionada;
 
-    const response = await fetch('/jogar/proxima', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            resposta: respostaFinal,
-            tempoRestante: tempo
-        })
-    });
+    try {
+        const response = await fetch('/jogar/proxima', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                resposta: respostaFinal,
+                tempoRestante: tempo
+            })
+        });
 
-    const data = await response.json();
-    feedbackDiv.classList.remove('correct', 'incorrect');
-    if (data.correta == 1 && !tempoEsgotado) {
-        mensagemFeedback.textContent = 'Resposta correta!';
-        feedbackDiv.classList.add('correct');
-    } else {
-        mensagemFeedback.textContent = tempoEsgotado
-            ? 'Tempo esgotado. Resposta considerada incorreta.'
-            : 'Resposta incorreta.';
-        feedbackDiv.classList.add('incorrect');
-    }
+        const data = await response.json();
+        feedbackDiv.classList.remove('correct', 'incorrect');
 
-    feedbackDiv.style.display = 'block';
-
-    setTimeout(() => {
-        if (data.proximaPergunta) {
-            window.location.href = '/jogar/gabhoot';
+        if (data.correta == 1 && !tempoEsgotado) {
+            mensagemFeedback.textContent = 'Resposta correta!';
+            feedbackDiv.classList.add('correct');
         } else {
-            window.location.href = '/jogar/espera';
+            mensagemFeedback.textContent = tempoEsgotado
+                ? 'Tempo esgotado. Resposta considerada incorreta.'
+                : 'Resposta incorreta.';
+            feedbackDiv.classList.add('incorrect');
         }
-    }, 3000);
+
+        feedbackDiv.style.display = 'block';
+
+        setTimeout(() => {
+            if (data.proximaPergunta) {
+                window.location.href = '/jogar/gabhoot';
+            } else {
+                window.location.href = '/jogar/espera';
+            }
+        }, 3000);
+    } catch (error) {
+        console.error('Erro ao enviar resposta:', error);
+        alert('Ocorreu um erro ao enviar sua resposta. Tente novamente.');
+        botaoEnviar.disabled = false;
+        botaoEnviar.textContent = "Enviar Resposta";
+
+        radios.forEach((radio) => {
+            radio.disabled = false;
+        });
+    }
 }
 
 </script>

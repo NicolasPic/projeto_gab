@@ -17,6 +17,14 @@ function configurarSocket(io) {
                     socket.join(codigoSala);
 
                     console.log(`Jogador ${usuarioID} reconectado à sala ${codigoSala}.`);
+
+                    const jogadoresFaltantes = Object.values(salas[codigoSala].jogadores).filter(
+                        (jogador) => !jogador.respondeuTodas
+                    ).length;
+
+                    socket.emit('jogadoresFaltantes', { faltando: jogadoresFaltantes });
+                    io.to(codigoSala).emit('jogadoresFaltantes', { faltando: jogadoresFaltantes });
+
                     socket.emit('reconectado', { codigoSala, sucesso: true });
                 } else {
                     console.log(`Jogador ${usuarioID} não pertence a nenhuma sala.`);
@@ -44,7 +52,7 @@ function configurarSocket(io) {
                         type: sequelize.QueryTypes.SELECT
                     }
                 );
-    
+
                 if (!rows || rows.length === 0) {
                     console.error(`Nenhuma pergunta encontrada para o quiz ${quizId}.`);
                     return;
@@ -137,27 +145,34 @@ function configurarSocket(io) {
                 return;
             }
         
+            // Atualiza o estado do jogador
             if (salas[codigoSala].jogadores[usuarioID]) {
                 salas[codigoSala].jogadores[usuarioID].respondeuTodas = true;
+                console.log(`Jogador ${usuarioID} marcou como respondeu todas as perguntas na sala ${codigoSala}.`);
             }
         
+            // Recalcula o progresso
+            const jogadoresTotal = Object.keys(salas[codigoSala].jogadores).length;
             const jogadoresFaltantes = Object.values(salas[codigoSala].jogadores).filter(
                 (jogador) => !jogador.respondeuTodas
-            );
+            ).length;
         
-            io.to(codigoSala).emit('jogadoresFaltantes', { faltando: jogadoresFaltantes.length });
+            const etapaAtual = jogadoresTotal - jogadoresFaltantes;
         
-            const todosResponderam = jogadoresFaltantes.length === 0;
+            // Emite o progresso para a sala
+            io.to(codigoSala).emit('progressoJogadores', {
+                atual: etapaAtual,
+                total: jogadoresTotal,
+            });
         
-            if (todosResponderam) {
-                console.log(`Todos os jogadores da sala ${codigoSala} terminaram.`);
-        
+            // Verifica se todos os jogadores completaram
+            if (jogadoresFaltantes === 0) {
+                console.log(`Todos os jogadores da sala ${codigoSala} completaram suas respostas.`);
                 setTimeout(() => {
-                    const url2 = `/jogar/resultado`;
-                    io.to(codigoSala).emit('redirect', url2);
+                    io.to(codigoSala).emit('redirect', `/jogar/resultado`);
                 }, 1000);
             } else {
-                console.log(`Aguardando jogadores na sala ${codigoSala}: ${jogadoresFaltantes.length} restantes.`);
+                console.log(`Aguardando jogadores na sala ${codigoSala}: ${jogadoresFaltantes} restantes.`);
             }
         });
 
@@ -167,7 +182,7 @@ function configurarSocket(io) {
                 const isAdmin = sala.admin === usuarioID;
                 delete sala.jogadores[usuarioID];
                 console.log(`Usuário ${usuarioID} removido da sala ${codigoSala}`);
-        
+
                 if (Object.keys(sala.jogadores).length === 0) {
                     delete salas[codigoSala];
                     console.log(`Sala ${codigoSala} foi removida pois está vazia.`);
@@ -179,7 +194,6 @@ function configurarSocket(io) {
                 }
                 socket.leave(codigoSala);
                 console.log(`Estado atual da sala ${codigoSala}:`, salas[codigoSala]);
-                io.to(codigoSala).emit('resetarSession');
             } else {
                 console.log(`Usuário ${usuarioID} não encontrado na sala ${codigoSala}.`);
             }

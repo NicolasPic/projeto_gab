@@ -1,28 +1,29 @@
-<div class="criarquiz-container">
-    <div class="metade-criarquiz-container criarquiz-superior"></div>
-    <div class="metade-criarquiz-container criarquiz-inferior">
-        <div class="criarquiz-centro-container">
-            <h1 class="criarquiz-titulo">Criar Novo Quiz</h1>
-            <form id="quizForm" class="criarquiz-form">
+<div class="body-container criar-quiz-view">
+    <div class="half-container superior">
+        <!-- Metade superior com fundo azul escuro -->
+    </div>
+
+    <div class="central-banner">
+        Criar Novo Quiz
+    </div>
+
+    <div class="half-container inferior">
+        <div class="container" style="margin-top: -500px; justify-content: flex-start; gap: 15px; background-color: rgba(var(--background-light), 0.9);">
+            <form id="quizForm">
                 <div class="input-group">
                     <label for="nome">Nome do Quiz:</label>
-                    <input type="text" id="nome" name="nome" required>
+                    <input type="text" id="nome" name="nome" placeholder="Digite o nome do quiz" required>
                 </div>
-
-                <div id="perguntasContainer" class="criarquiz-perguntas-container">
-                    <h3>Perguntas Salvas</h3>
-                    <ul id="listaPerguntas" class="criarquiz-lista-perguntas"></ul>
-                    <button type="button" id="addPergunta" class="botao-criarquiz">Adicionar Pergunta</button>
+                <div id="perguntasContainer" class="perguntas-list">
+                    <ul id="listaPerguntas" class="perguntas-list"></ul>
+                    <button type="button" id="addPergunta" class="button">Adicionar Pergunta</button>
                 </div>
-
-                <button type="button" id="salvarQuiz" class="botao-criarquiz">Salvar Quiz</button>
             </form>
-
-            <button type="button" id="voltarSala" class="botao-criarquiz">Voltar</button>
+            <button type="button" id="salvarQuiz" class="button">Salvar Quiz</button>
+            <button type="button" id="voltarSala" class="button">Voltar</button>
         </div>
     </div>
 </div>
-
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -42,107 +43,146 @@
     addPergunta.addEventListener('click', () => criarFormularioPergunta());
 
     function criarFormularioPergunta(pergunta = null, index = null) {
-        const perguntaDiv = document.createElement('div');
-        perguntaDiv.classList.add('pergunta');
-        perguntaDiv.innerHTML = `
+    // Desabilitar o botão "Adicionar Pergunta"
+    const botaoAdicionarPergunta = document.getElementById('addPergunta');
+    botaoAdicionarPergunta.disabled = true;
+    botaoAdicionarPergunta.classList.add('disabled');
+
+    // Desabilitar os botões existentes na lista
+    const botoes = document.querySelectorAll('.detalhesPergunta, .editarPergunta, .excluirPergunta');
+    botoes.forEach(botao => {
+        botao.disabled = true;
+        botao.classList.add('disabled');
+    });
+
+    const perguntaDiv = document.createElement('div');
+    perguntaDiv.classList.add('pergunta-item');
+    perguntaDiv.innerHTML = `
+        <div class="pergunta-header">
             <label>Pergunta:</label>
             <input type="text" class="textoPergunta" value="${pergunta?.texto || ''}" required>
-
+        </div>
+        
+        <div class="pergunta-tipo">
             <label>Tipo:</label>
             <select class="tipoPergunta">
                 <option value="multipla" ${pergunta?.tipo === 'multipla' ? 'selected' : ''}>Múltipla Escolha</option>
                 <option value="vf" ${pergunta?.tipo === 'vf' ? 'selected' : ''}>Verdadeiro/Falso</option>
             </select>
+        </div>
 
-            <div class="respostasContainer">
-                <h4>Respostas</h4>
+        <div class="respostas-container">
+            <h4>Respostas</h4>
+        </div>
+
+        <button type="button" class="button salvarPergunta">${index !== null ? 'Salvar Alterações' : 'Salvar Pergunta'}</button>
+        <button type="button" class="button cancelarPergunta">Cancelar</button>
+    `;
+
+    const tipoSelect = perguntaDiv.querySelector('.tipoPergunta');
+    const respostasContainer = perguntaDiv.querySelector('.respostas-container');
+    const salvarPergunta = perguntaDiv.querySelector('.salvarPergunta');
+    const cancelarPergunta = perguntaDiv.querySelector('.cancelarPergunta');
+
+    // Evento para alterar o tipo de pergunta
+    tipoSelect.addEventListener('change', () => {
+        respostasContainer.innerHTML = '';
+        if (tipoSelect.value === 'multipla') {
+            for (let i = 0; i < 5; i++) {
+                const resposta = pergunta?.respostas[i] || { texto: '', correta: 0 };
+                const respostaDiv = document.createElement('div');
+                respostaDiv.classList.add('resposta-item');
+                respostaDiv.innerHTML = `
+                    <input type="text" class="resposta-texto" placeholder="Opção ${i + 1}" value="${resposta.texto}" required>
+                    <label>Correta:</label>
+                    <input type="radio" name="correta-${index}" value="${i}" ${resposta.correta === 1 ? 'checked' : ''}>
+                `;
+                respostasContainer.appendChild(respostaDiv);
+            }
+        } else if (tipoSelect.value === 'vf') {
+            ['Verdadeiro', 'Falso'].forEach((texto, indexVF) => {
+                const resposta = pergunta?.respostas[indexVF] || { texto, correta: 0 };
+                const respostaDiv = document.createElement('div');
+                respostaDiv.classList.add('resposta-item');
+                respostaDiv.innerHTML = `
+                    <input type="text" class="resposta-texto" value="${texto}" readonly>
+                    <label>Correta:</label>
+                    <input type="radio" name="correta-${index}" value="${indexVF}" ${resposta.correta === 1 ? 'checked' : ''}>
+                `;
+                respostasContainer.appendChild(respostaDiv);
+            });
+        }
+    });
+
+    salvarPergunta.addEventListener('click', () => {
+        const textoPergunta = perguntaDiv.querySelector('.textoPergunta').value;
+        const tipoPergunta = tipoSelect.value;
+        const respostas = Array.from(respostasContainer.querySelectorAll('.resposta-item')).map(respostaDiv => ({
+            texto: respostaDiv.querySelector('.resposta-texto').value,
+            correta: respostaDiv.querySelector('input[type="radio"]').checked ? 1 : 0,
+        }));
+
+        if (!textoPergunta || respostas.length === 0 || !respostas.some(r => r.correta === 1)) {
+            alert('Preencha todos os campos e marque uma resposta como correta.');
+            return;
+        }
+
+        if (index !== null) {
+            perguntasSalvas[index] = { texto: textoPergunta, tipo: tipoPergunta, respostas };
+        } else {
+            perguntasSalvas.push({ texto: textoPergunta, tipo: tipoPergunta, respostas });
+        }
+
+        atualizarListaPerguntas();
+        perguntaDiv.remove();
+
+        // Reabilitar os botões da lista e o botão "Adicionar Pergunta"
+        botaoAdicionarPergunta.disabled = false;
+        botaoAdicionarPergunta.classList.remove('disabled');
+        botoes.forEach(botao => {
+            botao.disabled = false;
+            botao.classList.remove('disabled');
+        });
+    });
+
+    cancelarPergunta.addEventListener('click', () => {
+        perguntaDiv.remove();
+
+        botaoAdicionarPergunta.disabled = false;
+        botaoAdicionarPergunta.classList.remove('disabled');
+        botoes.forEach(botao => {
+            botao.disabled = false;
+            botao.classList.remove('disabled');
+        });
+    });
+
+    tipoSelect.dispatchEvent(new Event('change'));
+    document.getElementById('perguntasContainer').appendChild(perguntaDiv);
+}
+
+   function atualizarListaPerguntas() {
+    listaPerguntas.innerHTML = '';
+    perguntasSalvas.forEach((pergunta, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div>
+                <strong>${index + 1}. ${pergunta.texto} (${pergunta.tipo})</strong>
+                <button type="button" class="detalhesPergunta">Detalhes</button>
+                <button type="button" class="editarPergunta">Editar</button>
+                <button type="button" class="excluirPergunta">Excluir</button>
             </div>
-
-            <button type="button" class="salvarPergunta">${index !== null ? 'Salvar Alterações' : 'Salvar Pergunta'}</button>
         `;
-
-        const tipoSelect = perguntaDiv.querySelector('.tipoPergunta');
-        const respostasContainer = perguntaDiv.querySelector('.respostasContainer');
-        const salvarPergunta = perguntaDiv.querySelector('.salvarPergunta');
-
-
-        tipoSelect.addEventListener('change', () => {
-            respostasContainer.innerHTML = '';
-            if (tipoSelect.value === 'multipla') {
-                for (let i = 0; i < 5; i++) {
-                    const resposta = pergunta?.respostas[i] || { texto: '', correta: 0 };
-                    const respostaDiv = document.createElement('div');
-                    respostaDiv.classList.add('resposta');
-                    respostaDiv.innerHTML = `
-                        <input type="text" placeholder="Opção ${i + 1}" value="${resposta.texto}" required>
-                        <label>Correta:</label>
-                        <input type="radio" name="correta" value="${i}" ${resposta.correta === 1 ? 'checked' : ''}>
-                    `;
-                    respostasContainer.appendChild(respostaDiv);
-                }
-            } else if (tipoSelect.value === 'vf') {
-                ['Verdadeiro', 'Falso'].forEach((texto, indexVF) => {
-                    const resposta = pergunta?.respostas[indexVF] || { texto, correta: 0 };
-                    const respostaDiv = document.createElement('div');
-                    respostaDiv.classList.add('resposta');
-                    respostaDiv.innerHTML = `
-                        <input type="text" value="${texto}" readonly>
-                        <label>Correta:</label>
-                        <input type="radio" name="correta" value="${indexVF}" ${resposta.correta === 1 ? 'checked' : ''}>
-                    `;
-                    respostasContainer.appendChild(respostaDiv);
-                });
-            }
+        li.querySelector('.detalhesPergunta').addEventListener('click', () => {
+            alert(`Detalhes: ${JSON.stringify(pergunta, null, 2)}`);
         });
-
-
-        salvarPergunta.addEventListener('click', () => {
-            const textoPergunta = perguntaDiv.querySelector('.textoPergunta').value;
-            const tipoPergunta = tipoSelect.value;
-            const respostas = Array.from(respostasContainer.querySelectorAll('.resposta')).map(respostaDiv => {
-                return {
-                    texto: respostaDiv.querySelector('input[type="text"]').value,
-                    correta: respostaDiv.querySelector('input[type="radio"]').checked ? 1 : 0,
-                };
-            });
-
-            if (!textoPergunta || respostas.length === 0 || !respostas.some(r => r.correta === 1)) {
-                alert('Preencha todos os campos e marque uma resposta como correta.');
-                return;
-            }
-
-            if (index !== null) {
-                perguntasSalvas[index] = { texto: textoPergunta, tipo: tipoPergunta, respostas };
-            } else {
-                perguntasSalvas.push({ texto: textoPergunta, tipo: tipoPergunta, respostas });
-            }
-
+        li.querySelector('.editarPergunta').addEventListener('click', () => criarFormularioPergunta(pergunta, index));
+        li.querySelector('.excluirPergunta').addEventListener('click', () => {
+            perguntasSalvas.splice(index, 1);
             atualizarListaPerguntas();
-            perguntaDiv.remove();
         });
-
-        tipoSelect.dispatchEvent(new Event('change'));
-        perguntasContainer.appendChild(perguntaDiv);
-    }
-
-    function atualizarListaPerguntas() {
-        listaPerguntas.innerHTML = '';
-        perguntasSalvas.forEach((pergunta, index) => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div>
-                    <strong>${index + 1}. ${pergunta.texto} (${pergunta.tipo})</strong>
-                    <button type="button" class="detalhesPergunta">Detalhes</button>
-                    <button type="button" class="editarPergunta">Editar</button>
-                </div>
-            `;
-            li.querySelector('.detalhesPergunta').addEventListener('click', () => {
-                alert(`Detalhes: ${JSON.stringify(pergunta, null, 2)}`);
-            });
-            li.querySelector('.editarPergunta').addEventListener('click', () => criarFormularioPergunta(pergunta, index));
-            listaPerguntas.appendChild(li);
-        });
-    }
+        listaPerguntas.appendChild(li);
+    });
+}
 
     document.getElementById('salvarQuiz').addEventListener('click', async () => {
         const nome = document.getElementById('nome').value;

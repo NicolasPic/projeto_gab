@@ -1,24 +1,19 @@
-/* 1. Use a more-intuitive box-sizing model */
+
 *, *::before, *::after {
     box-sizing: border-box;
   }
   
-  /* 2. Remove default margin */
+
   * {
     margin: 0;
   }
   
   body {
-    /* 3. Add accessible line-height */
     line-height: 1.5;
-    /* 4. Improve text rendering */
+
     -webkit-font-smoothing: antialiased;
   }
 
- 
-  /*
-    9. Create a root stacking context
-  */
   #root, #__next {
     isolation: isolate;
   }
@@ -28,5 +23,6 @@
     padding: 0;
     height: 100%;
     overflow: hidden; 
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }

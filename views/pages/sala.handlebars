@@ -1,52 +1,59 @@
-<div class="sala-container">
-    <!-- Contêiner superior para Jogadores na Sala -->
-    <div class="metade-sala-container sala-superior" style="position: relative;">
-        <div class="lista-jogadores-container">
-            <h2 id="tituloSala">Jogadores na Sala: {{codigoSala}}</h2>
-            <ul id="listaJogadores">
-                {{#if jogadores}}
-                    {{#each jogadores}}
-                        <li>{{this.nome}}</li>
-                    {{/each}}
-                {{else}}
-                    <li>Nenhum jogador na sala.</li>
-                {{/if}}
-            </ul>
-        </div>
+<div class="body-container sala-view">
+    <div class="half-container superior">
+        <ul class="list">
+            {{#if jogadores}}
+                {{#each jogadores}}
+                <li>{{this.nome}}</li>
+                {{/each}}
+            {{else}}
+                <li>Nenhum jogador na sala.</li>
+            {{/if}}
+        </ul>
     </div>
 
-    <!-- Contêiner central -->
-    <div class="centro-sala-container">
-        <h1>GABHoot</h1>
+    <div class="central-banner" id="tituloSala">
+        Jogadores na Sala: {{codigoSala}}
     </div>
-    <div class="metade-sala-container sala-inferior">
-        <div class="botoes-container">
+
+    <div class="half-container inferior">
+        <div class="container">
             {{#if isAdmin}}
-                <div class="filtro-container">
-                    <label class="filtro-label" for="quizSearch">Filtre os quizzes disponíveis abaixo:</label>
-                </div>
-                <div class="campos-quiz-container">
-                    <input type="text" id="quizSearch" placeholder="Digite o nome do quiz ou do criador...">
-                    <select id="quizSelecionado" required>
-                        <option value="" disabled selected>Selecione um quiz</option>
-                        {{#each quizzes}}
-                            <option value="{{this.id}}" data-autor-id="{{this.autor_id}}" data-nome="{{this.nome}}">
-                                {{this.nome}} - Criado por {{this.autor}}
-                            </option>
-                        {{/each}}
-                    </select>
-                </div>
-                
-                <button class="botao-sala" id="btnIniciar">Iniciar</button>
-                <button class="botao-sala" onclick="window.location.href='/jogar/criar-quiz'">Criar Quiz</button>
-                <button class="botao-sala" id="btnEditarQuiz">Editar Quiz</button>
+            <!-- Campo de pesquisa -->
+            <div class="input-group">
+                <label for="quizSearch">Filtre os quizzes disponíveis abaixo:</label>
+                <input type="text" id="quizSearch" placeholder="Digite o nome do quiz ou do criador...">
+            </div>
+            
+            <!-- Seleção de quiz -->
+            <div class="select-container">
+                <label for="quizSelecionado">Selecione um Quiz:</label>
+                <select id="quizSelecionado" required>
+                    <option value="" disabled selected>Selecione um quiz</option>
+                    {{#each quizzes}}
+                    <option value="{{this.id}}" data-autor-id="{{this.autor_id}}" data-nome="{{this.nome}}">
+                        {{this.nome}} - Criado por {{this.autor}}
+                    </option>
+                    {{/each}}
+                </select>
+            </div>
+            
+            <!-- Botões administrativos -->
+            <div class="button-group">
+                <button class="button" id="btnIniciar">Iniciar</button>
+                <button class="button" onclick="window.location.href='/jogar/criar-quiz'">Criar Quiz</button>
+                <button class="button" id="btnEditarQuiz">Editar Quiz</button>
+            </div>
             {{else}}
-                <button class="botao-sala" id="btnIniciar" style="display: none;">Iniciar</button>
+            <!-- Botão de início para usuários comuns -->
+            <button class="button" id="btnIniciar" style="display: none;">Iniciar</button>
             {{/if}}
-            <button class="botao-sala" id="btnVoltar">Voltar</button>
+            
+            <!-- Botão de voltar -->
+            <button class="button" id="btnVoltar">Voltar</button>
         </div>
     </div>
 </div>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -96,7 +103,6 @@
         return;
     }
 
-    // Verificar permissões
     if (isAdminGeral) {
         window.location.href = `/admin/editar-quiz/${quizId}?context=sala&codigoSala=${codigoSala}`;
         return;

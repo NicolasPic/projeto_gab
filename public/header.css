@@ -1,34 +1,30 @@
-/* Estilo básico para o cabeçalho */
-.header {
+header {
     display: flex;
-    align-items: center;       /* Centraliza verticalmente */
-    padding: 15px 30px;        /* Espaçamento interno */
-    background-color: #007bff; /* Cor de fundo */
-    color: white;              /* Cor do texto */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para o cabeçalho */
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: var(--background-light);
+    font-size: 1.2em;
+    font-weight: bold;
+    box-shadow: 0 4px 6px var(--shadow-light);
 }
 
-/* Estilo para o logotipo */
-.logo h1 {
-    font-size: 24px;
+header a {
+    color: var(--background-light);
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: 500;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+header a:hover {
+    color: var(--button-hover);
+}
+
+header h1 {
     margin: 0;
-}
-
-/* Barra de navegação em linha horizontal */
-.navbar ul {
-    list-style: none;          /* Remove os marcadores */
-    display: flex;             /* Mostra os itens em linha */
-    gap: 20px;                 /* Espaço entre os links */
-    margin-left: 20px;         /* Espaço entre logo e navegação */
-    padding: 0;
-}
-
-.navbar a {
-    text-decoration: none;     /* Remove o sublinhado dos links */
-    color: white;              /* Cor do texto */
-    font-size: 16px;
-}
-
-.navbar a:hover {
-    color: #ffdd57;            /* Cor de destaque ao passar o mouse */
+    font-size: 1.8em;
+    font-weight: bold;
 }

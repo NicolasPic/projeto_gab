@@ -1,0 +1,45 @@
+.resultados-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.resultados-list-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--blue-light), var(--blue-deep));
+    color: var(--white);
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-light);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 150px;
+}
+
+.resultados-list-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 6px var(--shadow-dark);
+}
+
+.resultados-list-item span {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.resultados-list-item span.position {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.resultados-list-item span.player-score {
+    color: var(--gold);
+    font-weight: bold;
+}

@@ -8,7 +8,7 @@ const passport = require("passport")
 router.get('/', (req, res) => {
     res.render('pages/login', { 
         title: 'Página login',
-        customHeaderVazio: true  // Ativa o cabeçalho principal
+        customHeaderVazio: true
     });
 });
 

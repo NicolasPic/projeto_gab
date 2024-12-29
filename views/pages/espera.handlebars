@@ -1,42 +1,72 @@
-<div class="espera-container">
-    <!-- Contêiner superior -->
-    <div class="metade-espera-container espera-superior"></div>
-
-    <!-- Contêiner central -->
-    <div class="centro-espera-container">
-        <h1>Aguardando outros jogadores...</h1>
-        <h2 id="jogadoresFaltantes">Jogadores restantes: --</h2>
-        <div class="spinner"></div>
+<div class="body-container">
+    <div class="half-container superior">
+        <!-- Metade superior com fundo azul escuro -->
     </div>
 
-    <!-- Contêiner inferior -->
-    <div class="metade-espera-container espera-inferior"></div>
+    <div class="central-banner">
+        Aguardando outros jogadores...
+    </div>
+
+    <div class="half-container inferior">
+        <div class="container">
+            <h2 id="jogadoresFaltantes">Progresso dos jogadores: <span id="numeroFaltantes">(0/0)</span></h2>
+            <div class="spinner"></div>
+        </div>
+    </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    const socket = io();
-    const codigoSala = "{{codigoSala}}";
-    const usuarioID = "{{usuarioID}}";
+    document.addEventListener('DOMContentLoaded', () => {
+        const socket = io();
+        const codigoSala = "{{codigoSala}}";
+        const usuarioID = "{{usuarioID}}";
 
-    socket.on('connect', () => {
-        console.log(`Conectado com socket ID: ${socket.id}`);
-        socket.emit('reconectar', { usuarioID });
-    });
+        let ultimoJogadoresFaltantes = null;
 
-    socket.emit('quemrespondeu', { codigoSala, usuarioID });
+        socket.on('connect', () => {
+            console.log(`Conectado com socket ID: ${socket.id}`);
+            socket.emit('reconectar', { usuarioID });
 
-    socket.on('redirect', (url) => {
-        window.location.href = url;
-    });
-    
-    socket.on('jogadoresFaltantes', ({ faltando }) => {
-        console.log(`Recebido: Jogadores restantes: ${faltando}`); 
-        const jogadoresFaltantesElement = document.getElementById('jogadoresFaltantes');
-        if (jogadoresFaltantesElement) {
-            jogadoresFaltantesElement.textContent = `Jogadores restantes: ${faltando}`;
+            socket.emit('quemrespondeu', { codigoSala, usuarioID });
+        });
+
+        socket.on('redirect', (url) => {
+            console.log(`Redirecionando para: ${url}`);
+            window.location.href = url;
+        });
+
+       socket.on('progressoJogadores', ({ atual, total }) => {
+    console.log(`Recebido progresso: ${atual}/${total}`);
+
+    const numeroFaltantesElement = document.getElementById('numeroFaltantes');
+    if (numeroFaltantesElement) {
+        numeroFaltantesElement.textContent = `(${atual}/${total})`;
+        console.log('Progresso dos jogadores atualizado no DOM.');
+    } else {
+        console.error('Elemento #numeroFaltantes não encontrado no DOM.');
+    }
+});
+
+        socket.on('jogadoresFaltantes', ({ faltando }) => {
+        console.log(`Recebido: Jogadores restantes: ${faltando}`);
+        const faltandoAtual = parseInt(faltando, 10);
+
+        if (faltandoAtual !== ultimoJogadoresFaltantes) {
+            const numeroFaltantesElement = document.getElementById('numeroFaltantes');
+            const jogadoresFaltantesElement = document.getElementById('jogadoresFaltantes');
+
+            if (numeroFaltantesElement && jogadoresFaltantesElement) {
+                numeroFaltantesElement.textContent = faltando;
+                console.log('Número de jogadores restantes atualizado no DOM.');
+            } else {
+                console.error('Elementos #numeroFaltantes ou #jogadoresFaltantes não encontrados no DOM.');
+            }
+            ultimoJogadoresFaltantes = faltandoAtual;
         } else {
-            console.error('Elemento #jogadoresFaltantes não encontrado no DOM.');
+            console.log('Nenhuma mudança detectada no número de jogadores restantes.');
         }
+    });
+
     });
 </script>

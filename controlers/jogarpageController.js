@@ -187,10 +187,6 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
         .filter(r => r.correta === 1)
         .reduce((total, r) => total + (r.tempoRestante || 0), 0);
 
-    console.log('Respostas na sessão:', respostas);
-    console.log('Acertos:', acertos);
-    console.log('Pontuação individual:', pontos);
-
     if (salas[codigoSala]?.jogadores[usuarioID]) {
         salas[codigoSala].jogadores[usuarioID].pontuacao = pontos;
     }
@@ -206,16 +202,27 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             }
         );
 
-        const resultados = jogadores.map(jogador => ({
-            nome: jogador.nome,
-            pontuacaoTotalIndividual: salas[codigoSala].jogadores[jogador.id]?.pontuacao || 0
-        }));
+        const resultados = jogadores
+            .map(jogador => ({
+                id: jogador.id,
+                nome: jogador.nome,
+                pontuacaoTotalIndividual: salas[codigoSala].jogadores[jogador.id]?.pontuacao || 0
+            }))
+            .sort((a, b) => b.pontuacaoTotalIndividual - a.pontuacaoTotalIndividual)
+            .map((jogador, index) => ({
+                ...jogador,
+                posicao: index + 1
+            }));
 
+        const top5Resultados = resultados.slice(0, Math.min(5, resultados.length));
+
+        console.log("Teste",top5Resultados);
         return res.render('pages/resultado', {
             codigoSala,
             jogadores,
             usuarioID,
             acertos,
+            top5: JSON.stringify(top5Resultados),
             pontuacaoIndividual: pontos,
             resultados: JSON.stringify(resultados),
             error: null
@@ -236,7 +243,6 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
         req.session.respostas = null;
     }
 });
-
 
 router.get('/criar-quiz', isAuthenticated, (req, res) => {
     const codigoSala = req.session.codigoSala;

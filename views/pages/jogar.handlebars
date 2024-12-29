@@ -1,31 +1,34 @@
-<div class="jogar-container">
-    <div class="metade-jogar-container jogar-superior">
-        <div class="jogar-centro-superior-container">
-            <h1>GABHoot</h1>
-        </div>
+<div class="body-container">
+    <div class="half-container superior">
+        <div class="container">
+    <div class="player-card">
+        <h3>Nome do Jogador:</h3>
+        <p id="nomeJogador">{{nomeJogador}}</p>
+    </div>
+</div>
     </div>
 
-    <div class="metade-jogar-container jogar-inferior">
-        <div class="jogar-centro-inferior-container">
-            <div class="nome-jogador-container">
-                <label for="nomeJogador">Nome do Jogador:</label>
-                <input type="text" id="nomeJogador" value="{{nomeJogador}}" readonly />
-                <p>ID do usuário: {{usuarioID}}</p>
+    <div class="central-banner">
+        GABHoot
+    </div>
+
+    <div class="half-container inferior">
+        <div class="container">
+            <div id="mensagemErro" class="alert" style="display: none;"></div>
+
+            <div class="container">
+                <div class="input-group">
+                  <input type="text" id="codigoSala" placeholder="Código da Sala" />      
+                </div>
+                <button id="btnCriarSala" class="button">Criar Sala</button>
+                <button id="btnEntrarSala" class="button">Entrar na Sala</button>
             </div>
 
-            <!-- Contêiner de mensagens de erro -->
-            <div id="mensagemErro" class="mensagem-erro" style="display: none;"></div>
-
-            <div class="botao-jogar-container">
-                <button id="btnCriarSala" class="botao-jogar">Criar Sala</button>
-                <button id="btnEntrarSala" class="botao-jogar">Entrar na Sala</button>
-                <input type="text" id="codigoSala" placeholder="Código da Sala" />
-            </div>
-
-            <button id="btnVoltarHome" class="botao-jogar">Voltar para Home</button>
+            <button id="btnVoltarHome" class="button">Voltar para Home</button>
         </div>
     </div>
 </div>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
