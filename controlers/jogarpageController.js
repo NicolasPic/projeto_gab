@@ -66,7 +66,6 @@ router.get('/sala/:codigo', isAuthenticated, async (req, res) => {
                 type: sequelize.QueryTypes.SELECT
             }
         );
-        console.log(quizzes);
         return res.render('pages/sala', {
             codigoSala,
             jogadores,
@@ -104,7 +103,11 @@ router.get('/gabhoot', isAuthenticated, async (req, res) => {
         return res.status(404).send('Pergunta não encontrada.');
     }
 
-    res.render('pages/gabhoot', { pergunta });
+    res.render('pages/gabhoot', {
+        pergunta,
+        codigoSala,
+        usuarioID
+    });
 });
 
 router.post('/proxima', isAuthenticated, async (req, res) => {
@@ -135,12 +138,7 @@ router.post('/proxima', isAuthenticated, async (req, res) => {
 
         const perguntaAtual = salas[codigoSala].jogadores[usuarioID].perguntaAtual;
 
-        console.log('Resposta enviada pelo usuário:', respostaID);
-        console.log('Pergunta atual:', perguntaAtual);
-        console.log('Respostas disponíveis para a pergunta atual:', perguntaAtual.respostas);
-
         const respostaCorreta = perguntaAtual.respostas.find(r => r.id == respostaID)?.correta || false;
-        console.log('Resposta correta encontrada:', respostaCorreta);
 
         req.session.respostas.push({
             pergunta_id: perguntaAtual.id,
@@ -216,7 +214,6 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
 
         const top5Resultados = resultados.slice(0, Math.min(5, resultados.length));
 
-        console.log("Teste",top5Resultados);
         return res.render('pages/resultado', {
             codigoSala,
             jogadores,
@@ -247,8 +244,6 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
 router.get('/criar-quiz', isAuthenticated, (req, res) => {
     const codigoSala = req.session.codigoSala;
     const usuarioID = req.user ? req.user.id : null;
-    console.log('sala quiz:', codigoSala);
-    console.log(usuarioID)
     res.render('pages/criarQuiz', {
         title: 'Criar Quiz',
         customHeaderHome: true,

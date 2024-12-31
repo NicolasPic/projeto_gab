@@ -36,17 +36,17 @@
             window.location.href = url;
         });
 
-       socket.on('progressoJogadores', ({ atual, total }) => {
+        socket.on('progressoJogadores', ({ atual, total }) => {
         console.log(`Recebido progresso: ${atual}/${total}`);
 
-    const numeroFaltantesElement = document.getElementById('numeroFaltantes');
-    if (numeroFaltantesElement) {
-        numeroFaltantesElement.textContent = `(${atual}/${total})`;
-        console.log('Progresso dos jogadores atualizado no DOM.');
-    } else {
-        console.error('Elemento #numeroFaltantes não encontrado no DOM.');
-    }
-});
+        const numeroFaltantesElement = document.getElementById('numeroFaltantes');
+            if (numeroFaltantesElement) {
+                numeroFaltantesElement.textContent = `(${atual}/${total})`;
+                console.log('Progresso dos jogadores atualizado no DOM.');
+            } else {
+                console.error('Elemento #numeroFaltantes não encontrado no DOM.');
+            }
+        });
 
         socket.on('jogadoresFaltantes', ({ faltando }) => {
         console.log(`Recebido: Jogadores restantes: ${faltando}`);

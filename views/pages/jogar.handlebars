@@ -37,7 +37,6 @@
 
     socket.on('connect', () => {
         console.log(`Conectado com socket ID: ${socket.id}`);
-        socket.emit('reconectar', { usuarioID });
     });
 
     socket.on('reconectado', (data) => {
@@ -56,21 +55,21 @@
     } else {
         console.log('Digite um código de sala para criar.');
     }
-});
+    });
 
-document.getElementById('btnEntrarSala').addEventListener('click', () => {
-    const codigoSala = document.getElementById('codigoSala').value.trim();
-    if (codigoSala) {
-        console.log("Emitindo evento 'entrarSala' para entrar na sala:", codigoSala);
-        socket.emit('entrarSala', { codigoSala, usuarioID });
-    } else {
-        console.log('Digite um código de sala para entrar.');
-    }
-});
+    document.getElementById('btnEntrarSala').addEventListener('click', () => {
+        const codigoSala = document.getElementById('codigoSala').value.trim();
+        if (codigoSala) {
+            console.log("Emitindo evento 'entrarSala' para entrar na sala:", codigoSala);
+            socket.emit('entrarSala', { codigoSala, usuarioID });
+        } else {
+            console.log('Digite um código de sala para entrar.');
+        }
+    });
 
-document.getElementById('btnVoltarHome').addEventListener('click', () => {
-    window.location.href = '/home';
-});
+    document.getElementById('btnVoltarHome').addEventListener('click', () => {
+        window.location.href = '/home';
+    });
 
     socket.on('salaCriadaOuEntrou', (data) => {
         if (data.sucesso) {

@@ -43,12 +43,10 @@
     addPergunta.addEventListener('click', () => criarFormularioPergunta());
 
     function criarFormularioPergunta(pergunta = null, index = null) {
-    // Desabilitar o botão "Adicionar Pergunta"
     const botaoAdicionarPergunta = document.getElementById('addPergunta');
     botaoAdicionarPergunta.disabled = true;
     botaoAdicionarPergunta.classList.add('disabled');
 
-    // Desabilitar os botões existentes na lista
     const botoes = document.querySelectorAll('.detalhesPergunta, .editarPergunta, .excluirPergunta');
     botoes.forEach(botao => {
         botao.disabled = true;
@@ -83,8 +81,7 @@
     const respostasContainer = perguntaDiv.querySelector('.respostas-container');
     const salvarPergunta = perguntaDiv.querySelector('.salvarPergunta');
     const cancelarPergunta = perguntaDiv.querySelector('.cancelarPergunta');
-
-    // Evento para alterar o tipo de pergunta
+    
     tipoSelect.addEventListener('change', () => {
         respostasContainer.innerHTML = '';
         if (tipoSelect.value === 'multipla') {

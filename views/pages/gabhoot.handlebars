@@ -37,6 +37,7 @@
 </div>
 
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
 let tempo = 20;
 const tempoRestanteEl = document.getElementById('tempo');
@@ -50,6 +51,20 @@ function selecionarResposta(valor) {
     inputResposta.value = valor || '';
 }
 
+const socket = io();
+const codigoSala = "{{codigoSala}}";
+const usuarioID = "{{usuarioID}}"; 
+
+socket.on('connect', () => {
+    console.log(`Conectado ao socket com ID: ${socket.id}`);
+    socket.emit('reconectar', { usuarioID });
+});
+
+socket.on('redirect', (url) => {
+    console.log(`Redirecionando para: ${url}`);
+    window.location.href = url;
+});
+
 const contador = setInterval(() => {
     tempo--;
     tempoRestanteEl.textContent = tempo;
@@ -57,7 +72,7 @@ const contador = setInterval(() => {
     if (tempo <= 0) {
         clearInterval(contador);
         inputTempoRestante.value = 0;
-        enviarResposta(true); // Enviar resposta ao esgotar o tempo
+        enviarResposta(true); 
     }
 }, 1000);
 
@@ -138,5 +153,5 @@ async function enviarResposta(tempoEsgotado = false) {
         });
     }
 }
-
 </script>
+

@@ -17,7 +17,7 @@ function configurarSocket(io) {
                     socket.join(codigoSala);
         
                     salas[codigoSala].jogadores[usuarioID].desconectado = false;
-        
+                    console.log(`Jogador ${usuarioID} marcado como conectado na sala ${codigoSala}.`);
                     console.log(`Jogador ${usuarioID} reconectado à sala ${codigoSala}.`);
         
                     const jogadoresFaltantes = Object.values(salas[codigoSala].jogadores).filter(
@@ -88,6 +88,7 @@ function configurarSocket(io) {
                     salas[codigoSala].jogadores[usuarioID].respondeuTodas = false;
                     salas[codigoSala].jogadores[usuarioID].pontuacaoTotal = 0;
                 });
+                salas[codigoSala].status = "emPartida";
 
                 const url = `/jogar/gabhoot`;
                 io.to(codigoSala).emit('redirect', url);
@@ -122,17 +123,23 @@ function configurarSocket(io) {
 
         socket.on('entrarSala', ({ codigoSala, usuarioID }) => {
             if (salas[codigoSala]) {
-                salas[codigoSala].jogadores[usuarioID] = {
-                    perguntas: [],
-                    perguntaAtual: null,
-                    respostasJogadores: {}
-                };
-
-                usuarios[usuarioID] = socket.id;
-                socket.join(codigoSala);
-
-                console.log(`Usuário ${usuarioID} entrou na sala ${codigoSala}.`);
-                socket.emit('salaCriadaOuEntrou', { codigoSala, sucesso: true });
+                if(salas[codigoSala].status == 'emPartida') {
+                    console.log(`Tentativa de entrar na sala ${codigoSala}, mas ela esta em partida.`);
+                    socket.emit('salaErro', { mensagem: 'A sala esta em partida.' });
+                } else {
+                    salas[codigoSala].jogadores[usuarioID] = {
+                        perguntas: [],
+                        perguntaAtual: null,
+                        respostasJogadores: {}
+                    };
+    
+                    usuarios[usuarioID] = socket.id;
+                    socket.join(codigoSala);
+    
+                    console.log(`Usuário ${usuarioID} entrou na sala ${codigoSala}.`);
+                    socket.emit('salaCriadaOuEntrou', { codigoSala, sucesso: true });
+                }
+               
             } else {
                 console.log(`Tentativa de entrar na sala ${codigoSala}, mas ela não existe.`);
                 socket.emit('salaErro', { mensagem: 'A sala não existe.' });
@@ -162,11 +169,11 @@ function configurarSocket(io) {
                 total: jogadoresTotal,
             });
         
-            // Verifica se todos os jogadores completaram
             if (jogadoresFaltantes === 0) {
                 console.log(`Todos os jogadores da sala ${codigoSala} completaram suas respostas.`);
                 setTimeout(() => {
                     io.to(codigoSala).emit('redirect', `/jogar/resultado`);
+                    salas[codigoSala].status = "acabou";
                 }, 1000);
             } else {
                 console.log(`Aguardando jogadores na sala ${codigoSala}: ${jogadoresFaltantes} restantes.`);
@@ -203,9 +210,57 @@ function configurarSocket(io) {
             io.to(codigoSala).emit('redirect', `/jogar/sala/${codigoSala}`);
         });
 
+        const TIMEOUT_RECONNECT = 10000;
+
         socket.on('disconnect', () => {
             console.log(`Socket ${socket.id} desconectado.`);
-            console.log('Estado atual das salas após desconexão:', salas);
+            
+            const usuarioID = Object.keys(usuarios).find(id => usuarios[id] === socket.id);
+
+            if (usuarioID) {
+                const codigoSala = Object.keys(salas).find((codigo) =>
+                    Object.keys(salas[codigo].jogadores).includes(usuarioID)
+                );
+
+                if (codigoSala) {
+                    salas[codigoSala].jogadores[usuarioID].desconectado = true;
+                    console.log(`Jogador ${usuarioID} marcado como desconectado na sala ${codigoSala}.`);
+
+                    setTimeout(() => {
+                        const salaAtual = salas[codigoSala];
+                        const jogadorAtual = salaAtual?.jogadores[usuarioID];
+                    
+                        if (salaAtual && jogadorAtual?.desconectado) {
+                            console.log(`Timeout expirado para reconexão do jogador ${usuarioID} na sala ${codigoSala}.`);
+                    
+                            delete salaAtual.jogadores[usuarioID];
+                            console.log(`Jogador ${usuarioID} removido da sala ${codigoSala}.`);
+                    
+                            const jogadoresFaltantes = Object.values(salaAtual.jogadores).filter(
+                                (jogador) => !jogador.respondeuTodas && !jogador.desconectado
+                            ).length;
+                    
+                            if (Object.keys(salaAtual.jogadores).length === 0 || jogadoresFaltantes === 0) {
+                                console.log(`Todos os jogadores da sala ${codigoSala} completaram suas respostas ou saíram.`);
+                                io.to(codigoSala).emit('redirect', `/jogar/resultado`);
+                                salas[codigoSala].status = "acabou";
+                            } else {
+                                io.to(codigoSala).emit('jogadoresFaltantes', { faltando: jogadoresFaltantes });
+                            }
+                    
+                            if (Object.values(salaAtual.jogadores).every(j => j.desconectado)) {
+                                delete salas[codigoSala];
+                                console.log(`Sala ${codigoSala} removida por todos os jogadores estarem desconectados.`);
+                            }
+                    
+                            io.to(codigoSala).emit('jogadorDesconectado', { usuarioID });
+                        }
+                    }, TIMEOUT_RECONNECT);
+                
+            }
+        }
+
+        console.log('Estado atual das salas após desconexão:', salas);
         });
 
     });
