@@ -179,7 +179,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
     const codigoSala = req.session.codigoSala;
     const usuarioID = req.user ? req.user.id : null;
     const respostas = req.session.respostas || [];
-
+    const isAdmin = salas[codigoSala].admin == usuarioID;
     const acertos = respostas.filter(r => r.correta === 1).length;
     const pontos = respostas
         .filter(r => r.correta === 1)
@@ -219,6 +219,7 @@ router.get('/resultado', isAuthenticated, async (req, res) => {
             jogadores,
             usuarioID,
             acertos,
+            isAdmin,
             top5: JSON.stringify(top5Resultados),
             pontuacaoIndividual: pontos,
             resultados: JSON.stringify(resultados),

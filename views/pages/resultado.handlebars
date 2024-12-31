@@ -7,7 +7,7 @@
         GABHoot
     </div>
 
-    <div class="half-container inferior">
+   <div class="half-container inferior">
         <div class="container" style="margin-top: -330px; justify-content: flex-start; gap: 15px; background-color: rgba(var(--background-light), 0.9);">
             <h1>Resultado Final</h1>
             <p>Total de acertos: {{#if acertos}}{{acertos}}{{else}}0{{/if}}</p>
@@ -25,11 +25,18 @@
                 {{/each}}
             </ul>
 
+            {{#if isAdmin}}
             <button class="button" id="btnIniciar">Jogar Novamente</button>
+            {{else}}
+            <button class="button" id="btnIniciar" style="display: none;">Jogar Novamente</button>
+            {{/if}}
+
             <button class="button" id="Voltar">Voltar</button>
         </div>
     </div>
 </div>
+
+    
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
