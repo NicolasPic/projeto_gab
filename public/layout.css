@@ -45,17 +45,26 @@ body {
 }
 
 .central-banner {
-    position: absolute;
-    top: 15%;
-    left: 0;
-    right: 0;
-    transform: translateY(-50%);
-    background-color: rgba(var(--background-light));
-    color: var(--primary-color);
+    width: 100%;
     padding: 15px 0;
-    font-size: 4em;
-    font-weight: bold;
+    background-color: rgba(var(--background-light), 1); 
+    color: var(--primary-color);
     text-align: center;
-    z-index: 1;
+    font-size: 4vw;  
+    font-weight: bold;
     box-shadow: 0 4px 6px var(--shadow-light);
+}
+
+@media (max-width: 600px) {
+    .central-banner {
+        font-size: 6vw;  
+        padding: 10px 0;
+    }
+}
+
+/* Ajustes para telas médias */
+@media (max-width: 1024px) {
+    .central-banner {
+        font-size: 4vw; 
+    }
 }
